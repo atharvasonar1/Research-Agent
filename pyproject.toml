@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Evidence-backed one-domain real estate account research agent"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["openai>=3.19.2,<4", "jsonschema>=4.18,<5"]
+dependencies = ["openai>=3.19.2,<4", "jsonschema>=4.18,<5", "httpx2>=2.12,<3"]
 
 [project.scripts]
 gtm-research = "gtm_research.cli:main"

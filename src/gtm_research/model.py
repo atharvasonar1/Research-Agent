@@ -38,6 +38,8 @@ class ModelError(Exception):
 
 
 class OpenAIModel:
+    provider = "openai"
+
     def __init__(self, model, api_key, client=None):
         self.model = model
         if client is None:

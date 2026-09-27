@@ -15,7 +15,7 @@ class CliSmokeTests(unittest.TestCase):
     def run_cli(self, *args):
         executable = shutil.which("gtm-research")
         self.assertIsNotNone(executable, "Install the project and activate its environment first")
-        env = {key: value for key, value in os.environ.items() if key not in ("OPENAI_API_KEY", "OPENAI_MODEL")}
+        env = {key: value for key, value in os.environ.items() if key not in ("OPENAI_API_KEY", "OPENAI_MODEL", "GEMINI_API_KEY", "GEMINI_MODEL", "RESEARCH_PROVIDER")}
         return subprocess.run([executable, *args], capture_output=True, text=True, timeout=10, env=env)
 
     def test_help_lists_research(self):
@@ -55,3 +55,26 @@ class CliSmokeTests(unittest.TestCase):
                      patch("builtins.print"):
                     result = main(["research", "team.example", "--model", "test-model", "--max-steps", "2", "--output-dir", directory])
                 self.assertEqual(result, expected)
+
+    def test_gemini_key_error_names_correct_provider(self):
+        result = self.run_cli("research", "team.example", "--provider", "gemini", "--model", "gemini-2.5-flash")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("set GEMINI_API_KEY", result.stderr)
+
+    def test_gemini_selected_from_explicit_env_file(self):
+        from pathlib import Path
+        from helpers import FakeModel, fetch, fixture_reader, submit
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / '.env.local'
+            path.write_text('GEMINI_API_KEY=hidden-key\nGEMINI_MODEL=gemini-2.5-flash\nRESEARCH_PROVIDER=gemini\n')
+            model = FakeModel([fetch(), submit()])
+            model.close = lambda: None
+            with patch.dict(os.environ, {}, clear=True), \
+                 patch("gtm_research.gemini.GeminiModel", return_value=model) as factory, \
+                 patch("gtm_research.model.OpenAIModel") as openai, \
+                 patch("gtm_research.reader.WebsiteReader", return_value=fixture_reader()), \
+                 patch("builtins.print"):
+                result = main(["research", "team.example", "--env-file", str(path), "--output-dir", directory])
+            self.assertEqual(result, 0)
+            factory.assert_called_once_with('gemini-2.5-flash', 'hidden-key')
+            openai.assert_not_called()

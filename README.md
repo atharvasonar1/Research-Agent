@@ -10,7 +10,7 @@ canonical scope; [ISSUES.md](docs/ISSUES.md) contains the ten local issue drafts
 
 ## Current status
 
-The Phase 1 implementation includes one model adapter, a bounded website reader,
+The Phase 1 implementation supports OpenAI or Gemini through one selected adapter, a bounded website reader,
 a tool loop, citation validation, and local JSON/Markdown output. Offline tests
 use a fake model and synthetic HTML fixtures. **Live model/site quality has not
 been validated.** See [validation notes](docs/PHASE1_VALIDATION.md).
@@ -40,8 +40,8 @@ network access or API credentials.
 
 Set `OPENAI_API_KEY` securely in your shell, then choose a model available to your
 API account that supports Responses function calling. `OPENAI_MODEL` can supply
-the default; otherwise `--model` is required. The program does not load `.env`
-automatically and never accepts API keys as command-line arguments.
+the default; otherwise `--model` is required. The program loads a local env file only when explicitly passed with `--env-file`;
+it never executes that file or accepts API keys as command-line arguments.
 
 ```sh
 gtm-research research https://your-team-domain.example/ \
@@ -70,6 +70,54 @@ an invented brief. Run artifacts, `.env` files, and virtual environments are
 ignored by Git. Known API-key values are redacted from saved output, and raw
 provider/network exception messages are not recorded. Do not put other secrets
 in input URLs or website content; the trace intentionally retains public text.
+
+## Gemini setup for issue #1
+
+Run this in your own interactive terminal (never paste the key into chat):
+
+```sh
+cd /Users/atharva/Desktop/Fellow-Agent
+.venv/bin/python scripts/configure_gemini.py
+```
+
+The helper hides key input, atomically saves `.env.local` with owner-only `0600`
+permissions, preserves unrelated settings, and sets `RESEARCH_PROVIDER=gemini`
+and `GEMINI_MODEL=gemini-2.5-flash`. Both `.env.local` and its temporary files are
+Git-ignored. To run on a real public team's canonical hostname:
+
+```sh
+gtm-research research https://your-team-domain.example/ \
+  --provider gemini --env-file .env.local \
+  --max-steps 8 --max-seconds 120 --model-timeout 30
+```
+
+CLI options override configuration; process environment overrides values in the
+explicit env file. No env file is loaded implicitly. OpenAI remains the default
+provider without configuration; `--provider openai` selects the existing adapter.
+Gemini uses only `GEMINI_API_KEY`/`GEMINI_MODEL`; there is no provider fallback.
+
+On 2026-09-27, Google's [pricing documentation](https://ai.google.dev/gemini-api/docs/pricing#gemini-2.5-flash)
+listed `gemini-2.5-flash` input/output as free on the free tier. **This does not
+verify availability, remaining quota, or billing tier for your account.** A
+metadata check can verify advertised `generateContent` support; an authenticated
+generation is needed to check current usability. No paid model substitution or
+billing upgrade is automatic. Free-tier input/output may be used to improve
+Google's products, as stated on that pricing page; this pilot sends public site
+evidence and the research instructions.
+
+`gemini.py` calls Google's fixed `v1beta/models/<id>:generateContent` REST endpoint
+using `httpx2`. It passes the key in a header, disables proxy environment handling,
+redirects, and retries, and exposes only the two existing function declarations.
+The provider schema uses Gemini's supported subset; the harness still enforces
+the complete original schema. Each call is a fresh decision over the recorded
+state, as with OpenAI; raw model conversation/thought signatures are not replayed.
+There is no SDK automatic function execution, Google Search grounding, URL
+context tool, or change to website permissions. Errors are sanitized, thinking
+usage is retained when returned, and traces record the selected provider.
+
+The [GenerateContent API reference](https://ai.google.dev/api/generate-content)
+is the adapter's API contract. Live pilot validation is still pending credentials;
+see [Gemini validation notes](docs/GEMINI_VALIDATION.md).
 
 ## Architecture and contracts
 
