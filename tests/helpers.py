@@ -35,8 +35,8 @@ def brief():
         ],
         "unknowns": ["CRM size, contact volume, follow-up process, budget, and buying intent are unknown."],
         "fit_label": "uncertain",
-        "fit_rationale": "The site identifies a real estate team, but qualification evidence is limited.",
-        "discovery_questions": ["How do you track and follow up with past seller inquiries?"],
+        "fit_rationale": {"text": "The site identifies a real estate team, but qualification evidence is limited.", "claim_refs": [1, 2]},
+        "discovery_questions": [{"question": "Which CRM, if any, do you use?", "premise_claim_refs": []}],
     }
 
 

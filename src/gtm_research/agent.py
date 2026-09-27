@@ -30,13 +30,18 @@ def redact(value, secrets):
 
 def readable_brief(brief):
     lines = [f"# {brief['company_name']}", "", f"Research priority: {brief['fit_label']}",
-             "", brief["fit_rationale"], "", "## Sourced claims", ""]
-    for claim in brief["claims"]:
-        lines.extend([f"- {claim['claim']}", f"  Source: {claim['url']}",
+             "", brief["fit_rationale"]["text"],
+             "Evidence: " + ", ".join(f"[C{ref}](#c{ref})" for ref in brief["fit_rationale"]["claim_refs"]),
+             "", "## Sourced claims", ""]
+    for index, claim in enumerate(brief["claims"], 1):
+        lines.extend([f"### C{index}", f"- {claim['claim']}", f"  Source: {claim['url']}",
                       f"  Excerpt: {claim['excerpt']}"])
-    for heading, field in (("Unknowns", "unknowns"), ("Discovery questions", "discovery_questions")):
-        lines.extend(["", f"## {heading}", ""])
-        lines.extend(f"- {item}" for item in brief[field])
+    lines.extend(["", "## Unknowns", ""])
+    lines.extend(f"- {item}" for item in brief["unknowns"])
+    lines.extend(["", "## Discovery questions", ""])
+    for item in brief["discovery_questions"]:
+        refs = ", ".join(f"[C{ref}](#c{ref})" for ref in item["premise_claim_refs"])
+        lines.extend([f"- {item['question']}", f"  Premise evidence: {refs or 'No factual premise declared; review neutrality.'}"])
     lines.extend(["", "Excerpt presence was checked; semantic support still needs human review.", ""])
     return "\n".join(lines)
 

@@ -167,7 +167,18 @@ on their fetched page after whitespace normalization. It rejects unfetched URLs,
 missing/extra fields, invalid priorities, and empty evidence. Source review times
 and fetched content remain in the trace.
 
-The small built-in `phase1-example-v1` guide asks about markets, team, seller
+The v2 brief contract makes `fit_rationale` an object with `text` and `claim_refs`
+(one-based claim indices, at least one), and each discovery question an object
+with `question` and `premise_claim_refs` (empty only for neutral questions without
+factual premises). Missing/out-of-range references are rejected. The readable
+brief links references to numbered claims. This is a JSON shape change; earlier
+saved briefs remain historical v1 artifacts and are not rewritten. Instructions
+require every factual rationale assertion and question premise to be supported
+by its referenced claims, and unknowns to remain explicit. Reference validity
+and excerpt presence do **not** prove semantic support or question neutrality;
+human review remains necessary. No extra LLM judge or network call was added.
+
+The small built-in `phase1-example-v2` guide asks about markets, team, seller
 services, lead capture, and follow-up. `promising`, `uncertain`, and `unlikely`
 express research priority, not purchase probability or Fello's ICP. CRM size,
 contact volume, budget, and intent remain unknown without evidence. A richer
@@ -178,9 +189,11 @@ versioned qualification guide and evaluation dataset belong to Phase 2.
 The implementation must bound website reads and the model/tool loop, record all
 results, validate evidence, permit bounded correction, and pass offline cases
 for success, unsupported claims, forbidden URLs, tool errors, and exhaustion.
-**Full Phase 1 acceptance also needs a manually inspected live run on a public
-real estate team website. This has not happened.** The next pilot issue covers
-three sites and records failures honestly.
+**Full Phase 1 acceptance remains open under issue #1.** A real Jills Zeder
+brief has now received manual review, revealing unsupported premises and missing
+coverage. See [the original review](docs/ISSUE1_MODEL_AVAILABILITY_REVIEW.md) and
+[the evidence-contract rerun](docs/ISSUE1_EVIDENCE_V2_REVIEW.md). Three-site outcomes
+and remaining defects must be reviewed before acceptance.
 
 Website text and search results are data, never permission changes. Deterministic
 URL controls enforce that boundary even if the model follows malicious page text.
