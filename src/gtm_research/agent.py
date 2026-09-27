@@ -5,11 +5,12 @@ from datetime import datetime, timezone
 import json
 import math
 from pathlib import Path
-from time import monotonic
+from time import monotonic, sleep
+from random import uniform
 from uuid import uuid4
 
 from .bounds import bounded_call
-from .model import GUIDE_VERSION, ModelError
+from .model import GUIDE_VERSION, ModelError, RetryableModelError
 from .reader import ToolError
 from .schema import FETCH_SCHEMA, schema_errors, validate_brief
 
@@ -41,11 +42,13 @@ def readable_brief(brief):
 
 
 def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
-                 model_timeout=30, secrets=()):
+                 model_timeout=30, secrets=(), max_model_retries=3):
     if not isinstance(max_steps, int) or isinstance(max_steps, bool) or max_steps < 1:
         raise ValueError("max_steps must be a positive integer")
     if any(not math.isfinite(value) or value <= 0 for value in (max_seconds, model_timeout)):
         raise ValueError("time limits must be finite and positive")
+    if not isinstance(max_model_retries, int) or isinstance(max_model_retries, bool) or not 0 <= max_model_retries <= 10:
+        raise ValueError("max_model_retries must be an integer from 0 to 10")
     # Create a unique run directory before spending any model budget. Failed runs
     # cannot inherit an old successful brief from a reused directory.
     run_dir = Path(output_dir) / uuid4().hex
@@ -58,7 +61,7 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
     brief = None
     status = "budget_exhausted"
     reason = "step_limit"
-    model_calls = tool_calls = 0
+    model_calls = tool_calls = retries_scheduled = 0
     for step in range(1, max_steps + 1):
         remaining = deadline - monotonic()
         if remaining <= 0:
@@ -80,6 +83,39 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
                 status, reason = "failed", "model_timeout"
             errors.append(reason)
             events.append({"step": step, "model_error": reason})
+            break
+        except RetryableModelError:
+            # Each retry occupies the next normal loop step/model-call slot.
+            errors.append("gemini_http_503")
+            retry = {"scheduled": False}
+            event = {"step": step, "model_error": "gemini_http_503", "http_status": 503, "retry": retry}
+            events.append(event)
+            if step >= max_steps:
+                status, reason = "budget_exhausted", "model_call_budget_exhausted_after_503"
+            elif retries_scheduled >= max_model_retries:
+                status, reason = "failed", "gemini_503_retry_limit"
+            else:
+                # Equal jitter avoids immediate bursts: [0.5, 1], [1, 2],
+                # [2, 4], then capped at [4, 8] seconds for explicit larger limits.
+                ceiling = min(8.0, 2.0 ** retries_scheduled)
+                delay = uniform(ceiling / 2, ceiling)
+                remaining = deadline - monotonic()
+                if delay >= remaining:
+                    status, reason = "budget_exhausted", "time_limit_before_retry"
+                else:
+                    retries_scheduled += 1
+                    retry.update(scheduled=True, number=retries_scheduled,
+                                 delay_seconds=round(delay, 6), next_step=step + 1)
+                    before_sleep = monotonic()
+                    sleep(delay)
+                    retry["elapsed_sleep_seconds"] = round(monotonic() - before_sleep, 6)
+                    if monotonic() >= deadline:
+                        status, reason = "budget_exhausted", "time_limit"
+                        retry["stop_reason"] = reason
+                        break
+                    continue
+            retry["stop_reason"] = reason
+            errors.append(reason)
             break
         except ModelError as exc:
             status, reason = "failed", str(exc)
@@ -132,9 +168,10 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
         "started_at": started_at, "duration_seconds": round(monotonic() - start, 4),
         "pages": len(pages), "model_calls": model_calls, "tool_calls": tool_calls,
         "errors": errors, "guide_version": GUIDE_VERSION,
+        "retries_scheduled": retries_scheduled,
         "model": getattr(model, "model", "fake"),
         "provider": getattr(model, "provider", "fake"),
-        "limits": {"max_steps": max_steps, "max_seconds": max_seconds,
+        "limits": {"max_model_retries": max_model_retries, "retry_max_delay_seconds": 8, "max_steps": max_steps, "max_seconds": max_seconds,
                    "model_timeout": model_timeout, "page_timeout": reader.timeout,
                    "max_page_bytes": reader.max_bytes, "max_redirects": reader.max_redirects},
         "cost_usd": None,

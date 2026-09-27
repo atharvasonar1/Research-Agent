@@ -37,6 +37,10 @@ class ModelError(Exception):
     """Safe error code; raw provider messages may contain secrets."""
 
 
+class RetryableModelError(ModelError):
+    """A temporary Gemini HTTP 503; retry policy belongs to the harness."""
+
+
 class OpenAIModel:
     provider = "openai"
 

@@ -117,7 +117,8 @@ usage is retained when returned, and traces record the selected provider.
 
 The [GenerateContent API reference](https://ai.google.dev/api/generate-content)
 is the adapter's API contract. The authenticated access check succeeded on 2026-09-27, but pilot acceptance
-is still pending; see [the live pilot report](docs/ISSUE1_LIVE_PILOT.md).
+is still pending; see [the original live pilot report](docs/ISSUE1_LIVE_PILOT.md)
+and [the bounded-retry review](docs/ISSUE1_RETRY_REVIEW.md).
 
 ## Architecture and contracts
 
@@ -125,13 +126,20 @@ is still pending; see [the live pilot report](docs/ISSUE1_LIVE_PILOT.md).
 calling, with explicit schemas in `schema.py` for `fetch_page` and `submit_brief`.
 The API contract follows the [official function-calling documentation](https://developers.openai.com/api/docs/guides/function-calling).
 Each call receives the current state, available URLs, previous tool results, and
-remaining steps. Exactly one tool decision is accepted per model call; provider
+remaining steps. Exactly one tool decision is accepted per model call; transport-level
 retries are disabled. No hosted tools are enabled.
 
 `agent.py` executes the chosen tool, records its result, updates state, and repeats
 until validated submission or budget exhaustion. Invalid tool arguments and
 citations consume a step and return validation errors for correction. Provider
-errors stop the run explicitly. Every model decision consumes a step; HTTP
+errors stop the run explicitly, except Gemini HTTP 503: the harness allows up to
+three retries across the entire run. Each attempt consumes a normal model-call
+step. Equal-jitter exponential backoff uses [0.5, 1], [1, 2], and [2, 4] seconds
+by default (an eight-second ceiling applies to larger programmatic allowances).
+The harness checks the total deadline before and after waiting and records each
+503, selected delay, actual wait, next step, and final stop reason in the trace.
+Authentication, quota, model-not-found, bad-request, and other failures are not
+retried. See [retry pilot evidence](docs/ISSUE1_RETRY_REVIEW.md). Every model decision consumes a step; HTTP
 redirects have a separate cap of three. Repeated successful fetches use the
 run-local page cache.
 

@@ -5,7 +5,7 @@ import re
 
 import httpx2
 
-from .model import Action, INSTRUCTIONS, ModelError
+from .model import Action, INSTRUCTIONS, ModelError, RetryableModelError
 from .schema import TOOLS
 
 API_ROOT = "https://generativelanguage.googleapis.com/v1beta"
@@ -45,6 +45,8 @@ class GeminiModel:
             code = response.status_code
             if code in (401, 403):
                 raise ModelError("model_auth_error")
+            if code == 503:
+                raise RetryableModelError("gemini_http_503")
             if code == 429:
                 raise ModelError("model_rate_limit")
             if code == 404:
