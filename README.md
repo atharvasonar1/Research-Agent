@@ -82,7 +82,7 @@ cd /Users/atharva/Desktop/Fellow-Agent
 
 The helper hides key input, atomically saves `.env.local` with owner-only `0600`
 permissions, preserves unrelated settings, and sets `RESEARCH_PROVIDER=gemini`
-and `GEMINI_MODEL=gemini-2.5-flash`. Both `.env.local` and its temporary files are
+and `GEMINI_MODEL=gemini-3.8-flash`. Both `.env.local` and its temporary files are
 Git-ignored. To run on a real public team's canonical hostname:
 
 ```sh
@@ -96,8 +96,8 @@ explicit env file. No env file is loaded implicitly. OpenAI remains the default
 provider without configuration; `--provider openai` selects the existing adapter.
 Gemini uses only `GEMINI_API_KEY`/`GEMINI_MODEL`; there is no provider fallback.
 
-On 2026-09-27, Google's [pricing documentation](https://ai.google.dev/gemini-api/docs/pricing#gemini-2.5-flash)
-listed `gemini-2.5-flash` input/output as free on the free tier. **This does not
+On 2026-09-27, Google's [pricing documentation](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.8-flash)
+listed `gemini-3.8-flash` input/output as free on the free tier. **This does not
 verify availability, remaining quota, or billing tier for your account.** A
 metadata check can verify advertised `generateContent` support; an authenticated
 generation is needed to check current usability. No paid model substitution or
@@ -116,8 +116,8 @@ context tool, or change to website permissions. Errors are sanitized, thinking
 usage is retained when returned, and traces record the selected provider.
 
 The [GenerateContent API reference](https://ai.google.dev/api/generate-content)
-is the adapter's API contract. Live pilot validation is still pending credentials;
-see [Gemini validation notes](docs/GEMINI_VALIDATION.md).
+is the adapter's API contract. The authenticated access check succeeded on 2026-09-27, but pilot acceptance
+is still pending; see [the live pilot report](docs/ISSUE1_LIVE_PILOT.md).
 
 ## Architecture and contracts
 
@@ -138,7 +138,8 @@ run-local page cache.
 `reader.py` permits only the starting URL and discovered links on the exact
 hostname. Each network hop resolves DNS, rejects non-public addresses (including
 mixed public/private answers), and connects to the approved numeric address
-while preserving the original TLS hostname and certificate verification. Proxy
+while preserving the original TLS hostname and certificate verification through
+the native system trust store (`truststore`). Proxy
 environment variables are not used. Redirects cannot change hosts or downgrade
 HTTPS. The reader enforces a shared deadline across DNS, redirects, and body
 reads, a byte cap, and a socket watchdog. Only HTML/plain text is accepted;

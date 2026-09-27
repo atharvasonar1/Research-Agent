@@ -1,5 +1,9 @@
 # Issue #1: Gemini adapter validation
 
+Latest update: the authenticated `gemini-3.8-flash` check succeeded, but all three
+pilot attempts failed before submission. See [the live pilot report](ISSUE1_LIVE_PILOT.md).
+The notes below preserve the earlier offline adapter-validation snapshot.
+
 Date: 2026-09-27. Work remains on `phase-1-agent-loop`.
 
 ## User problem and behavior

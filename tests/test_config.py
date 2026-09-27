@@ -51,6 +51,7 @@ class ConfigTests(unittest.TestCase):
             text = target.read_text()
             self.assertIn('OPENAI_MODEL=existing', text)
             self.assertIn('GEMINI_API_KEY=new-hidden-key', text)
+            self.assertIn('GEMINI_MODEL=gemini-3.8-flash', text)
             self.assertEqual(text.count('GEMINI_API_KEY='), 1)
             self.assertEqual(os.stat(target).st_mode & 0o777, 0o600)
             self.assertNotIn('new-hidden-key', str(output.call_args_list))

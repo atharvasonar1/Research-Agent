@@ -124,11 +124,13 @@ class TransportTests(unittest.TestCase):
         conn.getresponse.return_value = response
         with patch("socket.create_connection", return_value=sock) as connect, \
              patch("http.client.HTTPConnection", return_value=conn), \
-             patch("ssl.create_default_context") as context:
+             patch("gtm_research.reader.truststore.SSLContext") as context:
             context.return_value.wrap_socket.return_value = sock
             result = request(("https" if https else "http") + "://team.example/", "93.184.216.34", 1, cap)
             self.assertEqual(connect.call_args.args[0], ("93.184.216.34", 443 if https else 80))
             if https:
+                import ssl
+                context.assert_called_once_with(ssl.PROTOCOL_TLS_CLIENT)
                 context.return_value.wrap_socket.assert_called_once_with(sock, server_hostname="team.example")
             conn.close.assert_called_once()
             return result
@@ -176,3 +178,10 @@ class TransportTests(unittest.TestCase):
                 request("http://team.example/", "93.184.216.34", 0.02, 8)
         self.assertTrue(interrupted.is_set())
         conn.close.assert_called_once()
+
+    def test_native_trust_context_keeps_certificate_and_hostname_checks(self):
+        import ssl
+        import truststore
+        context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        self.assertEqual(context.verify_mode, ssl.CERT_REQUIRED)
+        self.assertTrue(context.check_hostname)

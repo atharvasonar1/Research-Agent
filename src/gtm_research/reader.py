@@ -8,6 +8,7 @@ import ipaddress
 import math
 import socket
 import ssl
+import truststore
 from threading import Timer
 from time import monotonic
 from urllib.parse import urljoin, urlsplit, urlunsplit
@@ -98,7 +99,7 @@ def request(url, address, timeout, max_bytes):
             raise ToolError("timeout")
         raw.settimeout(remaining)
         if parts.scheme == "https":
-            raw = ssl.create_default_context().wrap_socket(raw, server_hostname=parts.hostname)
+            raw = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT).wrap_socket(raw, server_hostname=parts.hostname)
         conn.sock = raw
 
         def expire():
