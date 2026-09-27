@@ -1,3 +1,4 @@
+from helpers import submission
 import json
 from pathlib import Path
 import tempfile
@@ -35,7 +36,7 @@ class RetryTests(unittest.TestCase):
     def test_503_then_success_uses_existing_loop_and_records_retry(self):
         result, trace, requests, sleeper, exists = self.run_sequence([
             (503, {'error': {'message': 'temporary'}}), (200, response()),
-            (200, response('submit_brief', brief()))], max_steps=3)
+            (200, response('submit_brief', submission()))], max_steps=3)
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['metadata']['model_calls'], 3)
         self.assertEqual(result['metadata']['tool_calls'], 2)

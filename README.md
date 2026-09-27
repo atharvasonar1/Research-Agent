@@ -167,7 +167,7 @@ on their fetched page after whitespace normalization. It rejects unfetched URLs,
 missing/extra fields, invalid priorities, and empty evidence. Source review times
 and fetched content remain in the trace.
 
-The v2 brief contract makes `fit_rationale` an object with `text` and `claim_refs`
+The rationale/question contract makes `fit_rationale` an object with `text` and `claim_refs`
 (one-based claim indices, at least one), and each discovery question an object
 with `question` and `premise_claim_refs` (empty only for neutral questions without
 factual premises). Missing/out-of-range references are rejected. The readable
@@ -178,7 +178,23 @@ by its referenced claims, and unknowns to remain explicit. Reference validity
 and excerpt presence do **not** prove semantic support or question neutrality;
 human review remains necessary. No extra LLM judge or network call was added.
 
-The small built-in `phase1-example-v2` guide asks about markets, team, seller
+New submissions select `{claim, source_id, excerpt_id}` from a harness-generated
+source catalogue. IDs (`S1`, `E1`, etc.) are stable within a run; excerpt IDs are
+scoped to their source. The harness partitions fetched normalized text into exact
+spans of up to 600 characters and copies the selected URL/text into the saved
+brief. Models cannot submit retyped/stitched quotes. Unknown IDs are rejected;
+rationale/question claim-reference checks and human semantic review still apply.
+Spans can cross sentences or split long sentences, so claims must be narrow enough
+for the selected span; a span's presence does not establish a claim's meaning.
+
+Each model request contains each source once, compact action/error history and
+only the latest submitted draft. The full unmodified events and pages remain in
+the trace, alongside the source catalogue. Stateless GenerateContent still resends
+the catalogue on each call; this is not server-side caching. No extra model call,
+quota probe, automatic fallback or eight-call budget increase is introduced.
+See [the saved-trace diagnosis and single-run review](docs/ISSUE1_SOURCE_IDS_REVIEW.md).
+
+The small built-in `phase1-example-v3` guide asks about markets, team, seller
 services, lead capture, and follow-up. `promising`, `uncertain`, and `unlikely`
 express research priority, not purchase probability or Fello's ICP. CRM size,
 contact volume, budget, and intent remain unknown without evidence. A richer

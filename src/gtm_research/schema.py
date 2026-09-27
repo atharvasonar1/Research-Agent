@@ -32,6 +32,10 @@ BRIEF_SCHEMA = object_schema({
     "fit_rationale": RATIONALE_SCHEMA,
     "discovery_questions": {"type": "array", "items": QUESTION_SCHEMA, "minItems": 1, "maxItems": 30},
 })
+# Tool inputs select trusted source spans; saved briefs retain resolved URL/text.
+SUBMISSION_SCHEMA = {**BRIEF_SCHEMA, "properties": {**BRIEF_SCHEMA["properties"],
+    "claims": {"type": "array", "minItems": 1, "maxItems": 30,
+               "items": object_schema({"claim": TEXT, "source_id": TEXT, "excerpt_id": TEXT})}}}
 FETCH_SCHEMA = object_schema({"url": TEXT})
 TOOLS = [
     {
@@ -41,8 +45,8 @@ TOOLS = [
     },
     {
         "type": "function", "name": "submit_brief", "strict": True,
-        "description": "Submit a brief. Each claim must quote an excerpt on its fetched URL; fix validation errors within the remaining budget.",
-        "parameters": BRIEF_SCHEMA,
+        "description": "Submit a brief. Each claim must select a source_id and excerpt_id from sources; fix validation errors within the remaining budget.",
+        "parameters": SUBMISSION_SCHEMA,
     },
 ]
 

@@ -33,7 +33,10 @@ class AgentTests(unittest.TestCase):
         self.assertEqual(result["metadata"]["tool_calls"], 3)
         self.assertIn(SELLERS, self.model.states[1]["allowed_urls"])
         self.assertEqual(len(self.trace["events"]), 3)
-        self.assertEqual(json.loads((self.path / "brief.json").read_text())["claims"], value["claims"])
+        saved = json.loads((self.path / "brief.json").read_text())["claims"]
+        self.assertEqual([c["claim"] for c in saved], [c["claim"] for c in value["claims"]])
+        self.assertEqual(saved[-1]["url"], SELLERS)
+        self.assertIn(value["claims"][-1]["excerpt"], saved[-1]["excerpt"])
         self.assertIn("Harbor City", (self.path / "brief.md").read_text())
         self.assertTrue(self.trace["pages"][0]["fetched_at"])
         self.assertIsNone(result["metadata"]["cost_usd"])

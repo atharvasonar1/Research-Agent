@@ -12,7 +12,8 @@ from uuid import uuid4
 from .bounds import bounded_call
 from .model import GUIDE_VERSION, ModelError, RetryableModelError
 from .reader import ToolError
-from .schema import FETCH_SCHEMA, schema_errors, validate_brief
+from .schema import FETCH_SCHEMA, schema_errors
+from .evidence import Sources, model_state
 
 
 def redact(value, secrets):
@@ -62,6 +63,7 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
     start = monotonic()
     deadline = start + max_seconds
     events = []
+    sources = Sources()
     errors = []
     brief = None
     status = "budget_exhausted"
@@ -72,11 +74,8 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
         if remaining <= 0:
             reason = "time_limit"
             break
-        state = {
-            "start_url": reader.root, "guide_version": GUIDE_VERSION,
-            "allowed_urls": sorted(reader.allowed), "events": deepcopy(events),
-            "remaining_steps_including_this": max_steps - step + 1,
-        }
+        state = model_state(reader, sources, events, max_steps - step + 1, GUIDE_VERSION)
+        context = {"state_utf8_bytes": len(json.dumps(state, ensure_ascii=False).encode("utf-8"))}
         model_calls += 1
         try:
             wait = min(model_timeout, remaining)
@@ -133,7 +132,7 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
             events.append({"step": step, "model_error": reason})
             break
         event = {"step": step, "action": {"name": action.name, "arguments": action.arguments},
-                 "usage": action.usage}
+                 "usage": action.usage, "context": context}
         if monotonic() >= deadline:
             reason = "time_limit"
             event["result"] = {"ok": False, "errors": ["time_limit"]}
@@ -148,16 +147,17 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
             else:
                 try:
                     page = reader.fetch(action.arguments["url"], timeout=deadline - monotonic())
+                    sources.add(page)
                     result = {"ok": True, "page": page}
                 except ToolError as exc:
                     result = {"ok": False, "errors": [str(exc)]}
                 except Exception:
                     result = {"ok": False, "errors": ["tool_error"]}
         elif action.name == "submit_brief":
-            problems = validate_brief(action.arguments, reader.pages)
+            resolved, problems = sources.resolve(action.arguments, reader.pages)
             result = {"ok": not problems, "errors": problems}
             if not problems:
-                brief = deepcopy(action.arguments)
+                brief = resolved
                 status, reason = "completed", "validated_submission"
         else:
             result = {"ok": False, "errors": ["unknown_tool"]}
@@ -183,7 +183,7 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
     }
     report = redact({"status": status, "reason": reason, "metadata": metadata}, secrets)
     trace = redact({**report, "start_url": reader.root, "events": events,
-                    "pages": list(pages.values())}, secrets)
+                    "pages": list(pages.values()), "sources": sources.items}, secrets)
     (run_dir / "trace.json").write_text(json.dumps(trace, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (run_dir / "result.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     if brief is not None:

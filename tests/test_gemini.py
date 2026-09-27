@@ -1,3 +1,4 @@
+from helpers import submission
 import json
 from pathlib import Path
 import tempfile
@@ -94,7 +95,7 @@ class GeminiTests(unittest.TestCase):
         bad = brief()
         bad["claims"][0]["excerpt"] = "Invented evidence"
         bad["claims"][0]["extra"] = "Must still be rejected by full local schema"
-        replies = iter([response(), response("submit_brief", bad), response("submit_brief", brief())])
+        replies = iter([response(), response("submit_brief", submission(bad)), response("submit_brief", submission())])
         requests = []
         def handler(request):
             requests.append(json.loads(request.content))
