@@ -30,14 +30,14 @@ def brief():
     return {
         "company_name": "Harbor Example Realty",
         "claims": [
-            {"claim": "The company is Harbor Example Realty.", "url": ROOT,
+            {"claim": {"subject": "The company", "relation": "is named", "value": "Harbor Example Realty"}, "url": ROOT,
              "excerpt": "Harbor Example Realty"},
-            {"claim": "The team serves Harbor City.", "url": ROOT,
+            {"claim": {"subject": "The team", "relation": "serves", "value": "Harbor City"}, "url": ROOT,
              "excerpt": "Our team serves Harbor City."},
         ],
         "unknowns": ["CRM size, contact volume, follow-up process, budget, and buying intent are unknown."],
         "fit_label": "uncertain",
-        "fit_rationale": {"text": "The site identifies a real estate team, but qualification evidence is limited.", "claim_refs": [1, 2]},
+        "sales_inferences": [{"text": "Further research may be useful.", "claim_refs": [1, 2], "limitation": "Operating needs are unverified."}],
         "discovery_questions": [{"question": "Which CRM, if any, do you use?", "premise_claim_refs": []}],
     }
 

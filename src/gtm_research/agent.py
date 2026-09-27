@@ -30,13 +30,18 @@ def redact(value, secrets):
 
 
 def readable_brief(brief):
-    lines = [f"# {brief['company_name']}", "", f"Research priority: {brief['fit_label']}",
-             "", brief["fit_rationale"]["text"],
-             "Evidence: " + ", ".join(f"[C{ref}](#c{ref})" for ref in brief["fit_rationale"]["claim_refs"]),
-             "", "## Sourced claims", ""]
+    lines = [f"# {brief['company_name']}", "", "## Website-reported facts", "",
+             "These are website statements, not independently verified facts.", ""]
     for index, claim in enumerate(brief["claims"], 1):
-        lines.extend([f"### C{index}", f"- {claim['claim']}", f"  Source: {claim['url']}",
-                      f"  Excerpt: {claim['excerpt']}"])
+        fact = claim['claim']
+        lines.extend([f"### C{index}", f"- {fact['subject']} — {fact['relation']}: {fact['value']}",
+                      f"  Source: {claim['url']}", f"  Excerpt: {claim['excerpt']}"])
+    lines.extend(["", "## Model sales inferences — not website facts", "",
+                  f"Provisional research priority (model judgment): {brief['fit_label']}", ""])
+    for index, item in enumerate(brief['sales_inferences'], 1):
+        refs = ", ".join(f"[C{ref}](#c{ref})" for ref in item['claim_refs'])
+        lines.extend([f"### I{index} — Model inference", item['text'],
+                      f"Based on: {refs}", f"Limitation / needs validation: {item['limitation']}"])
     lines.extend(["", "## Unknowns", ""])
     lines.extend(f"- {item}" for item in brief["unknowns"])
     lines.extend(["", "## Discovery questions", ""])

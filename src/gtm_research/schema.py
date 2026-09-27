@@ -12,12 +12,18 @@ def object_schema(properties):
 
 TEXT = {"type": "string", "minLength": 1, "maxLength": 4000}
 TEXT_LIST = {"type": "array", "items": TEXT, "minItems": 1, "maxItems": 30}
-CLAIM_SCHEMA = object_schema({"claim": TEXT, "url": TEXT, "excerpt": TEXT})
+ATOMIC_ASSERTION = object_schema({
+    "subject": {**TEXT, "description": "One entity described by the website."},
+    "relation": {**TEXT, "description": "One independently checkable predicate, not several joined predicates."},
+    "value": {**TEXT, "description": "One value, including essential period/attribution qualifiers. Never bundle unrelated assertions or sales interpretations."},
+})
+CLAIM_SCHEMA = object_schema({"claim": ATOMIC_ASSERTION, "url": TEXT, "excerpt": TEXT})
 CLAIM_REFS = {"type": "array", "items": {"type": "integer", "minimum": 1},
               "maxItems": 30, "uniqueItems": True,
               "description": "One-based indices into claims; each must support the associated factual assertions."}
-RATIONALE_SCHEMA = object_schema({
-    "text": {**TEXT, "description": "Separate cited observations from provisional judgment; no unsupported factual assertions."},
+INFERENCE_SCHEMA = object_schema({
+    "text": {**TEXT, "description": "A tentative model sales interpretation, explicitly not a website fact. Explain the research priority without inventing evidence."},
+    "limitation": {**TEXT, "description": "What the cited facts do not establish, and what needs validation."},
     "claim_refs": {**CLAIM_REFS, "minItems": 1},
 })
 QUESTION_SCHEMA = object_schema({
@@ -29,13 +35,13 @@ BRIEF_SCHEMA = object_schema({
     "claims": {"type": "array", "items": CLAIM_SCHEMA, "minItems": 1, "maxItems": 30},
     "unknowns": TEXT_LIST,
     "fit_label": {"type": "string", "enum": ["promising", "uncertain", "unlikely"]},
-    "fit_rationale": RATIONALE_SCHEMA,
+    "sales_inferences": {"type": "array", "items": INFERENCE_SCHEMA, "minItems": 1, "maxItems": 10},
     "discovery_questions": {"type": "array", "items": QUESTION_SCHEMA, "minItems": 1, "maxItems": 30},
 })
 # Tool inputs select trusted source spans; saved briefs retain resolved URL/text.
 SUBMISSION_SCHEMA = {**BRIEF_SCHEMA, "properties": {**BRIEF_SCHEMA["properties"],
     "claims": {"type": "array", "minItems": 1, "maxItems": 30,
-               "items": object_schema({"claim": TEXT, "source_id": TEXT, "excerpt_id": TEXT})}}}
+               "items": object_schema({"claim": ATOMIC_ASSERTION, "source_id": TEXT, "excerpt_id": TEXT})}}}
 FETCH_SCHEMA = object_schema({"url": TEXT})
 TOOLS = [
     {
@@ -74,13 +80,17 @@ def validate_brief(brief, pages):
             errors.append(f"claim:{index}:source_not_fetched")
         elif not excerpt or excerpt not in normalize_text(page["text"]):
             errors.append(f"claim:{index}:excerpt_not_found")
-        if not claim["claim"].strip():
+        if any(not value.strip() for value in claim["claim"].values()):
             errors.append(f"claim:{index}:empty_claim")
     if not brief["company_name"].strip():
         errors.append("company_name:empty")
     if any(not item.strip() for item in brief["unknowns"]):
         errors.append("unknowns:empty_item")
-    blocks = [("fit_rationale", brief["fit_rationale"], "text", "claim_refs")]
+    blocks = [(f"sales_inference:{i}", item, "text", "claim_refs")
+              for i, item in enumerate(brief["sales_inferences"])]
+    for i, item in enumerate(brief["sales_inferences"]):
+        if not item["limitation"].strip():
+            errors.append(f"sales_inference:{i}:empty_limitation")
     blocks.extend((f"discovery_question:{i}", q, "question", "premise_claim_refs")
                   for i, q in enumerate(brief["discovery_questions"]))
     for label, block, text_key, refs_key in blocks:

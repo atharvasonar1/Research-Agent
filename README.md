@@ -167,16 +167,22 @@ on their fetched page after whitespace normalization. It rejects unfetched URLs,
 missing/extra fields, invalid priorities, and empty evidence. Source review times
 and fetched content remain in the trace.
 
-The rationale/question contract makes `fit_rationale` an object with `text` and `claim_refs`
-(one-based claim indices, at least one), and each discovery question an object
-with `question` and `premise_claim_refs` (empty only for neutral questions without
-factual premises). Missing/out-of-range references are rejected. The readable
-brief links references to numbered claims. This is a JSON shape change; earlier
-saved briefs remain historical v1 artifacts and are not rewritten. Instructions
-require every factual rationale assertion and question premise to be supported
-by its referenced claims, and unknowns to remain explicit. Reference validity
-and excerpt presence do **not** prove semantic support or question neutrality;
-human review remains necessary. No extra LLM judge or network call was added.
+Facts use `claim: {subject, relation, value}`: one entity, one independently
+checkable predicate and one value with essential qualifiers. Each fact selects
+one source/excerpt pair. Splitting facts does not allow dropping sales periods or
+attribution. Atomic structure is validated; actual atomicity and semantic support
+still require human review.
+
+Sales interpretation belongs only in `sales_inferences`, an array of
+`{text, claim_refs, limitation}`. Each inference must cite existing one-based fact
+indices and state what remains unverified. The old `fit_rationale` field is
+rejected. Rendering separates **Website-reported facts** from **Model sales
+inferences — not website facts**, including the provisional priority under the
+latter. Discovery questions retain `{question, premise_claim_refs}`; neutral
+questions can use empty references, but inferences cannot become factual premises.
+These are JSON shape changes; historical briefs are preserved, not migrated.
+No semantic judge or extra model call was added. See
+[the atomic-fact review](docs/ISSUE1_ATOMIC_FACTS_REVIEW.md).
 
 New submissions select `{claim, source_id, excerpt_id}` from a harness-generated
 source catalogue. IDs (`S1`, `E1`, etc.) are stable within a run; excerpt IDs are
@@ -194,7 +200,7 @@ the catalogue on each call; this is not server-side caching. No extra model call
 quota probe, automatic fallback or eight-call budget increase is introduced.
 See [the saved-trace diagnosis and single-run review](docs/ISSUE1_SOURCE_IDS_REVIEW.md).
 
-The small built-in `phase1-example-v3` guide asks about markets, team, seller
+The small built-in `phase1-example-v4` guide asks about markets, team, seller
 services, lead capture, and follow-up. `promising`, `uncertain`, and `unlikely`
 express research priority, not purchase probability or Fello's ICP. CRM size,
 contact volume, budget, and intent remain unknown without evidence. A richer

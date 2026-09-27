@@ -25,7 +25,7 @@ class AgentTests(unittest.TestCase):
 
     def test_success_discovers_link_and_writes_brief_and_trace(self):
         value = brief()
-        value["claims"].append({"claim": "Home valuation consultations are offered.",
+        value["claims"].append({"claim": {"subject": "The team", "relation": "offers", "value": "home valuation consultations"},
                                  "url": SELLERS, "excerpt": "We offer home valuation consultations."})
         result = self.run_agent([fetch(), fetch(SELLERS), submit(value)])
         self.assertEqual(result["status"], "completed")

@@ -55,9 +55,9 @@ class SourceTests(unittest.TestCase):
         self.assertIn('claim:0:excerpt_not_found', self.sources.resolve(submission(), self.reader.pages)[1])
 
     def test_claim_reference_requirements_remain_after_resolution(self):
-        for block, key in [('fit_rationale', 'claim_refs'), ('discovery_questions', 'premise_claim_refs')]:
+        for block, key in [('sales_inferences', 'claim_refs'), ('discovery_questions', 'premise_claim_refs')]:
             value = submission()
-            target = value[block] if block == 'fit_rationale' else value[block][0]
+            target = value[block][0]
             target[key] = [999]
             self.assertTrue(self.sources.resolve(value, self.reader.pages)[1])
 

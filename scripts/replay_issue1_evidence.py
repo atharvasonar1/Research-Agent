@@ -11,7 +11,7 @@ from types import SimpleNamespace
 
 from gtm_research.evidence import Sources, model_state
 from gtm_research.model import GUIDE_VERSION
-from gtm_research.schema import normalize_text, validate_brief
+from gtm_research.schema import normalize_text
 
 
 def inspect(trace):
@@ -37,7 +37,10 @@ def inspect(trace):
             reader.allowed.add(page['url'])
         elif event.get('action', {}).get('name') == 'submit_brief':
             draft = event['action']['arguments']
-            errors = validate_brief(draft, pages)
+            # Historical submissions use the v2 string-claim schema. Reproduce
+            # their recorded excerpt failures without pretending they are v4 inputs.
+            errors = [f"claim:{i}:excerpt_not_found" for i, c in enumerate(draft['claims'])
+                      if normalize_text(c['excerpt']) not in normalize_text(pages[c['url']]['text'])]
             assert errors == result['errors'], (step, errors, result['errors'])
             assert sources.resolve(draft, pages)[1], 'Old free-text citations must not bypass ID contract'
             for index, claim in enumerate(draft['claims']):
@@ -53,9 +56,10 @@ def inspect(trace):
     eid = next(key for key, text in sources.items[sid]['excerpts'].items()
                if 'affiliated with Coldwell Banker Realty' in text)
     corrected = deepcopy(trace['events'][-1]['action']['arguments'])
-    corrected['claims'] = [{'claim': 'The site identifies The Jills Zeder Group as affiliated with Coldwell Banker Realty.',
+    corrected['claims'] = [{'claim': {'subject': 'The Jills Zeder Group', 'relation': 'is affiliated with', 'value': 'Coldwell Banker Realty'},
                              'source_id': sid, 'excerpt_id': eid}]
-    corrected['fit_rationale'] = {'text': 'This identity warrants further research; operating needs remain unknown.', 'claim_refs': [1]}
+    corrected.pop('fit_rationale', None)
+    corrected['sales_inferences'] = [{'text': 'This identity may warrant further research.', 'claim_refs': [1], 'limitation': 'Operating needs remain unknown.'}]
     corrected['discovery_questions'] = [{'question': 'Which CRM, if any, do you use?', 'premise_claim_refs': []}]
     resolved, errors = sources.resolve(corrected, pages)
     assert not errors, errors
