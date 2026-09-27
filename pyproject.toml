@@ -5,10 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gtm-account-research"
 version = "0.1.0"
-description = "Foundation for an evidence-backed real estate account research agent"
+description = "Evidence-backed one-domain real estate account research agent"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["openai>=3.19.2,<4", "jsonschema>=4.18,<5"]
 
 [project.scripts]
 gtm-research = "gtm_research.cli:main"

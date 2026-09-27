@@ -7,7 +7,7 @@ or research capabilities are claimed by the Phase 0 setup.
 
 ## 1. Foundation: README, project brief, installable Python CLI, test command
 
-**Phase:** 0 · **Label:** `phase:0` · **Status:** Implemented locally; setup checks reported separately.
+**Phase:** 0 · **Label:** `phase:0` · **Status:** Foundation committed and pushed to `main`; setup checks passed.
 
 **User value:** A contributor can install the project, understand its scope, and run a credential-free check.
 
@@ -21,7 +21,7 @@ or research capabilities are claimed by the Phase 0 setup.
 
 ## 2. One-domain tool loop, trace, and bounded website reader
 
-**Phase:** 1 · **Label:** `phase:1` · **Status:** Planned
+**Phase:** 1 · **Label:** `phase:1` · **Status:** Implemented locally; offline validation in [PHASE1_VALIDATION.md](PHASE1_VALIDATION.md). Live validation pending.
 
 **User value:** A rep can research one team with bounded work and inspect how the result was produced.
 
@@ -36,7 +36,7 @@ or research capabilities are claimed by the Phase 0 setup.
 
 ## 3. Citation/excerpt verifier and adversarial fixture tests
 
-**Phase:** 1 · **Label:** `phase:1` · **Status:** Planned
+**Phase:** 1 · **Label:** `phase:1` · **Status:** Implemented locally; offline validation in [PHASE1_VALIDATION.md](PHASE1_VALIDATION.md). Live validation pending.
 
 **User value:** A rep can inspect supporting evidence and avoid unsupported assertions.
 
