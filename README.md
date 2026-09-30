@@ -1,28 +1,33 @@
 # GTM Account Research
 
 An evidence-backed research agent for SDRs and GTM operators evaluating public
-real estate team websites. Given one domain, it produces sourced claims,
-unknowns, a provisional research priority, and discovery questions.
+real estate team websites. Given one domain, it produces website-reported facts,
+explicit sales inferences, unknowns, a provisional research priority, and
+discovery questions with source evidence.
 
 This independent portfolio project is not affiliated with Fello and does not use
-its private ICP, CRM, or data. [PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md) is the
-canonical scope; [ISSUES.md](docs/ISSUES.md) contains the ten local issue drafts.
+its private ICP, CRM, or data. The canonical scope is
+[docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md). Implementation boundaries and
+decisions are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); measured results,
+known failures, and reproduction instructions are in
+[docs/VALIDATION.md](docs/VALIDATION.md).
 
-## Current status
+## Status
 
-The Phase 1 implementation supports OpenAI or Gemini through one selected adapter, a bounded website reader,
-a tool loop, citation validation, and local JSON/Markdown output. Offline tests
-use a fake model and synthetic HTML fixtures. **Live model/site quality has not
-been validated.** See [validation notes](docs/PHASE1_VALIDATION.md).
+Phase 1 is implemented and passes the offline suite, but remains open under
+[GitHub issue #1](https://github.com/atharvasonar1/Research-Agent/issues/1).
+Live runs exposed recurring semantic-support and provider-availability failures,
+so the project does not yet claim that its briefs work reliably in practice.
+Phase 2 has not started.
 
-There is no search provider, CRM integration, outreach, batch processor,
-dashboard, database, or multi-agent framework. The public credential-free replay
-and video/GIF are planned for Phase 4; the offline tests are the current
-credential-free demonstration.
+The repository contains one bounded agent loop, OpenAI and Gemini adapters, a
+same-host public website reader, deterministic citation validation, and local
+JSON/Markdown output. It has no search provider, CRM integration, outreach,
+batch processor, dashboard, database, or multi-agent framework.
 
 ## Setup and offline checks
 
-Requires Python 3.10 or newer. From the repository root:
+Python 3.10 or newer is required.
 
 ```sh
 python3 -m venv .venv
@@ -31,202 +36,62 @@ python -m pip install -e .
 python -m unittest discover -s tests -v
 python -m pip check
 gtm-research --help
+gtm-research --version
 ```
 
-Installation needs package-index access for dependencies. Tests do not need
-network access or API credentials.
+The tests use fake models and local fixtures. They do not need network access or
+credentials.
 
 ## Research one domain
 
-Set `OPENAI_API_KEY` securely in your shell, then choose a model available to your
-API account that supports Responses function calling. `OPENAI_MODEL` can supply
-the default; otherwise `--model` is required. The program loads a local env file only when explicitly passed with `--env-file`;
-it never executes that file or accepts API keys as command-line arguments.
+The program loads a local environment file only when `--env-file` is passed; it
+never executes that file and never accepts API keys as command-line arguments.
+For Gemini, configure the Git-ignored `.env.local` through hidden input:
 
 ```sh
-gtm-research research https://your-team-domain.example/ \
-  --model "$OPENAI_MODEL" \
-  --max-steps 8 --max-seconds 120 \
-  --page-timeout 10 --model-timeout 30 --max-page-bytes 250000
-```
-
-Replace the example domain with a real public team website. This command makes
-paid API requests and public website requests. The starting hostname is exact:
-`www.example.com` and `example.com` are different hosts. Use the site's canonical
-hostname; redirects to any other host are rejected. Standard HTTP/HTTPS ports
-only; HTTPS-to-HTTP redirects are rejected.
-
-Each invocation creates `runs/<unique-id>/` (or under `--output-dir`):
-
-- `trace.json`: tool decisions, results, fetched text, URLs, source times, errors,
-  token usage when returned by the provider, and run limits.
-- `result.json`: completed/failed/budget-exhausted status and run metadata.
-- `brief.json` and `brief.md`: created only after a validated submission.
-
-Exit code `0` means a validated submission, `1` means a failed/exhausted run or
-output-write failure, and `2` means invalid arguments/configuration. Missing
-credentials are reported before any research request. Failed runs never produce
-an invented brief. Run artifacts, `.env` files, and virtual environments are
-ignored by Git. Known API-key values are redacted from saved output, and raw
-provider/network exception messages are not recorded. Do not put other secrets
-in input URLs or website content; the trace intentionally retains public text.
-
-## Gemini setup for issue #1
-
-Run this in your own interactive terminal (never paste the key into chat):
-
-```sh
-cd /Users/atharva/Desktop/Fellow-Agent
 .venv/bin/python scripts/configure_gemini.py
 ```
 
-The helper hides key input, atomically saves `.env.local` with owner-only `0600`
-permissions, preserves unrelated settings, and sets `RESEARCH_PROVIDER=gemini`
-and `GEMINI_MODEL=gemini-3.8-flash`. Both `.env.local` and its temporary files are
-Git-ignored. To run on a real public team's canonical hostname:
+Then run against the site's canonical hostname:
 
 ```sh
 gtm-research research https://your-team-domain.example/ \
   --provider gemini --env-file .env.local \
-  --max-steps 8 --max-seconds 120 --model-timeout 30
+  --max-steps 8 --max-seconds 120 \
+  --page-timeout 10 --model-timeout 30 --max-page-bytes 250000
 ```
 
-CLI options override configuration; process environment overrides values in the
-explicit env file. No env file is loaded implicitly. OpenAI remains the default
-provider without configuration; `--provider openai` selects the existing adapter.
-Gemini uses only `GEMINI_API_KEY`/`GEMINI_MODEL`; there is no provider fallback.
+Use `--provider openai --model "$OPENAI_MODEL"` with `OPENAI_API_KEY` for the
+OpenAI adapter. A live command makes provider and public website requests and may
+incur cost. The input hostname is exact; cross-host redirects and HTTPS
+downgrades are rejected.
 
-On 2026-09-27, Google's [pricing documentation](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.8-flash)
-listed `gemini-3.8-flash` input/output as free on the free tier. **This does not
-verify availability, remaining quota, or billing tier for your account.** A
-metadata check can verify advertised `generateContent` support; an authenticated
-generation is needed to check current usability. No paid model substitution or
-billing upgrade is automatic. Free-tier input/output may be used to improve
-Google's products, as stated on that pricing page; this pilot sends public site
-evidence and the research instructions.
+Each invocation creates a unique ignored `runs/<id>/` directory containing
+`trace.json` and `result.json`. A validated run also writes `brief.json` and
+`brief.md`. Exit code `0` means a validated submission, `1` means a failed or
+budget-exhausted run, and `2` means invalid arguments or configuration. Known
+API-key values are redacted, while public page text is retained for audit.
 
-`gemini.py` calls Google's fixed `v1beta/models/<id>:generateContent` REST endpoint
-using `httpx2`. It passes the key in a header, disables proxy environment handling,
-redirects, and retries, and exposes only the two existing function declarations.
-The provider schema uses Gemini's supported subset; the harness still enforces
-the complete original schema. Each call is a fresh decision over the recorded
-state, as with OpenAI; raw model conversation/thought signatures are not replayed.
-There is no SDK automatic function execution, Google Search grounding, URL
-context tool, or change to website permissions. Errors are sanitized, thinking
-usage is retained when returned, and traces record the selected provider.
+## Work and review process
 
-The [GenerateContent API reference](https://ai.google.dev/api/generate-content)
-is the adapter's API contract. The authenticated access check succeeded on 2026-09-27, but pilot acceptance
-is still pending; see [the original live pilot report](docs/ISSUE1_LIVE_PILOT.md)
-and [the bounded-retry review](docs/ISSUE1_RETRY_REVIEW.md).
+GitHub issues are the work plan:
 
-## Architecture and contracts
+- [#1 Phase 1 live pilot and manual claim review](https://github.com/atharvasonar1/Research-Agent/issues/1)
+- [#2 Optional search and provenance](https://github.com/atharvasonar1/Research-Agent/issues/2)
+- [#3 Versioned example qualification guide](https://github.com/atharvasonar1/Research-Agent/issues/3)
+- [#4 Reviewed evaluation set and frozen holdout](https://github.com/atharvasonar1/Research-Agent/issues/4)
+- [#5 Offline evaluation runner](https://github.com/atharvasonar1/Research-Agent/issues/5)
 
-`cli.py` configures a single run. `model.py` uses OpenAI Responses function
-calling, with explicit schemas in `schema.py` for `fetch_page` and `submit_brief`.
-The API contract follows the [official function-calling documentation](https://developers.openai.com/api/docs/guides/function-calling).
-Each call receives the current state, available URLs, previous tool results, and
-remaining steps. Exactly one tool decision is accepted per model call; transport-level
-retries are disabled. No hosted tools are enabled.
+Work on one issue at a time. Post Change & Product Reviews, trace links, and
+attempt-specific findings on the relevant issue or pull request instead of
+adding a new Markdown report to the repository. Keep generated runs ignored.
 
-`agent.py` executes the chosen tool, records its result, updates state, and repeats
-until validated submission or budget exhaustion. Invalid tool arguments and
-citations consume a step and return validation errors for correction. Provider
-errors stop the run explicitly, except Gemini HTTP 503: the harness allows up to
-three retries across the entire run. Each attempt consumes a normal model-call
-step. Equal-jitter exponential backoff uses [0.5, 1], [1, 2], and [2, 4] seconds
-by default (an eight-second ceiling applies to larger programmatic allowances).
-The harness checks the total deadline before and after waiting and records each
-503, selected delay, actual wait, next step, and final stop reason in the trace.
-Authentication, quota, model-not-found, bad-request, and other failures are not
-retried. See [retry pilot evidence](docs/ISSUE1_RETRY_REVIEW.md). Every model decision consumes a step; HTTP
-redirects have a separate cap of three. Repeated successful fetches use the
-run-local page cache.
+## Limits
 
-`reader.py` permits only the starting URL and discovered links on the exact
-hostname. Each network hop resolves DNS, rejects non-public addresses (including
-mixed public/private answers), and connects to the approved numeric address
-while preserving the original TLS hostname and certificate verification through
-the native system trust store (`truststore`). Proxy
-environment variables are not used. Redirects cannot change hosts or downgrade
-HTTPS. The reader enforces a shared deadline across DNS, redirects, and body
-reads, a byte cap, and a socket watchdog. Only HTML/plain text is accepted;
-compressed bodies are rejected to avoid decompression expansion. Script/style
-content is excluded; pages are decoded as UTF-8 with replacement for invalid
-bytes. No browser/JavaScript execution, cookies, or authenticated sources.
-
-The model and DNS caller waits are bounded using daemon workers in addition to
-transport timeouts. A timed-out in-flight operation may finish later, but cannot
-execute a tool or update the run. This is a caller deadline, not cancellation of
-an already-submitted API request; such a request may still be billed.
-
-A successful brief requires company name, one or more sourced claims (claim,
-URL, excerpt), unknowns, priority/rationale, and discovery questions. The harness
-adds pages, calls, errors, duration, guide version, and limits. Excerpts must occur
-on their fetched page after whitespace normalization. It rejects unfetched URLs,
-missing/extra fields, invalid priorities, and empty evidence. Source review times
-and fetched content remain in the trace.
-
-Facts use `claim: {subject, relation, value}`: one entity, one independently
-checkable predicate and one value with essential qualifiers. Each fact selects
-one source/excerpt pair. Splitting facts does not allow dropping sales periods or
-attribution. Atomic structure is validated; actual atomicity and semantic support
-still require human review.
-
-Sales interpretation belongs only in `sales_inferences`, an array of
-`{text, claim_refs, limitation}`. Each inference must cite existing one-based fact
-indices and state what remains unverified. The old `fit_rationale` field is
-rejected. Rendering separates **Website-reported facts** from **Model sales
-inferences — not website facts**, including the provisional priority under the
-latter. Discovery questions retain `{question, premise_claim_refs}`; neutral
-questions can use empty references, but inferences cannot become factual premises.
-These are JSON shape changes; historical briefs are preserved, not migrated.
-No semantic judge or extra model call was added. See
-[the atomic-fact review](docs/ISSUE1_ATOMIC_FACTS_REVIEW.md).
-
-New submissions select `{claim, source_id, excerpt_id}` from a harness-generated
-source catalogue. IDs (`S1`, `E1`, etc.) are stable within a run; excerpt IDs are
-scoped to their source. The harness partitions fetched normalized text into exact
-spans of up to 600 characters and copies the selected URL/text into the saved
-brief. Models cannot submit retyped/stitched quotes. Unknown IDs are rejected;
-rationale/question claim-reference checks and human semantic review still apply.
-Spans can cross sentences or split long sentences, so claims must be narrow enough
-for the selected span; a span's presence does not establish a claim's meaning.
-
-Each model request contains each source once, compact action/error history and
-only the latest submitted draft. The full unmodified events and pages remain in
-the trace, alongside the source catalogue. Stateless GenerateContent still resends
-the catalogue on each call; this is not server-side caching. No extra model call,
-quota probe, automatic fallback or eight-call budget increase is introduced.
-See [the saved-trace diagnosis and single-run review](docs/ISSUE1_SOURCE_IDS_REVIEW.md).
-
-The small built-in `phase1-example-v4` guide asks about markets, team, seller
-services, lead capture, and follow-up. `promising`, `uncertain`, and `unlikely`
-express research priority, not purchase probability or Fello's ICP. CRM size,
-contact volume, budget, and intent remain unknown without evidence. A richer
-versioned qualification guide and evaluation dataset belong to Phase 2.
-
-## Phase 1 definition of done and limitations
-
-The implementation must bound website reads and the model/tool loop, record all
-results, validate evidence, permit bounded correction, and pass offline cases
-for success, unsupported claims, forbidden URLs, tool errors, and exhaustion.
-**Full Phase 1 acceptance remains open under issue #1.** A real Jills Zeder
-brief has now received manual review, revealing unsupported premises and missing
-coverage. See [the original review](docs/ISSUE1_MODEL_AVAILABILITY_REVIEW.md) and
-[the evidence-contract rerun](docs/ISSUE1_EVIDENCE_V2_REVIEW.md). Three-site outcomes
-and remaining defects must be reviewed before acceptance.
-
-Website text and search results are data, never permission changes. Deterministic
-URL controls enforce that boundary even if the model follows malicious page text.
-Excerpt matching does not prove semantic support, company identity, completeness,
-or appropriate prioritization; those require human review and evaluation. Public
-sites may be stale, wrong, inaccessible, or JavaScript-only. Long pages can exceed
-byte/context limits; non-UTF-8 content may be degraded. Exact-host and compression
-policies intentionally reduce compatibility. No accuracy, latency, or cost
-benchmark is claimed; cost remains null until measured using verified pricing.
-
-V1 excludes personal-email enumeration, automated outreach, login-only sources,
-broad social scraping, CRM writes, dashboards, and vector databases. Later CRM
-work begins with local drafts and requires explicit approval for any HubSpot
-test-account write.
+Excerpt selection proves that text occurred on a fetched page; it does not prove
+that a claim follows from that text, that a site is current, or that a priority
+is useful. Public sites may be stale, blocked, JavaScript-only, compressed, or
+larger than the configured cap. Exact-host and public-IP policies deliberately
+trade compatibility for a narrow security boundary. Caller timeouts cannot
+cancel an already submitted provider request, which may still finish and be
+billed. See [docs/VALIDATION.md](docs/VALIDATION.md) before interpreting results.

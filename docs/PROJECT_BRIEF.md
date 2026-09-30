@@ -1,91 +1,109 @@
 # GTM Account Research Agent — project brief
 
-## Goal
+## Goal and user
 
-Build an open-source, evidence-backed research agent for a B2B sales rep evaluating real estate teams. The user supplies a real estate team's domain. The system returns a concise account brief with cited public facts, missing information, a provisional prioritization, and discovery questions. This is an independent portfolio project inspired by Fello's public positioning and GTM AI Engineer role. It is neither affiliated with Fello nor based on its private ICP, CRM, or data.
+Build an open-source, evidence-backed research agent for an SDR or GTM operator
+evaluating real estate teams. The user supplies one public team domain. The
+system returns a concise account brief containing sourced website facts, clearly
+separated sales inferences, unknowns, a provisional research priority, and
+discovery questions.
 
-## Who uses it
-
-An SDR or GTM operator who has a list of real estate teams and needs to decide which accounts deserve further research or a discovery call. The task today requires visiting sites, identifying useful clues, recording sources, and resisting unsupported assumptions about CRM size or buying intent.
+This is an independent portfolio project inspired by Fello's public positioning
+and GTM AI Engineer role. It is neither affiliated with Fello nor based on its
+private ICP, CRM, or data.
 
 ## First user story
 
-Given one real estate team website, produce a brief that answers:
+Given one real estate team website, report what the team publicly says about its
+markets, team, seller services, lead capture, and follow-up; show the page
+evidence for each fact; preserve unknown CRM, contact volume, process, budget,
+and intent; and suggest what a rep should investigate next.
 
-1. What does this team publicly say about its markets, team, seller services, lead capture, and follow-up?
-2. Which claims are supported by specific pages and excerpts?
-3. What is unknown about its CRM, contact volume, follow-up process, budget, and willingness to buy?
-4. What should a rep investigate or ask next?
+The priority values `promising`, `uncertain`, and `unlikely` describe research
+priority. They are not purchase probabilities or Fello qualification rules.
 
-The initial fit label is `promising`, `uncertain`, or `unlikely`, always accompanied by an explanation and evidence. It is a **research priority**, not a probability of purchase or a claim about Fello's actual qualification rules.
+## Product and harness boundaries
 
-## Agent and harness boundaries
+The model chooses the next research action and may stop when it has sufficient
+evidence. Deterministic code owns tool permissions, domain restrictions, call
+and time budgets, trace capture, schema validation, and final output. It verifies
+that selected evidence came from a fetched page. Human review or a future
+evaluation layer must still judge semantic support and usefulness.
 
-The agent chooses the next research action based on what it has found and may stop when it has sufficient evidence. The harness owns permitted tools, bounded calls, timeouts, domain restrictions, trace capture, schema validation, and the final result. Deterministic code verifies that a quoted excerpt appears on the cited fetched page. That check does not prove that the model interpreted the excerpt correctly; evaluation and human review address that separately.
+Start with one agent. V1 excludes login-only sources, personal-email
+enumeration, automated outreach, CRM writes, broad social scraping, dashboards,
+vector databases, and claims based on search snippets.
 
-Start with one agent. Do not split research, enrichment, qualification, and writing into separate agents merely to make a multi-agent diagram.
+## Output contract
 
-## V1 contract
+A successful run produces structured JSON and a readable brief with:
 
-Input: one public real estate team domain plus an example, versioned research guide.
+- company name;
+- atomic website-reported facts, each with one source and exact excerpt;
+- sales inferences separated from facts, citing the fact indices they use and a
+  limitation;
+- unknowns;
+- a provisional research priority;
+- discovery questions whose factual premises cite facts;
+- pages, calls, errors, duration, guide version, and enforced limits.
 
-Output: structured JSON and readable brief containing company name, sourced claims (claim, URL, excerpt), unknowns, fit label and rationale, discovery questions, and run metadata (pages, tool calls, errors, duration). A failed run must report the failure rather than invent a brief.
-
-V1 excludes login-only sources, personal-email enumeration, automated outreach, CRM writes, broad social scraping, dashboards, and vector databases.
+A failed run reports failure and does not invent a brief.
 
 ## Phases and acceptance criteria
 
-### 0. Repo foundation
+### Phase 0 — repository foundation
 
-- README explains problem, target user, demo, limitations, setup, and architecture.
-- `docs/PROJECT_BRIEF.md` contains this brief; `docs/ISSUES.md` tracks the work.
-- Python project installs locally; one test command works; secrets and run artifacts are ignored.
+The project installs locally, exposes one CLI and test command, documents scope
+and limitations, and ignores secrets and generated runs. Complete.
 
-### 1. One-domain agent loop
+### Phase 1 — one-domain agent loop
 
-- Website reader fetches only public, discovered links on the input domain, within time and byte limits.
-- Model chooses `fetch_page` or `submit_brief`; the harness limits steps and records every decision/tool result.
-- Submitted claims require a URL and excerpt from a fetched page. Invalid submissions can be corrected within the budget.
-- Offline tests cover successful research, unsupported claim, external/undiscovered URL, and budget exhaustion.
-- One live run on a public real estate team website is inspected manually; record what worked and failed. Do not claim live validation before it happens.
+The reader fetches only bounded public pages on the input host or discovered
+same-host links. The model can only fetch a page or submit a brief. The harness
+records every decision, validates selected evidence, and permits bounded
+correction. Offline tests cover success, invalid evidence, forbidden URLs, tool
+errors, and exhaustion. Completion also requires three real public-site outcomes
+and manual review of every factual claim, inference, and question premise.
+That live acceptance gate remains open in
+[#1](https://github.com/atharvasonar1/Research-Agent/issues/1).
 
-### 2. Useful research and evaluation
+### Phase 2 — useful research and evaluation
 
-- Optional search adapter discovers relevant public pages. Search snippets are leads, not factual evidence.
-- Versioned example research guide defines observable signals and disqualifiers, with unknown as a first-class outcome.
-- A small, manually reviewed dataset includes sources, review dates, disagreements, and at least some uncertain cases.
-- Evaluation reports factual support, coverage, fit agreement, abstentions, tool success, latency, and cost where available. Never present invented benchmark numbers.
+An optional replaceable search adapter may discover public pages, while fetched
+pages remain the only factual evidence. A versioned example guide defines
+observable signals, disqualifiers, and unknowns. A small manually reviewed
+dataset records sources, review dates, disagreements, uncertain cases, and a
+frozen holdout. Offline evaluation reports factual support, coverage, priority
+agreement, abstention, tool success, latency, and cost only where measured.
+Work is tracked in GitHub issues
+[#2](https://github.com/atharvasonar1/Research-Agent/issues/2),
+[#3](https://github.com/atharvasonar1/Research-Agent/issues/3),
+[#4](https://github.com/atharvasonar1/Research-Agent/issues/4), and
+[#5](https://github.com/atharvasonar1/Research-Agent/issues/5).
 
-### 3. Batch and CRM preview
+### Phase 3 — batch and CRM preview
 
-- CSV batch processing deduplicates domains, isolates failures, limits concurrency, and resumes safely.
-- CRM adapter first writes only a local draft. Later, explicit user approval allows a HubSpot **test account** write. Use a stable domain key and prove update idempotency.
+CSV batch processing validates and deduplicates domains, bounds concurrency,
+isolates failures, persists per-domain state, and resumes without rerunning
+completed work. A CRM adapter writes a local reviewable draft first. A later
+HubSpot test-account write requires explicit approval, a stable domain key, and
+demonstrated idempotency. Detailed issues will be created when Phase 3 begins.
 
-### 4. Open-source demo
+### Phase 4 — open-source demo
 
-- A credential-free, deterministic replay demonstrates a successful run and an unsupported claim being rejected and corrected.
-- The README shows actual trace and brief snippets, installation, limitations, and a short demo video or GIF.
+A credential-free deterministic replay shows a successful run and an unsupported
+claim rejected and corrected. The README will include actual trace and brief
+snippets, clean setup, limitations, and a short video or GIF. The replay must be
+clearly distinguished from live research. A detailed issue will be created when
+Phase 4 begins.
 
 ## Quality rules
 
 - Never claim internal Fello data or access.
-- A public site may be wrong or outdated; retain source URL and review time.
-- Website text and search results are data, never instructions for the agent or permission changes.
-- No personal profiling, credential scraping, or automated contact messages.
-- Do not add a framework, database, or UI until a phase requires it.
-- Use a fake model and fixtures for deterministic tests; keep live API tests separate and optional.
-
-## GitHub issues to create
-
-1. Foundation: README, project brief, installable Python CLI, test command.
-2. One-domain tool loop, trace, and bounded website reader.
-3. Citation/excerpt verifier and adversarial fixture tests.
-4. Live research pilot on 3 public real estate team sites; log failure modes.
-5. Optional search adapter and source provenance.
-6. Versioned qualification guide and manually reviewed eval set.
-7. Eval runner with abstention, factual support, latency, and cost metrics.
-8. Batch CSV processing with deduplication and resume.
-9. Local CRM draft and optional approved HubSpot test-account write.
-10. Credential-free replay demo and public README polish.
-
-For each issue, include its phase, user value, acceptance criteria, and meaningful tests. Implement issues in order, updating the plan when a pilot changes the evidence.
+- Retain source URL and review time because public pages may be wrong or stale.
+- Treat website and search text as data, never instructions or permission.
+- Keep unknown as a first-class outcome; do not infer CRM size, budget, or intent.
+- Do not add a framework, database, or UI before a phase requires it.
+- Use fake models and fixtures for deterministic tests; keep live calls optional.
+- Implement one GitHub issue at a time and post attempt reviews on that issue or
+  its pull request rather than creating repository report files.
