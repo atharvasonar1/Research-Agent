@@ -10,6 +10,11 @@ The archive contains SHA-256 checksums, original ignored runs, pre-cleanup docs,
 the pre-cleanup Git status, and the preserved uncommitted documentation patch.
 No credentials are included.
 
+The current `phase1-neutral-v1` contract removes fit labels and sales inferences,
+requires `qualification.status = not_assessed`, declares a sourced identity fact,
+and permits zero discovery questions. Historical measurements below describe the
+older contracts and remain unchanged for comparison.
+
 ## Offline progression
 
 | Milestone | Result |

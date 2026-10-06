@@ -162,8 +162,9 @@ class AgentTests(unittest.TestCase):
         self.assertEqual(result["reason"], "time_limit")
 
     def test_invalid_brief_fields_rejected(self):
-        for field, value in (("company_name", "   "), ("claims", []), ("fit_label", "certain-buyer"),
-                             ("unknowns", [" "]), ("discovery_questions", [])):
+        for field, value in (("company_name", "   "), ("claims", []),
+                             ("identity_claim_ref", 999), ("qualification", {"status": "assessed"}),
+                             ("unknowns", [" "])):
             with self.subTest(field=field):
                 invalid = brief()
                 invalid[field] = value

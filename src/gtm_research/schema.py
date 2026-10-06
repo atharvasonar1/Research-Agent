@@ -21,22 +21,25 @@ CLAIM_SCHEMA = object_schema({"claim": ATOMIC_ASSERTION, "url": TEXT, "excerpt":
 CLAIM_REFS = {"type": "array", "items": {"type": "integer", "minimum": 1},
               "maxItems": 30, "uniqueItems": True,
               "description": "One-based indices into claims; each must support the associated factual assertions."}
-INFERENCE_SCHEMA = object_schema({
-    "text": {**TEXT, "description": "A tentative model sales interpretation, explicitly not a website fact. Explain the research priority without inventing evidence."},
-    "limitation": {**TEXT, "description": "What the cited facts do not establish, and what needs validation."},
-    "claim_refs": {**CLAIM_REFS, "minItems": 1},
-})
 QUESTION_SCHEMA = object_schema({
     "question": {**TEXT, "description": "Ask about gaps without presupposing unobserved facts, problems or processes."},
     "premise_claim_refs": {**CLAIM_REFS, "description": "Cite every factual premise. Empty only for a neutral question with no company-specific factual premise."},
 })
+QUALIFICATION_SCHEMA = object_schema({
+    "status": {
+        "type": "string",
+        "enum": ["not_assessed"],
+        "description": "Qualification is deliberately not assessed in this phase.",
+    },
+})
 BRIEF_SCHEMA = object_schema({
     "company_name": TEXT,
     "claims": {"type": "array", "items": CLAIM_SCHEMA, "minItems": 1, "maxItems": 30},
+    "identity_claim_ref": {"type": "integer", "minimum": 1,
+                           "description": "One-based claim index declared as the sourced company-identity fact."},
     "unknowns": TEXT_LIST,
-    "fit_label": {"type": "string", "enum": ["promising", "uncertain", "unlikely"]},
-    "sales_inferences": {"type": "array", "items": INFERENCE_SCHEMA, "minItems": 1, "maxItems": 10},
-    "discovery_questions": {"type": "array", "items": QUESTION_SCHEMA, "minItems": 1, "maxItems": 30},
+    "qualification": QUALIFICATION_SCHEMA,
+    "discovery_questions": {"type": "array", "items": QUESTION_SCHEMA, "maxItems": 30},
 })
 # Tool inputs select trusted source spans; saved briefs retain resolved URL/text.
 SUBMISSION_SCHEMA = {**BRIEF_SCHEMA, "properties": {**BRIEF_SCHEMA["properties"],
@@ -86,13 +89,13 @@ def validate_brief(brief, pages):
         errors.append("company_name:empty")
     if any(not item.strip() for item in brief["unknowns"]):
         errors.append("unknowns:empty_item")
-    blocks = [(f"sales_inference:{i}", item, "text", "claim_refs")
-              for i, item in enumerate(brief["sales_inferences"])]
-    for i, item in enumerate(brief["sales_inferences"]):
-        if not item["limitation"].strip():
-            errors.append(f"sales_inference:{i}:empty_limitation")
-    blocks.extend((f"discovery_question:{i}", q, "question", "premise_claim_refs")
-                  for i, q in enumerate(brief["discovery_questions"]))
+    identity_ref = brief["identity_claim_ref"]
+    if type(identity_ref) is not int:
+        errors.append("identity_claim_ref:not_integer")
+    elif identity_ref > len(brief["claims"]):
+        errors.append("identity_claim_ref:claim_ref_not_found")
+    blocks = [(f"discovery_question:{i}", q, "question", "premise_claim_refs")
+              for i, q in enumerate(brief["discovery_questions"])]
     for label, block, text_key, refs_key in blocks:
         if not block[text_key].strip():
             errors.append(f"{label}:empty")

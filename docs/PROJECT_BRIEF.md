@@ -4,9 +4,9 @@
 
 Build an open-source, evidence-backed research agent for an SDR or GTM operator
 evaluating real estate teams. The user supplies one public team domain. The
-system returns a concise account brief containing sourced website facts, clearly
-separated sales inferences, unknowns, a provisional research priority, and
-discovery questions.
+system returns a concise account brief containing sourced website facts, unknowns,
+and neutral or evidence-premised discovery questions. Qualification is not
+assessed until a later versioned qualification guide explicitly enables it.
 
 This is an independent portfolio project inspired by Fello's public positioning
 and GTM AI Engineer role. It is neither affiliated with Fello nor based on its
@@ -19,8 +19,9 @@ markets, team, seller services, lead capture, and follow-up; show the page
 evidence for each fact; preserve unknown CRM, contact volume, process, budget,
 and intent; and suggest what a rep should investigate next.
 
-The priority values `promising`, `uncertain`, and `unlikely` describe research
-priority. They are not purchase probabilities or Fello qualification rules.
+The current Phase 1 contract records `qualification.status` as `not_assessed`.
+Future priority labels belong to the versioned qualification-guide phase; they
+will not be purchase probabilities or Fello qualification rules.
 
 ## Product and harness boundaries
 
@@ -40,11 +41,9 @@ A successful run produces structured JSON and a readable brief with:
 
 - company name;
 - atomic website-reported facts, each with one source and exact excerpt;
-- sales inferences separated from facts, citing the fact indices they use and a
-  limitation;
 - unknowns;
-- a provisional research priority;
-- discovery questions whose factual premises cite facts;
+- zero or more discovery questions whose factual premises cite facts;
+- `qualification: {"status": "not_assessed"}`;
 - pages, calls, errors, duration, guide version, and enforced limits.
 
 A failed run reports failure and does not invent a brief.
@@ -62,8 +61,8 @@ The reader fetches only bounded public pages on the input host or discovered
 same-host links. The model can only fetch a page or submit a brief. The harness
 records every decision, validates selected evidence, and permits bounded
 correction. Offline tests cover success, invalid evidence, forbidden URLs, tool
-errors, and exhaustion. Completion also requires three real public-site outcomes
-and manual review of every factual claim, inference, and question premise.
+errors, and exhaustion. Completion also requires real public-site outcomes and
+manual review of every factual claim and question premise.
 That live acceptance gate remains open in
 [#1](https://github.com/atharvasonar1/Research-Agent/issues/1).
 

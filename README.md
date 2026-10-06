@@ -2,8 +2,8 @@
 
 An evidence-backed research agent for SDRs and GTM operators evaluating public
 real estate team websites. Given one domain, it produces website-reported facts,
-explicit sales inferences, unknowns, a provisional research priority, and
-discovery questions with source evidence.
+unknowns, and neutral discovery questions with source evidence. Qualification is
+explicitly `not_assessed` in the current phase.
 
 This independent portfolio project is not affiliated with Fello and does not use
 its private ICP, CRM, or data. The canonical scope is
@@ -24,6 +24,15 @@ The repository contains one bounded agent loop, OpenAI and Gemini adapters, a
 same-host public website reader, deterministic citation validation, and local
 JSON/Markdown output. It has no search provider, CRM integration, outreach,
 batch processor, dashboard, database, or multi-agent framework.
+
+Run the persistent credential-free example without network access:
+
+```sh
+.venv/bin/python scripts/run_offline_example.py --output-dir runs/offline-neutral-example
+```
+
+The command prints the unique directory containing its neutral `brief.md` and
+complete `trace.json`. These generated files remain ignored by Git.
 
 ## Setup and offline checks
 
@@ -76,7 +85,8 @@ API-key values are redacted, while public page text is retained for audit.
 
 GitHub issues are the work plan:
 
-- [#1 Phase 1 live pilot and manual claim review](https://github.com/atharvasonar1/Research-Agent/issues/1)
+- [#1 Phase 1 reliable-research umbrella](https://github.com/atharvasonar1/Research-Agent/issues/1)
+- [#6 Neutral research brief](https://github.com/atharvasonar1/Research-Agent/issues/6)
 - [#2 Optional search and provenance](https://github.com/atharvasonar1/Research-Agent/issues/2)
 - [#3 Versioned example qualification guide](https://github.com/atharvasonar1/Research-Agent/issues/3)
 - [#4 Reviewed evaluation set and frozen holdout](https://github.com/atharvasonar1/Research-Agent/issues/4)

@@ -55,11 +55,9 @@ class SourceTests(unittest.TestCase):
         self.assertIn('claim:0:excerpt_not_found', self.sources.resolve(submission(), self.reader.pages)[1])
 
     def test_claim_reference_requirements_remain_after_resolution(self):
-        for block, key in [('sales_inferences', 'claim_refs'), ('discovery_questions', 'premise_claim_refs')]:
-            value = submission()
-            target = value[block][0]
-            target[key] = [999]
-            self.assertTrue(self.sources.resolve(value, self.reader.pages)[1])
+        value = submission()
+        value['discovery_questions'][0]['premise_claim_refs'] = [999]
+        self.assertTrue(self.sources.resolve(value, self.reader.pages)[1])
 
     def test_partition_preserves_text_and_each_span_is_contiguous(self):
         text = normalize_text(('A team® serves a region. Many useful details follow here. ' * 100))

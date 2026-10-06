@@ -35,9 +35,9 @@ def brief():
             {"claim": {"subject": "The team", "relation": "serves", "value": "Harbor City"}, "url": ROOT,
              "excerpt": "Our team serves Harbor City."},
         ],
+        "identity_claim_ref": 1,
         "unknowns": ["CRM size, contact volume, follow-up process, budget, and buying intent are unknown."],
-        "fit_label": "uncertain",
-        "sales_inferences": [{"text": "Further research may be useful.", "claim_refs": [1, 2], "limitation": "Operating needs are unverified."}],
+        "qualification": {"status": "not_assessed"},
         "discovery_questions": [{"question": "Which CRM, if any, do you use?", "premise_claim_refs": []}],
     }
 

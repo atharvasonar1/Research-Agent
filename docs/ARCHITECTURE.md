@@ -8,11 +8,11 @@ On each step the provider adapter receives the current state and chooses exactly
 one action: `fetch_page` or `submit_brief`. `agent.py` executes that action,
 records it, and either supplies the result to the next decision or ends the run.
 
-The LLM chooses pages, facts, inferences, priority, and questions. Code enforces
+The LLM chooses pages, facts, unknowns, and questions. Code enforces
 the URL boundary, DNS and transport rules, budgets, action/schema shape,
 source/excerpt identity, fact references, output persistence, and redaction. Code
-does not determine whether an excerpt semantically entails a fact or whether an
-inference is useful; those remain review concerns.
+does not determine whether an excerpt semantically entails a fact or whether a
+question is neutral; those remain review concerns.
 
 ## Website reader
 
@@ -38,13 +38,15 @@ characters. A submission selects IDs; the harness copies the canonical URL and
 excerpt into the output. This prevents invented or stitched quotations, while
 semantic support still requires review.
 
-The current `phase1-example-v4` contract represents a fact as one
+The current `phase1-neutral-v1` contract represents a fact as one
 `{subject, relation, value}` assertion with one source/excerpt pair. Sales
-interpretations use separate `{text, claim_refs, limitation}` records and are
-rendered as model inferences rather than website facts. Discovery questions use
-`{question, premise_claim_refs}`; neutral questions may have no premise. The
-harness checks structure and references, but cannot guarantee genuine atomicity,
-entailment, or a sound inference.
+interpretations and fit labels are absent. Qualification is required to be
+`{"status": "not_assessed"}`; assessed qualification is deferred to the future
+versioned-guide issue. `identity_claim_ref` declares which sourced fact establishes
+company identity. Discovery questions use `{question, premise_claim_refs}`;
+neutral questions may have no premise, and the array may be empty. The harness
+checks structure and references, but cannot guarantee genuine identity, atomicity,
+entailment, attribution completeness, or question neutrality.
 
 Each model request includes the instructions, compact action/error history,
 remaining budget, each current source once, and only the latest rejected draft.
@@ -92,6 +94,7 @@ trace for evidence review.
   account support before migration. It is not a fallback for availability errors.
 - The 250 KB page cap remains unchanged. Bartic's homepage is a documented
   reader limitation, not justification to enlarge the cap for one site.
+- The neutral contract is implemented; assessed qualification remains deferred.
 - A proposed evidence-first pipeline is under review and is not implemented. It
   would reserve the eight-call budget for bounded page selection, extraction, an
   independent supported/partial/unsupported fact gate, and synthesis using only

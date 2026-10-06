@@ -20,8 +20,7 @@ class AtomicFactsTests(unittest.TestCase):
         self.value['company_name'] = 'The Jills Zeder Group'
         self.value['claims'] = [{k:v for k,v in item.items() if k!='case'}
                                 for item in self.data['reviewed_atomic_examples']]
-        self.value['sales_inferences'] = [{'text': 'A discovery conversation about inquiry handling may be useful.',
-            'claim_refs': [4,5], 'limitation': 'Form presence does not establish lead volume, delivery, pain or buying intent.'}]
+        self.value['identity_claim_ref'] = 1
 
     def test_all_four_saved_bundles_rejected_as_legacy_claims(self):
         for case in self.data['failure_cases']:
@@ -47,29 +46,20 @@ class AtomicFactsTests(unittest.TestCase):
                 bad['claims'][0]['claim'][field]=value
                 self.assertTrue(self.sources.resolve(bad,self.pages)[1])
 
-    def test_inference_must_cite_facts_and_state_limitation(self):
-        for field, value in [('claim_refs',[]),('claim_refs',[999]),('limitation',' '),('text','')]:
+    def test_legacy_judgment_fields_are_not_reinterpreted(self):
+        for field, value in [('fit_label', 'promising'), ('sales_inferences', []),
+                             ('fit_rationale', {'text': 'Sophisticated operation', 'claim_refs': [1]})]:
             with self.subTest(field=field):
-                bad=deepcopy(self.value);bad['sales_inferences'][0][field]=value
-                self.assertTrue(self.sources.resolve(bad,self.pages)[1])
+                bad = deepcopy(self.value)
+                bad[field] = value
+                self.assertTrue(self.sources.resolve(bad, self.pages)[1])
 
-    def test_legacy_rationale_cannot_hide_interpretations(self):
-        bad=deepcopy(self.value)
-        bad['fit_rationale']={'text':'A sophisticated operation','claim_refs':[1]}
-        self.assertTrue(self.sources.resolve(bad,self.pages)[1])
-
-    def test_inference_has_no_website_evidence_slot(self):
-        bad=deepcopy(self.value)
-        bad['sales_inferences'][0]['source_id']='S1'
-        self.assertTrue(self.sources.resolve(bad,self.pages)[1])
-
-    def test_rendering_visibly_separates_facts_inferences_and_limits(self):
+    def test_rendering_is_neutral_and_preserves_reported_period(self):
         brief, errors=self.sources.resolve(self.value,self.pages)
         self.assertEqual(errors,[])
         rendered=readable_brief(brief)
-        facts, inference_part=rendered.split('## Model sales inferences — not website facts')
-        self.assertNotIn('discovery conversation', facts)
-        self.assertIn('### I1 — Model inference', inference_part)
-        self.assertIn('Based on: [C4](#c4), [C5](#c5)', inference_part)
-        self.assertIn('Form presence does not establish', inference_part)
-        self.assertIn('Provisional research priority (model judgment)', inference_part)
+        self.assertIn('**Not assessed.**', rendered)
+        self.assertIn('### C1 — Declared identity fact', rendered)
+        self.assertIn('$13B+ since 2021', rendered)
+        self.assertNotIn('Model sales inferences', rendered)
+        self.assertNotIn('Provisional research priority', rendered)

@@ -30,24 +30,24 @@ def redact(value, secrets):
 
 
 def readable_brief(brief):
-    lines = [f"# {brief['company_name']}", "", "## Website-reported facts", "",
+    lines = [f"# {brief['company_name']}", "", "## Qualification", "",
+             "**Not assessed.** This research brief does not assign fit, buying intent, or sales priority.",
+             "", "## Website-reported facts", "",
              "These are website statements, not independently verified facts.", ""]
     for index, claim in enumerate(brief["claims"], 1):
         fact = claim['claim']
-        lines.extend([f"### C{index}", f"- {fact['subject']} — {fact['relation']}: {fact['value']}",
+        identity = " — Declared identity fact" if index == brief["identity_claim_ref"] else ""
+        lines.extend([f"### C{index}{identity}", f"- {fact['subject']} — {fact['relation']}: {fact['value']}",
                       f"  Source: {claim['url']}", f"  Excerpt: {claim['excerpt']}"])
-    lines.extend(["", "## Model sales inferences — not website facts", "",
-                  f"Provisional research priority (model judgment): {brief['fit_label']}", ""])
-    for index, item in enumerate(brief['sales_inferences'], 1):
-        refs = ", ".join(f"[C{ref}](#c{ref})" for ref in item['claim_refs'])
-        lines.extend([f"### I{index} — Model inference", item['text'],
-                      f"Based on: {refs}", f"Limitation / needs validation: {item['limitation']}"])
     lines.extend(["", "## Unknowns", ""])
     lines.extend(f"- {item}" for item in brief["unknowns"])
     lines.extend(["", "## Discovery questions", ""])
-    for item in brief["discovery_questions"]:
-        refs = ", ".join(f"[C{ref}](#c{ref})" for ref in item["premise_claim_refs"])
-        lines.extend([f"- {item['question']}", f"  Premise evidence: {refs or 'No factual premise declared; review neutrality.'}"])
+    if brief["discovery_questions"]:
+        for item in brief["discovery_questions"]:
+            refs = ", ".join(f"[C{ref}](#c{ref})" for ref in item["premise_claim_refs"])
+            lines.extend([f"- {item['question']}", f"  Premise evidence: {refs or 'No factual premise declared; review neutrality.'}"])
+    else:
+        lines.append("No discovery questions were generated.")
     lines.extend(["", "Excerpt presence was checked; semantic support still needs human review.", ""])
     return "\n".join(lines)
 

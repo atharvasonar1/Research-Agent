@@ -59,7 +59,10 @@ def inspect(trace):
     corrected['claims'] = [{'claim': {'subject': 'The Jills Zeder Group', 'relation': 'is affiliated with', 'value': 'Coldwell Banker Realty'},
                              'source_id': sid, 'excerpt_id': eid}]
     corrected.pop('fit_rationale', None)
-    corrected['sales_inferences'] = [{'text': 'This identity may warrant further research.', 'claim_refs': [1], 'limitation': 'Operating needs remain unknown.'}]
+    corrected.pop('fit_label', None)
+    corrected.pop('sales_inferences', None)
+    corrected['identity_claim_ref'] = 1
+    corrected['qualification'] = {'status': 'not_assessed'}
     corrected['discovery_questions'] = [{'question': 'Which CRM, if any, do you use?', 'premise_claim_refs': []}]
     resolved, errors = sources.resolve(corrected, pages)
     assert not errors, errors
