@@ -29,7 +29,25 @@ DNS, redirects, headers, body reads, and sockets are bounded. The default page
 cap is 250,000 bytes and the redirect cap is three. Scripts and styles are
 removed, whitespace is normalized, and invalid UTF-8 is replaced. There is no
 browser, JavaScript execution, cookie session, or authenticated source access.
-Successful page reads are cached within a run.
+Successful page reads are cached within a run. Every fetch action also appends a
+structured reader outcome containing requested/final URL, redirect history, cap,
+observed bytes, declared `Content-Length` when parseable, completion state, HTTP
+status, cache status, and whether network work was attempted. Truncated bytes are
+labeled as a lower bound; oversized bodies are not retained in failure records.
+
+Deterministic failures are cached by canonical requested URL and effective size/
+redirect limits. These include oversize and format-policy failures, redirect and
+address-policy failures, and non-transient 4xx responses. DNS, timeout, network,
+incomplete-body, HTTP 408/425/429, and 5xx failures remain retryable. An
+undiscovered URL is rejected without network access and remains eligible if a
+later page discovers it.
+
+Two consecutive failed fetch decisions stop a run only when no permitted,
+unfetched URL remains outside the deterministic cache. With no fetched page the
+reason is `no_researchable_sources`; after partial research it is
+`no_research_progress`. The first failure always reaches the model, a discovered
+alternative prevents early stopping, successful fetches reset the counter, and
+every model decision remains inside the existing call budget.
 
 ## Evidence and brief contract
 
@@ -47,7 +65,7 @@ reordered selectors, then copies canonical source ID, evidence ID, URL, fetch ti
 offsets, and text into JSON and Markdown. These checks prove provenance only;
 they do not prove atomicity or semantic entailment.
 
-The current `phase1-complete-evidence-v1` contract represents a fact as one
+The current `phase1-reader-progress-v1` contract represents a fact as one
 `{subject, relation, value}` assertion with ordered evidence references. Sales
 interpretations and fit labels are absent. Qualification is required to be
 `{"status": "not_assessed"}`; assessed qualification is deferred to the future
@@ -91,7 +109,8 @@ owner-only permissions and preserves unrelated allowed settings.
 Each run writes a trace and result. Valid submissions additionally produce JSON
 and Markdown briefs. Known configured API-key values and raw provider/network
 exception details are excluded or sanitized; public page content remains in the
-trace for evidence review.
+trace for evidence review. Failed and successful fetch measurements are retained
+in `reader_outcomes`; successful pages remain available when a later fetch fails.
 
 ## Decisions and deferred changes
 

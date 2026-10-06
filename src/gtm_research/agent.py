@@ -80,6 +80,7 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
     status = "budget_exhausted"
     reason = "step_limit"
     model_calls = tool_calls = retries_scheduled = 0
+    consecutive_no_progress = 0
     for step in range(1, max_steps + 1):
         remaining = deadline - monotonic()
         if remaining <= 0:
@@ -162,6 +163,8 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
                     result = {"ok": True, "page": page}
                 except ToolError as exc:
                     result = {"ok": False, "errors": [str(exc)]}
+                    if exc.outcome is not None:
+                        result["reader_outcome"] = exc.outcome
                 except Exception:
                     result = {"ok": False, "errors": ["tool_error"]}
         elif action.name == "submit_brief":
@@ -177,6 +180,17 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
         errors.extend(result.get("errors", []))
         if brief is not None:
             break
+        if action.name == "fetch_page":
+            if result.get("ok"):
+                consecutive_no_progress = 0
+            elif "reader_outcome" in result:
+                consecutive_no_progress += 1
+                if consecutive_no_progress >= 2 and not reader.untried_allowed_urls():
+                    status = "failed"
+                    reason = "no_research_progress" if sources.items else "no_researchable_sources"
+                    result["stop_reason"] = reason
+                    errors.append(reason)
+                    break
     if brief is None and status == "budget_exhausted" and monotonic() >= deadline:
         reason = "time_limit"
     pages = {page["url"]: page for page in reader.pages.values()}
@@ -191,10 +205,13 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
                    "model_timeout": model_timeout, "page_timeout": reader.timeout,
                    "max_page_bytes": reader.max_bytes, "max_redirects": reader.max_redirects},
         "cost_usd": None,
+        "reader_failures": sum(item["status"] == "failed" for item in reader.outcomes),
+        "reader_cache_hits": sum(item["cached"] for item in reader.outcomes),
     }
     report = redact({"status": status, "reason": reason, "metadata": metadata}, secrets)
     trace = redact({**report, "start_url": reader.root, "events": events,
-                    "pages": list(pages.values()), "sources": sources.items}, secrets)
+                    "pages": list(pages.values()), "sources": sources.items,
+                    "reader_outcomes": reader.outcomes}, secrets)
     (run_dir / "trace.json").write_text(json.dumps(trace, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (run_dir / "result.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     if brief is not None:

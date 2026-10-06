@@ -64,7 +64,7 @@ class OfflineModel:
             ],
             "identity_claim_ref": 1,
             "unknowns": [
-                "CRM, contact volume, follow-up process, budget, and buying intent are not stated on the fixture page."
+                "CRM, contact volume, follow-up process, budget, and buying intent are not stated on the fetched fixture pages."
             ],
             "qualification": {"status": "not_assessed"},
             "discovery_questions": [],

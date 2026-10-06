@@ -34,6 +34,17 @@ Run the persistent credential-free example without network access:
 The command prints the unique directory containing its neutral `brief.md` and
 complete `trace.json`. These generated files remain ignored by Git.
 
+Run the simulated oversized-reader and repeat-prevention example:
+
+```sh
+.venv/bin/python scripts/run_offline_reader_failure_example.py \
+  --output-dir runs/offline-reader-failure-example
+```
+
+Its measurements are explicitly labeled as simulated. The trace shows one
+250,001-byte transport observation against the 250,000-byte cap, followed by a
+cached failure with no second network call.
+
 ## Setup and offline checks
 
 Python 3.10 or newer is required.
@@ -88,6 +99,7 @@ GitHub issues are the work plan:
 - [#1 Phase 1 reliable-research umbrella](https://github.com/atharvasonar1/Research-Agent/issues/1)
 - [#6 Neutral research brief](https://github.com/atharvasonar1/Research-Agent/issues/6)
 - [#7 Complete evidence references](https://github.com/atharvasonar1/Research-Agent/issues/7)
+- [#8 Reader failures and progress control](https://github.com/atharvasonar1/Research-Agent/issues/8)
 - [#2 Optional search and provenance](https://github.com/atharvasonar1/Research-Agent/issues/2)
 - [#3 Versioned example qualification guide](https://github.com/atharvasonar1/Research-Agent/issues/3)
 - [#4 Reviewed evaluation set and frozen holdout](https://github.com/atharvasonar1/Research-Agent/issues/4)

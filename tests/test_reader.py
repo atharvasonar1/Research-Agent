@@ -76,7 +76,7 @@ class ReaderTests(unittest.TestCase):
         page = reader.fetch(ROOT)
         self.assertEqual(page["url"], ROOT + "home")
         self.assertEqual(page["requested_url"], ROOT)
-        self.assertEqual(page["redirects"], [{"from": ROOT, "to": ROOT + "home"}])
+        self.assertEqual(page["redirects"], [{"status": 301, "from": ROOT, "to": ROOT + "home"}])
         self.assertIs(reader.pages[ROOT], reader.pages[ROOT + "home"])
 
     def test_redirect_rechecks_dns_and_blocks_rebinding(self):

@@ -47,7 +47,8 @@ A successful run produces structured JSON and a readable brief with:
 - `qualification: {"status": "not_assessed"}`;
 - pages, calls, errors, duration, guide version, and enforced limits.
 
-A failed run reports failure and does not invent a brief.
+A failed run reports failure and does not invent a brief. Its trace retains
+bounded reader outcomes and any pages fetched before the failure.
 
 ## Phases and acceptance criteria
 

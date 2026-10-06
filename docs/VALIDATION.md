@@ -10,12 +10,18 @@ The archive contains SHA-256 checksums, original ignored runs, pre-cleanup docs,
 the pre-cleanup Git status, and the preserved uncommitted documentation patch.
 No credentials are included.
 
-The current `phase1-complete-evidence-v1` contract keeps the neutral brief,
+The current `phase1-reader-progress-v1` contract keeps the neutral brief,
 requires `qualification.status = not_assessed`, and permits zero discovery
 questions. It adds sentence-oriented evidence spans with exact normalized offsets
 and up to four ordered references per fact, capped at 1,800 combined characters.
 These checks establish provenance, not entailment. Historical measurements below
 describe older contracts and remain unchanged for comparison.
+
+Reader outcomes now distinguish observed bytes from declared size and label
+truncated observations as lower bounds. Deterministic failures are cached within
+a run, while transient failures remain retryable. The 250,001-byte cutoff and
+480,787-byte complete read are covered by explicitly simulated fixtures; they are
+not claims about the current live Keri Shull site.
 
 ## Offline progression
 
@@ -29,6 +35,7 @@ describe older contracts and remain unchanged for comparison.
 | Atomic fact and inference contract | 95 passed in 1.813 s |
 | Repository cleanup verification (2026-09-30) | 95 passed in 1.511 s |
 | Complete evidence references | 109 passed in 1.355 s |
+| Reader failure records and no-progress control | 122 passed in 2.259 s |
 
 Coverage includes correction after invalid evidence; unfetched and wrong-page
 citations; external, undiscovered, private, mixed, multicast, and rebound DNS
@@ -40,7 +47,10 @@ installed CLI exit codes.
 The current suite additionally covers sentence boundaries, abbreviations,
 decimals, Unicode offsets, long-sentence fallback, ordered multi-source evidence,
 reference and combined-text bounds, legacy-contract rejection, and saved
-consent/reporting-period failure patterns.
+consent/reporting-period failure patterns. Reader coverage includes declared and
+observed sizes, exact/over-cap boundaries, truncated lower bounds, cached
+deterministic failures, transient recovery, discovered alternatives, partial
+research preservation, no-progress reasons, call accounting, and redaction.
 
 The current repository checks should be rerun with:
 
