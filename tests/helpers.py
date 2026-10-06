@@ -3,7 +3,6 @@ from pathlib import Path
 
 from gtm_research.model import Action
 from gtm_research.evidence import Sources
-from gtm_research.schema import normalize_text
 from gtm_research.reader import Response, WebsiteReader
 
 ROOT = "https://team.example/"
@@ -27,13 +26,23 @@ class FakeModel:
 
 
 def brief():
+    reader = fixture_reader()
+    sources = Sources()
+    sources.add(reader.fetch(ROOT))
+    sources.add(reader.fetch(SELLERS))
+    resolved, errors = sources.resolve(_base_submission(), reader.pages)
+    assert not errors, errors
+    return resolved
+
+
+def _base_submission():
     return {
         "company_name": "Harbor Example Realty",
         "claims": [
-            {"claim": {"subject": "The company", "relation": "is named", "value": "Harbor Example Realty"}, "url": ROOT,
-             "excerpt": "Harbor Example Realty"},
-            {"claim": {"subject": "The team", "relation": "serves", "value": "Harbor City"}, "url": ROOT,
-             "excerpt": "Our team serves Harbor City."},
+            {"claim": {"subject": "The company", "relation": "is named", "value": "Harbor Example Realty"},
+             "evidence_refs": [{"source_id": "S1", "evidence_id": "E1"}]},
+            {"claim": {"subject": "The team", "relation": "serves", "value": "Harbor City"},
+             "evidence_refs": [{"source_id": "S1", "evidence_id": "E1"}]},
         ],
         "identity_claim_ref": 1,
         "unknowns": ["CRM size, contact volume, follow-up process, budget, and buying intent are unknown."],
@@ -47,18 +56,12 @@ def fetch(url=ROOT):
 
 
 def submission(value=None):
-    value = deepcopy(brief() if value is None else value)
-    reader = fixture_reader()
-    sources = Sources()
-    sources.add(reader.fetch(ROOT))
-    sources.add(reader.fetch(SELLERS))
+    value = deepcopy(_base_submission() if value is None else value)
     for claim in value.get("claims", []):
-        url = claim.pop("url", "")
-        excerpt = normalize_text(claim.pop("excerpt", ""))
-        source_id = sources.by_url.get(url, "unknown")
-        candidates = sources.items.get(source_id, {}).get("excerpts", {})
-        excerpt_id = next((key for key, text in candidates.items() if excerpt and excerpt in text), "unknown")
-        claim.update(source_id=source_id, excerpt_id=excerpt_id)
+        claim["evidence_refs"] = [
+            {"source_id": ref["source_id"], "evidence_id": ref["evidence_id"]}
+            for ref in claim.get("evidence_refs", [])
+        ]
     return value
 
 

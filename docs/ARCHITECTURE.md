@@ -10,7 +10,8 @@ records it, and either supplies the result to the next decision or ends the run.
 
 The LLM chooses pages, facts, unknowns, and questions. Code enforces
 the URL boundary, DNS and transport rules, budgets, action/schema shape,
-source/excerpt identity, fact references, output persistence, and redaction. Code
+source/evidence identity, reference order and bounds, fact references, output
+persistence, and redaction. Code
 does not determine whether an excerpt semantically entails a fact or whether a
 question is neutral; those remain review concerns.
 
@@ -32,14 +33,22 @@ Successful page reads are cached within a run.
 
 ## Evidence and brief contract
 
-`evidence.py` assigns stable run-local source IDs (`S1`, ...) and exact excerpt
-IDs (`E1`, ...). Normalized source text is partitioned into spans of at most 600
-characters. A submission selects IDs; the harness copies the canonical URL and
-excerpt into the output. This prevents invented or stitched quotations, while
-semantic support still requires review.
+`evidence.py` assigns stable run-local source IDs (`S1`, ...) and exact evidence
+IDs (`E1`, ...). It normalizes source text once and records every span's exact
+text and half-open character offsets. Spans prefer sentence endings and remain at
+most 600 characters; long or punctuation-free text falls back to a whitespace
+boundary, then a hard boundary only for an overlong token. No normalized text is
+dropped or reordered.
 
-The current `phase1-neutral-v1` contract represents a fact as one
-`{subject, relation, value}` assertion with one source/excerpt pair. Sales
+A claim selects one to four `evidence_refs`, capped at 1,800 combined characters.
+References must follow source fetch order and then ascending offsets within each
+source. The harness rejects missing, duplicate, unknown, forged, unfetched, or
+reordered selectors, then copies canonical source ID, evidence ID, URL, fetch time,
+offsets, and text into JSON and Markdown. These checks prove provenance only;
+they do not prove atomicity or semantic entailment.
+
+The current `phase1-complete-evidence-v1` contract represents a fact as one
+`{subject, relation, value}` assertion with ordered evidence references. Sales
 interpretations and fit labels are absent. Qualification is required to be
 `{"status": "not_assessed"}`; assessed qualification is deferred to the future
 versioned-guide issue. `identity_claim_ref` declares which sourced fact establishes

@@ -13,13 +13,31 @@ class AtomicFactsTests(unittest.TestCase):
     def setUp(self):
         self.data = json.loads(Path(__file__).with_name('fixtures').joinpath('jills_atomic_cases.json').read_text())
         self.sources = Sources()
-        self.sources.items = {'S1': self.data['source']}
-        # All exact spans are retained from the saved source; no live fetching.
-        self.pages = {self.data['source_url']: {'text': ' '.join(self.data['source']['excerpts'].values())}}
+        # Explicitly adapt the immutable legacy fixture to the current contract;
+        # production does not reinterpret old briefs or source catalogues.
+        old_source = self.data['source']
+        normalized = ' '.join(old_source['excerpts'].values())
+        cursor = 0
+        evidence = {}
+        for evidence_id, text in old_source['excerpts'].items():
+            evidence[evidence_id] = {'text': text, 'start': cursor, 'end': cursor + len(text)}
+            cursor += len(text) + 1
+        self.sources.items = {'S1': {
+            'url': old_source['url'], 'fetched_at': old_source['fetched_at'],
+            'normalized_text': normalized, 'evidence': evidence,
+        }}
+        self.sources.by_url = {old_source['url']: 'S1'}
+        self.pages = {self.data['source_url']: {
+            'text': normalized, 'fetched_at': old_source['fetched_at'],
+        }}
         self.value = submission()
         self.value['company_name'] = 'The Jills Zeder Group'
-        self.value['claims'] = [{k:v for k,v in item.items() if k!='case'}
-                                for item in self.data['reviewed_atomic_examples']]
+        self.value['claims'] = [
+            {'claim': item['claim'], 'evidence_refs': [{
+                'source_id': item['source_id'], 'evidence_id': item['excerpt_id'],
+            }]}
+            for item in self.data['reviewed_atomic_examples']
+        ]
         self.value['identity_claim_ref'] = 1
 
     def test_all_four_saved_bundles_rejected_as_legacy_claims(self):
@@ -33,10 +51,11 @@ class AtomicFactsTests(unittest.TestCase):
         brief, errors = self.sources.resolve(self.value,self.pages)
         self.assertEqual(errors, [])
         for fact, selected in zip(brief['claims'],self.value['claims']):
-            self.assertEqual(fact['excerpt'], self.data['source']['excerpts'][selected['excerpt_id']])
+            evidence_id = selected['evidence_refs'][0]['evidence_id']
+            self.assertEqual(fact['evidence_refs'][0]['text'], self.data['source']['excerpts'][evidence_id])
         self.assertEqual(brief['claims'][1]['claim']['value'], '$13B+ since 2021')
         self.assertNotIn('RealTrends', brief['claims'][2]['claim']['value'])
-        self.assertEqual(brief['claims'][-1]['excerpt_id'], 'E9')  # Not the service-menu E10.
+        self.assertEqual(brief['claims'][-1]['evidence_refs'][0]['evidence_id'], 'E9')  # Not the service-menu E10.
 
     def test_rejects_array_values_or_sales_fields_inside_fact(self):
         for field, value in [('relation',['serves','is affiliated with']),('value',['Miami','Broker']),

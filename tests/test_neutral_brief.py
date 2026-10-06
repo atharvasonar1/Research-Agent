@@ -51,7 +51,6 @@ class NeutralBriefTests(unittest.TestCase):
             "relation": "reports sales since 2021 of",
             "value": "$13B+",
         }
-        value["claims"][1]["excerpt"] = "Our team serves Harbor City."
         self.assertEqual(validate_brief(value, self.reader.pages), [])
         rendered = readable_brief(value)
         self.assertIn("The website — reports sales since 2021 of: $13B+", rendered)

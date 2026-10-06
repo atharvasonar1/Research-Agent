@@ -37,8 +37,14 @@ def readable_brief(brief):
     for index, claim in enumerate(brief["claims"], 1):
         fact = claim['claim']
         identity = " — Declared identity fact" if index == brief["identity_claim_ref"] else ""
-        lines.extend([f"### C{index}{identity}", f"- {fact['subject']} — {fact['relation']}: {fact['value']}",
-                      f"  Source: {claim['url']}", f"  Excerpt: {claim['excerpt']}"])
+        lines.extend([f"### C{index}{identity}", f"- {fact['subject']} — {fact['relation']}: {fact['value']}"])
+        for ref_index, evidence in enumerate(claim['evidence_refs'], 1):
+            lines.extend([
+                f"  Evidence {ref_index} [{evidence['source_id']}/{evidence['evidence_id']}]: {evidence['url']}",
+                f"  Fetched: {evidence['fetched_at']}",
+                f"  Normalized offsets: [{evidence['start']}, {evidence['end']})",
+                f"  Excerpt: {evidence['text']}",
+            ])
     lines.extend(["", "## Unknowns", ""])
     lines.extend(f"- {item}" for item in brief["unknowns"])
     lines.extend(["", "## Discovery questions", ""])
@@ -48,7 +54,7 @@ def readable_brief(brief):
             lines.extend([f"- {item['question']}", f"  Premise evidence: {refs or 'No factual premise declared; review neutrality.'}"])
     else:
         lines.append("No discovery questions were generated.")
-    lines.extend(["", "Excerpt presence was checked; semantic support still needs human review.", ""])
+    lines.extend(["", "Evidence provenance and normalized offsets were checked; semantic support still needs human review.", ""])
     return "\n".join(lines)
 
 

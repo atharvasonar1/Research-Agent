@@ -53,11 +53,11 @@ def inspect(trace):
         events.append(deepcopy(event))
     # A narrow, manually supplied supported selection exercises the same resolver.
     sid = sources.by_url[trace['pages'][0]['url']]
-    eid = next(key for key, text in sources.items[sid]['excerpts'].items()
-               if 'affiliated with Coldwell Banker Realty' in text)
+    eid = next(key for key, item in sources.items[sid]['evidence'].items()
+               if 'affiliated with Coldwell Banker Realty' in item['text'])
     corrected = deepcopy(trace['events'][-1]['action']['arguments'])
     corrected['claims'] = [{'claim': {'subject': 'The Jills Zeder Group', 'relation': 'is affiliated with', 'value': 'Coldwell Banker Realty'},
-                             'source_id': sid, 'excerpt_id': eid}]
+                             'evidence_refs': [{'source_id': sid, 'evidence_id': eid}]}]
     corrected.pop('fit_rationale', None)
     corrected.pop('fit_label', None)
     corrected.pop('sales_inferences', None)
@@ -66,10 +66,13 @@ def inspect(trace):
     corrected['discovery_questions'] = [{'question': 'Which CRM, if any, do you use?', 'premise_claim_refs': []}]
     resolved, errors = sources.resolve(corrected, pages)
     assert not errors, errors
-    assert resolved['claims'][0]['excerpt'] in normalize_text(pages[resolved['claims'][0]['url']]['text'])
-    for field, invalid in [('source_id', 'S999'), ('excerpt_id', eid+' . . E999'), ('excerpt', 'fake quote')]:
+    selected = resolved['claims'][0]['evidence_refs'][0]
+    assert selected['text'] == normalize_text(pages[selected['url']]['text'])[selected['start']:selected['end']]
+    for invalid in ({'source_id': 'S999', 'evidence_id': eid},
+                    {'source_id': sid, 'evidence_id': eid+' . . E999'},
+                    {'source_id': sid, 'evidence_id': eid, 'text': 'fake quote'}):
         bad = deepcopy(corrected)
-        bad['claims'][0][field] = invalid
+        bad['claims'][0]['evidence_refs'][0] = invalid
         assert sources.resolve(bad, pages)[1]
     # Counterfactual state sizes above intentionally retain the original latest draft:
     # no optimistic assumption about what the model would write under the new schema.

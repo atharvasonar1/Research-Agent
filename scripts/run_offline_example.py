@@ -9,12 +9,21 @@ from gtm_research.reader import Response, WebsiteReader
 
 
 ROOT = "https://team.example/"
-PAGE_HTML = b"""<!doctype html>
+REPORTING = ROOT + "reporting"
+PAGES = {
+ROOT: b"""<!doctype html>
 <html><body>
-<h1>Harbor Example Realty</h1>
-<p>Our team serves Harbor City.</p>
+<h1>Harbor Example Realty.</h1>
+<p>The website reports more than $13 billion in sales.</p>
+<a href="/reporting">Reporting details</a>
 </body></html>
-"""
+""",
+REPORTING: b"""<!doctype html>
+<html><body>
+<p>The website states that the reporting period for that sales figure is since 2021.</p>
+</body></html>
+""",
+}
 
 
 class OfflineModel:
@@ -28,6 +37,8 @@ class OfflineModel:
         self.step += 1
         if self.step == 1:
             return Action("fetch_page", {"url": ROOT})
+        if self.step == 2:
+            return Action("fetch_page", {"url": REPORTING})
         return Action("submit_brief", {
             "company_name": "Harbor Example Realty",
             "claims": [
@@ -37,17 +48,18 @@ class OfflineModel:
                         "relation": "identifies the company as",
                         "value": "Harbor Example Realty",
                     },
-                    "source_id": "S1",
-                    "excerpt_id": "E1",
+                    "evidence_refs": [{"source_id": "S1", "evidence_id": "E1"}],
                 },
                 {
                     "claim": {
                         "subject": "The website",
-                        "relation": "states that the team serves",
-                        "value": "Harbor City",
+                        "relation": "reports sales since 2021 exceeding",
+                        "value": "$13 billion",
                     },
-                    "source_id": "S1",
-                    "excerpt_id": "E1",
+                    "evidence_refs": [
+                        {"source_id": "S1", "evidence_id": "E1"},
+                        {"source_id": "S2", "evidence_id": "E1"},
+                    ],
                 },
             ],
             "identity_claim_ref": 1,
@@ -60,7 +72,7 @@ class OfflineModel:
 
 
 def fixture_transport(url, address, timeout, max_bytes):
-    return Response(200, {"content-type": "text/html"}, PAGE_HTML)
+    return Response(200, {"content-type": "text/html"}, PAGES[url])
 
 
 def main(argv=None):
@@ -72,7 +84,7 @@ def main(argv=None):
         resolver=lambda *unused: "93.184.216.34",
         transport=fixture_transport,
     )
-    result = run_research(OfflineModel(), reader, output_dir=args.output_dir, max_steps=2)
+    result = run_research(OfflineModel(), reader, output_dir=args.output_dir, max_steps=3)
     print(json.dumps(result, indent=2))
     print(f"Brief: {result['run_dir']}/brief.md")
     print(f"Trace: {result['run_dir']}/trace.json")

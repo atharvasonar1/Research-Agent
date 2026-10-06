@@ -10,10 +10,12 @@ The archive contains SHA-256 checksums, original ignored runs, pre-cleanup docs,
 the pre-cleanup Git status, and the preserved uncommitted documentation patch.
 No credentials are included.
 
-The current `phase1-neutral-v1` contract removes fit labels and sales inferences,
-requires `qualification.status = not_assessed`, declares a sourced identity fact,
-and permits zero discovery questions. Historical measurements below describe the
-older contracts and remain unchanged for comparison.
+The current `phase1-complete-evidence-v1` contract keeps the neutral brief,
+requires `qualification.status = not_assessed`, and permits zero discovery
+questions. It adds sentence-oriented evidence spans with exact normalized offsets
+and up to four ordered references per fact, capped at 1,800 combined characters.
+These checks establish provenance, not entailment. Historical measurements below
+describe older contracts and remain unchanged for comparison.
 
 ## Offline progression
 
@@ -26,6 +28,7 @@ older contracts and remain unchanged for comparison.
 | Stable source/excerpt IDs | 88 passed in 1.379 s |
 | Atomic fact and inference contract | 95 passed in 1.813 s |
 | Repository cleanup verification (2026-09-30) | 95 passed in 1.511 s |
+| Complete evidence references | 109 passed in 1.355 s |
 
 Coverage includes correction after invalid evidence; unfetched and wrong-page
 citations; external, undiscovered, private, mixed, multicast, and rebound DNS
@@ -34,6 +37,10 @@ DNS, socket, and model failures; step/time exhaustion; provider serialization;
 503 retry success and exhaustion; configuration precedence; redaction; stable
 source/excerpt IDs; atomic fact shape; inference and question references; and
 installed CLI exit codes.
+The current suite additionally covers sentence boundaries, abbreviations,
+decimals, Unicode offsets, long-sentence fallback, ordered multi-source evidence,
+reference and combined-text bounds, legacy-contract rejection, and saved
+consent/reporting-period failure patterns.
 
 The current repository checks should be rerun with:
 

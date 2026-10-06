@@ -93,7 +93,7 @@ class GeminiTests(unittest.TestCase):
 
     def test_original_harness_rejects_unsupported_evidence_then_accepts_correction(self):
         bad = brief()
-        bad["claims"][0]["excerpt"] = "Invented evidence"
+        bad["claims"][0]["evidence_refs"][0]["evidence_id"] = "E99"
         bad["claims"][0]["extra"] = "Must still be rejected by full local schema"
         replies = iter([response(), response("submit_brief", submission(bad)), response("submit_brief", submission())])
         requests = []

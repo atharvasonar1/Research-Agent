@@ -3,6 +3,11 @@
 from jsonschema import Draft202012Validator
 
 
+MAX_EVIDENCE_SPAN_CHARS = 600
+MAX_EVIDENCE_REFS_PER_CLAIM = 4
+MAX_COMBINED_EVIDENCE_CHARS = 1800
+
+
 def object_schema(properties):
     return {
         "type": "object", "properties": properties,
@@ -17,7 +22,23 @@ ATOMIC_ASSERTION = object_schema({
     "relation": {**TEXT, "description": "One independently checkable predicate, not several joined predicates."},
     "value": {**TEXT, "description": "One value, including essential period/attribution qualifiers. Never bundle unrelated assertions or sales interpretations."},
 })
-CLAIM_SCHEMA = object_schema({"claim": ATOMIC_ASSERTION, "url": TEXT, "excerpt": TEXT})
+EVIDENCE_SELECTOR = object_schema({"source_id": TEXT, "evidence_id": TEXT})
+EVIDENCE_REFERENCE = object_schema({
+    "source_id": TEXT,
+    "evidence_id": TEXT,
+    "url": TEXT,
+    "fetched_at": TEXT,
+    "start": {"type": "integer", "minimum": 0},
+    "end": {"type": "integer", "minimum": 1},
+    "text": {**TEXT, "maxLength": MAX_EVIDENCE_SPAN_CHARS},
+})
+CLAIM_SCHEMA = object_schema({
+    "claim": ATOMIC_ASSERTION,
+    "evidence_refs": {
+        "type": "array", "items": EVIDENCE_REFERENCE, "minItems": 1,
+        "maxItems": MAX_EVIDENCE_REFS_PER_CLAIM, "uniqueItems": True,
+    },
+})
 CLAIM_REFS = {"type": "array", "items": {"type": "integer", "minimum": 1},
               "maxItems": 30, "uniqueItems": True,
               "description": "One-based indices into claims; each must support the associated factual assertions."}
@@ -44,7 +65,13 @@ BRIEF_SCHEMA = object_schema({
 # Tool inputs select trusted source spans; saved briefs retain resolved URL/text.
 SUBMISSION_SCHEMA = {**BRIEF_SCHEMA, "properties": {**BRIEF_SCHEMA["properties"],
     "claims": {"type": "array", "minItems": 1, "maxItems": 30,
-               "items": object_schema({"claim": ATOMIC_ASSERTION, "source_id": TEXT, "excerpt_id": TEXT})}}}
+               "items": object_schema({
+                   "claim": ATOMIC_ASSERTION,
+                   "evidence_refs": {
+                       "type": "array", "items": EVIDENCE_SELECTOR, "minItems": 1,
+                       "maxItems": MAX_EVIDENCE_REFS_PER_CLAIM, "uniqueItems": True,
+                   },
+               })}}}
 FETCH_SCHEMA = object_schema({"url": TEXT})
 TOOLS = [
     {
@@ -54,7 +81,7 @@ TOOLS = [
     },
     {
         "type": "function", "name": "submit_brief", "strict": True,
-        "description": "Submit a brief. Each claim must select a source_id and excerpt_id from sources; fix validation errors within the remaining budget.",
+        "description": "Submit a brief. Each claim selects one to four ordered evidence_refs from fetched sources; fix validation errors within the remaining budget.",
         "parameters": SUBMISSION_SCHEMA,
     },
 ]
@@ -77,12 +104,35 @@ def validate_brief(brief, pages):
     if errors:
         return errors
     for index, claim in enumerate(brief["claims"]):
-        page = pages.get(claim["url"])
-        excerpt = normalize_text(claim["excerpt"])
-        if page is None:
-            errors.append(f"claim:{index}:source_not_fetched")
-        elif not excerpt or excerpt not in normalize_text(page["text"]):
-            errors.append(f"claim:{index}:excerpt_not_found")
+        combined_chars = 0
+        seen = set()
+        previous = None
+        for ref_index, evidence in enumerate(claim["evidence_refs"]):
+            label = f"claim:{index}:evidence_ref:{ref_index}"
+            page = pages.get(evidence["url"])
+            pair = (evidence["source_id"], evidence["evidence_id"])
+            if pair in seen:
+                errors.append(f"{label}:duplicate")
+            seen.add(pair)
+            source_id = evidence["source_id"]
+            source_number = int(source_id[1:]) if source_id.startswith("S") and source_id[1:].isdigit() else None
+            if source_number is None or source_number < 1:
+                errors.append(f"{label}:invalid_source_id")
+            order = (source_number or 0, evidence["start"], evidence["end"])
+            if previous is not None and order <= previous:
+                errors.append(f"{label}:not_in_canonical_order")
+            previous = order
+            combined_chars += len(evidence["text"])
+            if evidence["end"] <= evidence["start"]:
+                errors.append(f"{label}:invalid_offsets")
+            if page is None:
+                errors.append(f"{label}:source_not_fetched")
+                continue
+            normalized = normalize_text(page["text"])
+            if evidence["end"] > len(normalized) or normalized[evidence["start"]:evidence["end"]] != evidence["text"]:
+                errors.append(f"{label}:text_or_offsets_mismatch")
+        if combined_chars > MAX_COMBINED_EVIDENCE_CHARS:
+            errors.append(f"claim:{index}:combined_evidence_too_large")
         if any(not value.strip() for value in claim["claim"].values()):
             errors.append(f"claim:{index}:empty_claim")
     if not brief["company_name"].strip():

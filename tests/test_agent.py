@@ -26,7 +26,7 @@ class AgentTests(unittest.TestCase):
     def test_success_discovers_link_and_writes_brief_and_trace(self):
         value = brief()
         value["claims"].append({"claim": {"subject": "The team", "relation": "offers", "value": "home valuation consultations"},
-                                 "url": SELLERS, "excerpt": "We offer home valuation consultations."})
+                                 "evidence_refs": [{"source_id": "S2", "evidence_id": "E1"}]})
         result = self.run_agent([fetch(), fetch(SELLERS), submit(value)])
         self.assertEqual(result["status"], "completed")
         self.assertEqual(result["metadata"]["pages"], 2)
@@ -35,20 +35,20 @@ class AgentTests(unittest.TestCase):
         self.assertEqual(len(self.trace["events"]), 3)
         saved = json.loads((self.path / "brief.json").read_text())["claims"]
         self.assertEqual([c["claim"] for c in saved], [c["claim"] for c in value["claims"]])
-        self.assertEqual(saved[-1]["url"], SELLERS)
-        self.assertIn(value["claims"][-1]["excerpt"], saved[-1]["excerpt"])
+        self.assertEqual(saved[-1]["evidence_refs"][0]["url"], SELLERS)
+        self.assertIn("home valuation consultations", saved[-1]["evidence_refs"][0]["text"])
         self.assertIn("Harbor City", (self.path / "brief.md").read_text())
         self.assertTrue(self.trace["pages"][0]["fetched_at"])
         self.assertIsNone(result["metadata"]["cost_usd"])
 
     def test_unsupported_citation_is_rejected_then_corrected(self):
         bad = brief()
-        bad["claims"][0]["excerpt"] = "We have one million CRM contacts."
+        bad["claims"][0]["evidence_refs"][0]["evidence_id"] = "E99"
         result = self.run_agent([fetch(), submit(bad), submit()])
         self.assertEqual(result["status"], "completed")
         rejection = self.trace["events"][1]["result"]
         self.assertFalse(rejection["ok"])
-        self.assertIn("claim:0:excerpt_not_found", rejection["errors"])
+        self.assertIn("claim:0:evidence_ref:0:evidence_not_found", rejection["errors"])
         self.assertEqual(self.model.states[2]["events"][1]["result"], rejection)
 
     def test_blocked_external_and_undiscovered_urls(self):
@@ -87,11 +87,13 @@ class AgentTests(unittest.TestCase):
         self.assertEqual(json.loads((self.path / "result.json").read_text())["status"], "budget_exhausted")
 
     def test_unfetched_and_wrong_page_citations(self):
-        bad = brief()
-        bad["claims"][0]["url"] = SELLERS
-        result = self.run_agent([fetch(), submit(bad), fetch(SELLERS), submit(bad)], max_steps=4)
-        self.assertIn("claim:0:source_not_fetched", result["metadata"]["errors"])
-        self.assertIn("claim:0:excerpt_not_found", result["metadata"]["errors"])
+        unfetched = brief()
+        unfetched["claims"][0]["evidence_refs"][0] = {"source_id": "S2", "evidence_id": "E1"}
+        wrong = brief()
+        wrong["claims"][0]["evidence_refs"][0]["evidence_id"] = "E99"
+        result = self.run_agent([fetch(), submit(unfetched), fetch(SELLERS), submit(wrong)], max_steps=4)
+        self.assertIn("claim:0:evidence_ref:0:source_not_fetched", result["metadata"]["errors"])
+        self.assertIn("claim:0:evidence_ref:0:evidence_not_found", result["metadata"]["errors"])
         self.assertFalse((self.path / "brief.json").exists())
 
     def test_invalid_schema_and_unknown_tool_consume_steps(self):
@@ -100,11 +102,11 @@ class AgentTests(unittest.TestCase):
         self.assertIn("unknown_tool", result["metadata"]["errors"])
         self.assertEqual(result["metadata"]["pages"], 0)
 
-    def test_empty_excerpt_cannot_pass(self):
+    def test_empty_evidence_id_cannot_pass(self):
         bad = brief()
-        bad["claims"][0]["excerpt"] = "   "
+        bad["claims"][0]["evidence_refs"][0]["evidence_id"] = ""
         result = self.run_agent([fetch(), submit(bad)], max_steps=2)
-        self.assertIn("claim:0:excerpt_not_found", result["metadata"]["errors"])
+        self.assertIn("schema:claims.0.evidence_refs.0.evidence_id:minLength", result["metadata"]["errors"])
 
     def test_model_error_does_not_invent_brief(self):
         result = self.run_agent([ModelError("model_auth_error")])
@@ -147,10 +149,8 @@ class AgentTests(unittest.TestCase):
         self.run_agent([RuntimeError("secret-value")])
         self.assertNotIn("secret-value", (self.path / "trace.json").read_text())
 
-    def test_whitespace_normalized_excerpt(self):
-        value = brief()
-        value["claims"][1]["excerpt"] = "Our team\n serves  Harbor City."
-        self.assertEqual(self.run_agent([fetch(), submit(value)])["status"], "completed")
+    def test_normalized_fixture_evidence_completes(self):
+        self.assertEqual(self.run_agent([fetch(), submit()])["status"], "completed")
 
     def test_overall_deadline_during_model_call_is_budget_exhaustion(self):
         class SlowModel:

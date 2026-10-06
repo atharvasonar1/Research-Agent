@@ -28,17 +28,21 @@ class SourceTests(unittest.TestCase):
         value = submission()
         result, errors = sources.resolve(value, {ROOT: page})
         self.assertEqual(errors, [])
-        self.assertEqual(result['claims'][0]['excerpt'], page['text'])
-        self.assertEqual(result['claims'][0]['url'], ROOT)
-        self.assertEqual(result['claims'][0]['source_id'], 'S1')
-        self.assertEqual(value['claims'][0]['excerpt_id'], 'E1')
+        selected = result['claims'][0]['evidence_refs'][0]
+        self.assertEqual(selected['text'], page['text'])
+        self.assertEqual(selected['url'], ROOT)
+        self.assertEqual(selected['source_id'], 'S1')
+        self.assertEqual(selected['evidence_id'], 'E1')
+        self.assertEqual((selected['start'], selected['end']), (0, len(page['text'])))
 
     def test_forged_source_span_and_retyped_quote_are_rejected(self):
-        for field, value in [('source_id', 'S9'), ('excerpt_id', 'E1 . . E2'),
-                             ('excerpt_id', 'E99'), ('excerpt', 'A\\u00ae')]:
-            with self.subTest(field=field):
+        for changed in ({'source_id': 'S9', 'evidence_id': 'E1'},
+                        {'source_id': 'S1', 'evidence_id': 'E1 . . E2'},
+                        {'source_id': 'S1', 'evidence_id': 'E99'},
+                        {'source_id': 'S1', 'evidence_id': 'E1', 'text': 'A\\u00ae'}):
+            with self.subTest(changed=changed):
                 bad = submission()
-                bad['claims'][0][field] = value
+                bad['claims'][0]['evidence_refs'][0] = changed
                 resolved, errors = self.sources.resolve(bad, self.reader.pages)
                 self.assertIsNone(resolved)
                 self.assertTrue(errors)
@@ -47,12 +51,13 @@ class SourceTests(unittest.TestCase):
         # E2 exists on S2, not S1: excerpt IDs are scoped to sources.
         self.sources.add({**self.page, 'url': SELLERS, 'text': ('word ' * 300)})
         value = submission()
-        value['claims'][0]['excerpt_id'] = 'E2'
+        value['claims'][0]['evidence_refs'][0] = {'source_id': 'S1', 'evidence_id': 'E2'}
         self.assertTrue(self.sources.resolve(value, self.reader.pages)[1])
 
     def test_resolved_text_still_checked_against_fetched_page(self):
-        self.sources.items['S1']['excerpts']['E1'] = 'Not in fetched page'
-        self.assertIn('claim:0:excerpt_not_found', self.sources.resolve(submission(), self.reader.pages)[1])
+        self.sources.items['S1']['evidence']['E1']['text'] = 'Not in fetched page'
+        self.assertIn('claim:0:evidence_ref:0:text_or_offsets_mismatch',
+                      self.sources.resolve(submission(), self.reader.pages)[1])
 
     def test_claim_reference_requirements_remain_after_resolution(self):
         value = submission()
@@ -62,8 +67,9 @@ class SourceTests(unittest.TestCase):
     def test_partition_preserves_text_and_each_span_is_contiguous(self):
         text = normalize_text(('A team® serves a region. Many useful details follow here. ' * 100))
         spans = excerpts(text)
-        self.assertEqual(' '.join(spans.values()), text)
-        self.assertTrue(all(span in text and len(span) <= 600 for span in spans.values()))
+        self.assertEqual(' '.join(span['text'] for span in spans.values()), text)
+        self.assertTrue(all(text[span['start']:span['end']] == span['text'] and
+                            len(span['text']) <= 600 for span in spans.values()))
 
     def test_only_latest_draft_and_one_source_copy_resent_trace_unchanged(self):
         draft = submission()

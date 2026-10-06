@@ -87,6 +87,7 @@ GitHub issues are the work plan:
 
 - [#1 Phase 1 reliable-research umbrella](https://github.com/atharvasonar1/Research-Agent/issues/1)
 - [#6 Neutral research brief](https://github.com/atharvasonar1/Research-Agent/issues/6)
+- [#7 Complete evidence references](https://github.com/atharvasonar1/Research-Agent/issues/7)
 - [#2 Optional search and provenance](https://github.com/atharvasonar1/Research-Agent/issues/2)
 - [#3 Versioned example qualification guide](https://github.com/atharvasonar1/Research-Agent/issues/3)
 - [#4 Reviewed evaluation set and frozen holdout](https://github.com/atharvasonar1/Research-Agent/issues/4)
@@ -98,9 +99,10 @@ adding a new Markdown report to the repository. Keep generated runs ignored.
 
 ## Limits
 
-Excerpt selection proves that text occurred on a fetched page; it does not prove
-that a claim follows from that text, that a site is current, or that a priority
-is useful. Public sites may be stale, blocked, JavaScript-only, compressed, or
+Evidence-reference validation proves that exact normalized spans occurred on
+fetched pages in canonical order; it does not prove that a claim follows from
+them, that a site is current, or that a priority is useful. Public sites may be
+stale, blocked, JavaScript-only, compressed, or
 larger than the configured cap. Exact-host and public-IP policies deliberately
 trade compatibility for a narrow security boundary. Caller timeouts cannot
 cancel an already submitted provider request, which may still finish and be

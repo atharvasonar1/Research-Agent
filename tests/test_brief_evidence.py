@@ -46,8 +46,8 @@ class BriefEvidenceTests(unittest.TestCase):
 
     def test_referenced_claim_still_requires_actual_page_evidence(self):
         value = brief()
-        value['claims'][1]['excerpt'] = 'Our sophisticated CRM handles a million leads.'
-        self.assertIn('claim:1:excerpt_not_found', validate_brief(value, self.reader.pages))
+        value['claims'][1]['evidence_refs'][0]['text'] = 'Our sophisticated CRM handles a million leads.'
+        self.assertIn('claim:1:evidence_ref:0:text_or_offsets_mismatch', validate_brief(value, self.reader.pages))
 
     def test_neutral_question_and_unobserved_optional_features_allowed(self):
         # Identity/market-only evidence must not require invented forms or services.

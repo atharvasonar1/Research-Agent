@@ -40,7 +40,8 @@ vector databases, and claims based on search snippets.
 A successful run produces structured JSON and a readable brief with:
 
 - company name;
-- atomic website-reported facts, each with one source and exact excerpt;
+- atomic website-reported facts, each with one or more bounded, exact evidence
+  references where complete support crosses a span or source boundary;
 - unknowns;
 - zero or more discovery questions whose factual premises cite facts;
 - `qualification: {"status": "not_assessed"}`;
