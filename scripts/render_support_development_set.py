@@ -173,6 +173,13 @@ def render(data):
             ])
             for prior in case.get("label_history", []):
                 lines.append(f"- Label history: **{prior['proposed_grade']}** (`{prior['status']}`) — {prior['reason']}")
+            for prior in case.get("case_history", []):
+                old = prior["candidate_claim"]
+                lines.extend([
+                    f"- Case history (`{prior['status']}`): {old['subject']} — {old['relation']}: {old['value']}",
+                    f"- Prior proposal: **{prior['proposed_grade']}**; unsupported clause: {prior['unsupported_clause']}; explanation: {prior['explanation']}",
+                    f"- Prior origin: `{prior['case_origin']}` — {prior['origin_reference']}",
+                ])
             alternative = case.get("website_attributed_wording_proposal")
             if alternative:
                 lines.extend([

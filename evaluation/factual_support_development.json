@@ -63,10 +63,11 @@
   "third_company_candidate": {
     "company": "The Goodhart Group",
     "domain": "thegoodhartgroup.com",
-    "status": "proposed_not_fetched",
+    "status": "capture_blocked_host",
     "development_only": true,
     "excluded_from_issue_11_acceptance_sample": true,
-    "selection_rationale": "It is a real estate team distinct from the two development companies and is expected to expose public company, service, market, and contact material suitable for supported controls and missing-context challenges. Suitability under the current reader cap and same-host rules remains to be established by the proposed capture; no availability claim is made before that capture."
+    "selection_rationale": "It is a real estate team distinct from the two development companies and was selected for public company, service, market, and contact material. The requested exact host redirected to www.thegoodhartgroup.com; WebsiteReader blocked that cross-host redirect before reading a body, so no cases can be created from this attempt.",
+    "capture_artifact": "evaluation/evidence/thegoodhartgroup_capture_2026-10-07.json"
   },
   "snapshots": [
     {
@@ -165,6 +166,13 @@
       "company": "Harbor Example Realty",
       "domain": "team.example",
       "reason": "Synthetic fixture company; excluded from real-company development counts."
+    },
+    {
+      "company": "The Goodhart Group",
+      "domain": "thegoodhartgroup.com",
+      "artifact": "evaluation/evidence/thegoodhartgroup_capture_2026-10-07.json",
+      "observed_bytes": 0,
+      "reason": "The requested exact host returned HTTP 301 to www.thegoodhartgroup.com. The guarded reader rejected the cross-host redirect before reading a response body; no alternate-host retry was made and no evidence cases were created."
     }
   ],
   "cases": [
@@ -1024,9 +1032,16 @@
           "text": "Luxury Rentals Buyers Buy With Us Neighborhood Guides Relocation Sellers List With Us Our Numbers Marketing Masters Global Connections Industry Experts Distinctive Sales About Us The Jills Zeder Group Client Reviews In The Media Blog Press Videos Contact Us MIAMI BEACH OFFICE 305.341.7447 1682 Jefferson Avenue Miami Beach, FL 33139 CORAL GABLES OFFICE 305.722.5721 4000 Ponce de Leon Blvd Suite 700 Coral Gables, FL 33146 FOLLOW US ON: Coral Gables Miami Beach LEAVE A MESSAGE First Name Last Name Email Address Phone Number Message By checking this box, I consent to receive text messages related"
         }
       ],
-      "proposed_grade": "partial",
+      "proposed_grade": "unsupported",
       "unsupported_clause": "collects contact information; information requests and showing requests",
-      "explanation": "The cited excerpt shows fields and only the beginning of consent text; the request purposes continue in E3, and visible fields do not prove actual collection.",
+      "explanation": "The cited excerpt displays fields and only the beginning of consent text. Displayed fields do not establish the claim's central assertion that contact information is actually collected, and the stated request purposes continue in uncited E3.",
+      "label_history": [
+        {
+          "proposed_grade": "partial",
+          "status": "superseded_unreviewed_proposal",
+          "reason": "The earlier proposal treated the displayed form fields as substantive support for collection. Under the clarified central-assertion rubric, a visible form does not establish actual collection."
+        }
+      ],
       "label_status": "proposed_unreviewed",
       "reviewer_provenance": {
         "label_authority": "ai_proposed",
@@ -1229,8 +1244,8 @@
       "domain": "jillszeder.com",
       "candidate_claim": {
         "subject": "The Jills Zeder Group",
-        "relation": "offers property search, relocation assistance, and",
-        "value": "digital marketing strategies for luxury listings"
+        "relation": "is affiliated with",
+        "value": "Coldwell Banker Realty"
       },
       "evidence_refs": [
         {
@@ -1245,16 +1260,31 @@
         }
       ],
       "proposed_grade": "unsupported",
-      "unsupported_clause": "relocation assistance and digital marketing strategies for luxury listings",
-      "explanation": "The cited span contains navigation labels and media coverage; it does not establish relocation assistance or the claimed digital-marketing service.",
+      "unsupported_clause": "is affiliated with Coldwell Banker Realty",
+      "explanation": "The cited span contains navigation labels and media coverage but says nothing about a brokerage affiliation. The same claim is supported elsewhere in JILLS-F001, making this a controlled wrong-excerpt case.",
+      "case_history": [
+        {
+          "status": "superseded_unreviewed_case_definition",
+          "candidate_claim": {
+            "subject": "The Jills Zeder Group",
+            "relation": "offers property search, relocation assistance, and",
+            "value": "digital marketing strategies for luxury listings"
+          },
+          "proposed_grade": "unsupported",
+          "unsupported_clause": "relocation assistance and digital marketing strategies for luxury listings",
+          "explanation": "The cited span contains navigation labels and media coverage; it does not establish relocation assistance or the claimed digital-marketing service.",
+          "case_origin": "observed_agent_failure",
+          "origin_reference": "archived source-ID run C5 and AI-proposed review"
+        }
+      ],
       "label_status": "proposed_unreviewed",
       "reviewer_provenance": {
         "label_authority": "ai_proposed",
         "proposal_source": "Codex preparation of issue #10 development set",
         "human_approval": false
       },
-      "case_origin": "observed_agent_failure",
-      "origin_reference": "archived source-ID run C5 and AI-proposed review"
+      "case_origin": "deliberately_constructed_challenge",
+      "origin_reference": "wrong-excerpt control pairing the supported JILLS-F001 claim with unrelated archived E10 evidence"
     },
     {
       "case_id": "KERI-Q001",

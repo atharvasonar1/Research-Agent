@@ -5,7 +5,7 @@
 ## Readiness
 
 - Fact cases: 30 across 2 real companies.
-- Proposed grades: 16 supported, 8 partial, 6 unsupported.
+- Proposed grades: 16 supported, 7 partial, 7 unsupported.
 - Discovery-question cases: 4 (excluded from the fact-case count).
 - Human-approved fact labels: 0.
 - Ready for reference evaluation: **no**.
@@ -33,6 +33,7 @@
 - Bartic Group (barticgroup.com): Truncated oversized-response prefix, not a completed reader snapshot; excluded from claim/evidence cases.
 - Matt O'Neill Real Estate (www.mattoneillrealestate.com): Provider failed before any page fetch; no evidence snapshot exists.
 - Harbor Example Realty (team.example): Synthetic fixture company; excluded from real-company development counts.
+- The Goodhart Group (thegoodhartgroup.com): The requested exact host returned HTTP 301 to www.thegoodhartgroup.com. The guarded reader rejected the cross-host redirect before reading a response body; no alternate-host retry was made and no evidence cases were created.
 
 ## Review history
 
@@ -62,9 +63,9 @@
 
 ### Selected development-only candidate
 
-- **The Goodhart Group** (`thegoodhartgroup.com`), status: `proposed_not_fetched`.
+- **The Goodhart Group** (`thegoodhartgroup.com`), status: `capture_blocked_host`.
 - Excluded from issue #11 acceptance sample: **true**.
-- Rationale: It is a real estate team distinct from the two development companies and is expected to expose public company, service, market, and contact material suitable for supported controls and missing-context challenges. Suitability under the current reader cap and same-host rules remains to be established by the proposed capture; no availability claim is made before that capture.
+- Rationale: It is a real estate team distinct from the two development companies and was selected for public company, service, market, and contact material. The requested exact host redirected to www.thegoodhartgroup.com; WebsiteReader blocked that cross-host redirect before reading a body, so no cases can be created from this attempt.
 
 ## Fact cases
 
@@ -354,11 +355,12 @@
 ### JILLS-F009 — The Jills Zeder Group
 
 - Candidate: The Jills Zeder Group — collects contact information via a form for: information requests and showing requests
-- Proposed grade: **partial**
+- Proposed grade: **unsupported**
 - Unsupported clause: collects contact information; information requests and showing requests
-- Explanation: The cited excerpt shows fields and only the beginning of consent text; the request purposes continue in E3, and visible fields do not prove actual collection.
+- Explanation: The cited excerpt displays fields and only the beginning of consent text. Displayed fields do not establish the claim's central assertion that contact information is actually collected, and the stated request purposes continue in uncited E3.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
 - Origin: `observed_agent_failure` — archived atomic run C5 and AI-proposed review
+- Label history: **partial** (`superseded_unreviewed_proposal`) — The earlier proposal treated the displayed form fields as substantive support for collection. Under the clarified central-assertion rubric, a visible form does not establish actual collection.
 - Evidence `jills-home-20260927/S1/E2` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [595, 1194):
 
   > Luxury Rentals Buyers Buy With Us Neighborhood Guides Relocation Sellers List With Us Our Numbers Marketing Masters Global Connections Industry Experts Distinctive Sales About Us The Jills Zeder Group Client Reviews In The Media Blog Press Videos Contact Us MIAMI BEACH OFFICE 305.341.7447 1682 Jefferson Avenue Miami Beach, FL 33139 CORAL GABLES OFFICE 305.722.5721 4000 Ponce de Leon Blvd Suite 700 Coral Gables, FL 33146 FOLLOW US ON: Coral Gables Miami Beach LEAVE A MESSAGE First Name Last Name Email Address Phone Number Message By checking this box, I consent to receive text messages related
@@ -429,12 +431,15 @@
 
 ### JILLS-F015 — The Jills Zeder Group
 
-- Candidate: The Jills Zeder Group — offers property search, relocation assistance, and: digital marketing strategies for luxury listings
+- Candidate: The Jills Zeder Group — is affiliated with: Coldwell Banker Realty
 - Proposed grade: **unsupported**
-- Unsupported clause: relocation assistance and digital marketing strategies for luxury listings
-- Explanation: The cited span contains navigation labels and media coverage; it does not establish relocation assistance or the claimed digital-marketing service.
+- Unsupported clause: is affiliated with Coldwell Banker Realty
+- Explanation: The cited span contains navigation labels and media coverage but says nothing about a brokerage affiliation. The same claim is supported elsewhere in JILLS-F001, making this a controlled wrong-excerpt case.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
-- Origin: `observed_agent_failure` — archived source-ID run C5 and AI-proposed review
+- Origin: `deliberately_constructed_challenge` — wrong-excerpt control pairing the supported JILLS-F001 claim with unrelated archived E10 evidence
+- Case history (`superseded_unreviewed_case_definition`): The Jills Zeder Group — offers property search, relocation assistance, and: digital marketing strategies for luxury listings
+- Prior proposal: **unsupported**; unsupported clause: relocation assistance and digital marketing strategies for luxury listings; explanation: The cited span contains navigation labels and media coverage; it does not establish relocation assistance or the claimed digital-marketing service.
+- Prior origin: `observed_agent_failure` — archived source-ID run C5 and AI-proposed review
 - Evidence `jills-home-20260927/S1/E10` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [4839, 5332):
 
   > List With Us Follow Us On Instagram @JILLSZEDERBEACH @JILLSZEDERGABLES Call To Actions NEIGHBORHOOD GUIDES Explore LUXURY CONDOS Explore PROPERTY SEARCH Explore In The Media The Jills Zeder Group is regularly featured in both national and local media, appearing in The Wall Street Journal, CNBC, Curbed, Forbes, Haute Living, Mansion Global, Miami Magazine, Ocean Drive magazine, Robb Report, South Florida Business Journal, The Real Deal, the Miami Herald, and the Sun Sentinel, among others.

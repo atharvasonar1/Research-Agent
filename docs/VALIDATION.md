@@ -38,7 +38,7 @@ not claims about the current live Keri Shull site.
 | Reader failure records and no-progress control | 122 passed in 2.259 s |
 | Research coverage and stopping checkpoint | 131 passed in 1.495 s |
 | Bounded factual-support checker | 151 passed in 1.790 s |
-| Development-set rubric and capture-plan preparation | 161 passed in 1.737 s; 10 focused integrity tests |
+| Development-only capture and dataset revision | 161 passed in 1.827 s; 10 focused integrity tests |
 
 Coverage includes correction after invalid evidence; unfetched and wrong-page
 citations; external, undiscovered, private, mixed, multicast, and rebound DNS
@@ -157,8 +157,8 @@ token use, latency, and provider-failure gates remain unevaluated. Mocked tests
 must not be used to claim those gates passed.
 
 The development set now contains 30 distinct fact cases across the saved Keri
-Shull and Jills Zeder snapshots: 16 proposed supported, eight proposed partial, and
-six proposed unsupported. Four discovery-question cases are stored separately
+Shull and Jills Zeder snapshots: 16 proposed supported, seven proposed partial, and
+seven proposed unsupported. Four discovery-question cases are stored separately
 and excluded from the fact count. All 34 labels remain `proposed_unreviewed`; the
 archived Codex reviews are AI-proposed, while the user's Keri observations are
 retained as provenance rather than silently converted into approved taxonomy
@@ -182,6 +182,14 @@ Regeneration and label-isolation command:
 
 No verifier or website call is made. The temporary verifier input deliberately
 contains no proposed grades, explanations, origins, or reviewer provenance.
+
+The authorized development-only Goodhart Group capture attempted
+`https://thegoodhartgroup.com/` through the unchanged guarded reader on October 7,
+2026. The server returned HTTP 301 to `https://www.thegoodhartgroup.com/`; the
+reader rejected the cross-host redirect with `blocked_host` before reading a body.
+No alternate-host retry was made, no size limit changed, and no Goodhart evidence
+case was created. The preserved outcome is
+`evaluation/evidence/thegoodhartgroup_capture_2026-10-07.json`.
 
 When that independent set exists, score saved prediction and run summaries with:
 

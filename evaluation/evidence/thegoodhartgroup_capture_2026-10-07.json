@@ -1,0 +1,38 @@
+{
+  "capture_kind": "development_only_guarded_reader",
+  "generator_calls": 0,
+  "verifier_calls": 0,
+  "reader_settings": {
+    "timeout_seconds": 10.0,
+    "max_bytes": 250000,
+    "max_redirects": 3
+  },
+  "status": "failed",
+  "error": "blocked_host",
+  "reader_outcomes": [
+    {
+      "requested_url": "https://thegoodhartgroup.com/",
+      "final_url": "https://www.thegoodhartgroup.com/",
+      "redirects": [],
+      "max_bytes": 250000,
+      "observed_bytes": 0,
+      "declared_content_length": null,
+      "read_completed": false,
+      "observed_bytes_kind": "unavailable",
+      "http_status": 301,
+      "status": "failed",
+      "error": "blocked_host",
+      "cached": false,
+      "network_attempted": true
+    }
+  ],
+  "allowed_urls": [
+    "https://thegoodhartgroup.com/"
+  ],
+  "attempted_at": "2026-10-07T14:03:07.684591+00:00",
+  "company": "The Goodhart Group",
+  "domain": "thegoodhartgroup.com",
+  "source_text": null,
+  "normalized_text_sha256": null,
+  "capture_note": "The requested exact host redirected to www.thegoodhartgroup.com. WebsiteReader blocked the cross-host redirect before reading a body; no alternate-host retry was made."
+}
