@@ -11,7 +11,10 @@ class ModelTests(unittest.TestCase):
     def make_model(self, **changes):
         client = Mock()
         response = {"status": "completed", "output": [SimpleNamespace(
-            type="function_call", name="fetch_page", arguments='{"url":"https://team.example/"}')],
+            type="function_call", name="fetch_page", arguments=(
+                '{"url":"https://team.example/","purpose":"Read the starting page.",'
+                '"topic_ids":["company_identity"]}'
+            ))],
             "usage": SimpleNamespace(input_tokens=10, output_tokens=5, total_tokens=15)}
         response.update(changes)
         client.responses.create.return_value = SimpleNamespace(**response)
@@ -68,7 +71,10 @@ class SDKIntegrationTests(unittest.TestCase):
                 "id": "resp_fixture", "object": "response", "created_at": 0,
                 "status": "completed", "model": "test-model",
                 "output": [{"type": "function_call", "id": "fc_fixture", "call_id": "call_fixture",
-                            "name": "fetch_page", "arguments": '{"url":"https://team.example/"}'}],
+                            "name": "fetch_page", "arguments": (
+                                '{"url":"https://team.example/","purpose":"Read the starting page.",'
+                                '"topic_ids":["company_identity"]}'
+                            )}],
                 "usage": {"input_tokens": 10, "output_tokens": 5, "total_tokens": 15},
             })
 

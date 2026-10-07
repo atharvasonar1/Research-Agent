@@ -28,11 +28,13 @@ batch processor, dashboard, database, or multi-agent framework.
 Run the persistent credential-free example without network access:
 
 ```sh
-.venv/bin/python scripts/run_offline_example.py --output-dir runs/offline-neutral-example
+.venv/bin/python scripts/run_offline_example.py --output-dir runs/offline-coverage-example
 ```
 
-The command prints the unique directory containing its neutral `brief.md` and
-complete `trace.json`. These generated files remain ignored by Git.
+The scripted command prints the unique directory containing its neutral
+`brief.md` and complete `trace.json`. It fetches a fixture homepage, follows a
+relevant fixture link, and records trusted-topic coverage, candidate disposition,
+and a stopping decision. These generated files remain ignored by Git.
 
 Run the simulated oversized-reader and repeat-prevention example:
 
@@ -100,6 +102,7 @@ GitHub issues are the work plan:
 - [#6 Neutral research brief](https://github.com/atharvasonar1/Research-Agent/issues/6)
 - [#7 Complete evidence references](https://github.com/atharvasonar1/Research-Agent/issues/7)
 - [#8 Reader failures and progress control](https://github.com/atharvasonar1/Research-Agent/issues/8)
+- [#9 Research coverage and stopping](https://github.com/atharvasonar1/Research-Agent/issues/9)
 - [#2 Optional search and provenance](https://github.com/atharvasonar1/Research-Agent/issues/2)
 - [#3 Versioned example qualification guide](https://github.com/atharvasonar1/Research-Agent/issues/3)
 - [#4 Reviewed evaluation set and frozen holdout](https://github.com/atharvasonar1/Research-Agent/issues/4)

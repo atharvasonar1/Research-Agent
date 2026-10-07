@@ -14,7 +14,11 @@ from helpers import ROOT, brief, fixture_reader
 
 def response(name="fetch_page", args=None, **extra):
     return {"candidates": [{"finishReason": "STOP", "content": {"parts": [
-        {"functionCall": {"name": name, "args": {"url": ROOT} if args is None else args}}
+        {"functionCall": {"name": name, "args": {
+            "url": ROOT,
+            "purpose": "Read the starting page for company context.",
+            "topic_ids": ["company_identity", "markets", "team"],
+        } if args is None else args}}
     ]}}], "usageMetadata": {"promptTokenCount": 10, "candidatesTokenCount": 5,
                               "thoughtsTokenCount": 2, "totalTokenCount": 17}, **extra}
 
@@ -111,7 +115,11 @@ class GeminiTests(unittest.TestCase):
             self.assertNotIn("test-secret", json.dumps(trace))
 
     def test_gemini_cannot_bypass_url_guardrails(self):
-        model = self.model(lambda request: httpx2.Response(200, json=response(args={"url": "http://127.0.0.1/"})))
+        model = self.model(lambda request: httpx2.Response(200, json=response(args={
+            "url": "http://127.0.0.1/",
+            "purpose": "Attempt an untrusted destination.",
+            "topic_ids": ["company_identity"],
+        })))
         with tempfile.TemporaryDirectory() as directory:
             result = run_research(model, fixture_reader(), directory, max_steps=1)
             self.assertEqual(result["status"], "budget_exhausted")

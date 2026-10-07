@@ -39,6 +39,17 @@ class AtomicFactsTests(unittest.TestCase):
             for item in self.data['reviewed_atomic_examples']
         ]
         self.value['identity_claim_ref'] = 1
+        self.value['coverage'] = [
+            {'topic_id': 'company_identity', 'status': 'covered',
+             'summary': 'The saved source identifies the company.',
+             'evidence_refs': [deepcopy(self.value['claims'][0]['evidence_refs'][0])]},
+            *[
+                {'topic_id': topic_id, 'status': 'unresolved',
+                 'summary': f'{topic_id} was not assessed by this saved regression.',
+                 'evidence_refs': []}
+                for topic_id in ('markets', 'team', 'seller_services', 'lead_capture', 'public_follow_up')
+            ],
+        ]
 
     def test_all_four_saved_bundles_rejected_as_legacy_claims(self):
         for case in self.data['failure_cases']:

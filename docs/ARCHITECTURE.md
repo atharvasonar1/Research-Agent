@@ -7,6 +7,8 @@ provider and budgets, creates a unique output directory, and starts the harness.
 On each step the provider adapter receives the current state and chooses exactly
 one action: `fetch_page` or `submit_brief`. `agent.py` executes that action,
 records it, and either supplies the result to the next decision or ends the run.
+Fetch actions include a bounded task purpose and trusted-topic IDs. This is an
+operational decision summary, not private chain-of-thought.
 
 The LLM chooses pages, facts, unknowns, and questions. Code enforces
 the URL boundary, DNS and transport rules, budgets, action/schema shape,
@@ -65,7 +67,7 @@ reordered selectors, then copies canonical source ID, evidence ID, URL, fetch ti
 offsets, and text into JSON and Markdown. These checks prove provenance only;
 they do not prove atomicity or semantic entailment.
 
-The current `phase1-reader-progress-v1` contract represents a fact as one
+The current `phase1-coverage-v1` contract represents a fact as one
 `{subject, relation, value}` assertion with ordered evidence references. Sales
 interpretations and fit labels are absent. Qualification is required to be
 `{"status": "not_assessed"}`; assessed qualification is deferred to the future
@@ -79,6 +81,31 @@ Each model request includes the instructions, compact action/error history,
 remaining budget, each current source once, and only the latest rejected draft.
 The complete unmodified events, fetched pages, and source catalogue remain in
 the trace.
+
+## Coverage and stopping checkpoint
+
+The harness defines six trusted topics: company identity, markets, team, seller
+services, lead capture, and public follow-up. A submitted brief contains each
+topic exactly once as `covered` or `unresolved`. Covered topics select one to
+four canonical evidence spans; unresolved topics select none. These checks prove
+reference provenance and prevent gaps from disappearing. They do not establish
+that research was complete or that the selected evidence semantically covers the
+topic.
+
+The reader retains the complete discovered-URL inventory without requiring the
+model to explain ordinary navigation links. A submission may declare at most 20
+relevant candidates. Each carries trusted-topic IDs, a short reason, and one
+disposition: `visited`, `skipped`, `blocked`, or `pending`. Code confirms that the
+URL was discovered, a declared visit occurred, and a declared block corresponds
+to a reader failure. `skipped` is a model choice; `blocked` is reader-enforced.
+Human review must still decide whether relevant pages were omitted, a skip was
+sensible, or the stopping summary was justified.
+
+Stopping codes are `sufficient_coverage`, `no_relevant_candidates`,
+`reader_limited`, and `budget_limited`. Unresolved topics and pending candidates
+remain visible in JSON, Markdown, and the trace. No page minimum is imposed, and
+the checkpoint is part of the existing submission action rather than another
+model call.
 
 ## Providers, budgets, and retries
 

@@ -30,7 +30,7 @@ def brief():
     sources = Sources()
     sources.add(reader.fetch(ROOT))
     sources.add(reader.fetch(SELLERS))
-    resolved, errors = sources.resolve(_base_submission(), reader.pages)
+    resolved, errors = sources.resolve(_base_submission(), reader.pages, reader)
     assert not errors, errors
     return resolved
 
@@ -48,11 +48,42 @@ def _base_submission():
         "unknowns": ["CRM size, contact volume, follow-up process, budget, and buying intent are unknown."],
         "qualification": {"status": "not_assessed"},
         "discovery_questions": [{"question": "Which CRM, if any, do you use?", "premise_claim_refs": []}],
+        "coverage": [
+            {"topic_id": "company_identity", "status": "covered",
+             "summary": "The fetched homepage identifies the company.",
+             "evidence_refs": [{"source_id": "S1", "evidence_id": "E1"}]},
+            {"topic_id": "markets", "status": "covered",
+             "summary": "The fetched homepage names a served market.",
+             "evidence_refs": [{"source_id": "S1", "evidence_id": "E1"}]},
+            {"topic_id": "team", "status": "covered",
+             "summary": "The fetched homepage describes the team.",
+             "evidence_refs": [{"source_id": "S1", "evidence_id": "E1"}]},
+            {"topic_id": "seller_services", "status": "unresolved",
+             "summary": "Seller-service details are unresolved in this reusable fixture brief.",
+             "evidence_refs": []},
+            {"topic_id": "lead_capture", "status": "unresolved",
+             "summary": "Lead-capture details are unresolved in this reusable fixture brief.",
+             "evidence_refs": []},
+            {"topic_id": "public_follow_up", "status": "unresolved",
+             "summary": "Public follow-up timing and process were not stated on the fetched pages.",
+             "evidence_refs": []},
+        ],
+        "relevant_candidates": [],
+        "stopping": {
+            "code": "no_relevant_candidates",
+            "summary": "This reusable fixture leaves optional topics explicitly unresolved.",
+        },
     }
 
 
-def fetch(url=ROOT):
-    return Action("fetch_page", {"url": url})
+def fetch(url=ROOT, purpose=None, topic_ids=None):
+    return Action("fetch_page", {
+        "url": url,
+        "purpose": purpose or ("Read the starting page for company context." if url == ROOT
+                               else "Read a discovered page for relevant service details."),
+        "topic_ids": topic_ids or (["company_identity", "markets", "team"] if url == ROOT
+                                   else ["seller_services", "lead_capture"]),
+    })
 
 
 def submission(value=None):
@@ -61,6 +92,11 @@ def submission(value=None):
         claim["evidence_refs"] = [
             {"source_id": ref["source_id"], "evidence_id": ref["evidence_id"]}
             for ref in claim.get("evidence_refs", [])
+        ]
+    for coverage in value.get("coverage", []):
+        coverage["evidence_refs"] = [
+            {"source_id": ref["source_id"], "evidence_id": ref["evidence_id"]}
+            for ref in coverage.get("evidence_refs", [])
         ]
     return value
 

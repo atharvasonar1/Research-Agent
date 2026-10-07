@@ -16,7 +16,11 @@ class RepeatingOfflineModel:
     provider = "offline"
 
     def decide(self, state, timeout):
-        return Action("fetch_page", {"url": ROOT})
+        return Action("fetch_page", {
+            "url": ROOT,
+            "purpose": "Try the starting page for trusted company topics.",
+            "topic_ids": ["company_identity", "markets", "team"],
+        })
 
 
 class SimulatedOversizedTransport:

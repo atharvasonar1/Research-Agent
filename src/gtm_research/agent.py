@@ -12,7 +12,7 @@ from uuid import uuid4
 from .bounds import bounded_call
 from .model import GUIDE_VERSION, ModelError, RetryableModelError
 from .reader import ToolError
-from .schema import FETCH_SCHEMA, schema_errors
+from .schema import FETCH_SCHEMA, RESEARCH_TOPICS, schema_errors
 from .evidence import Sources, model_state
 
 
@@ -54,6 +54,44 @@ def readable_brief(brief):
             lines.extend([f"- {item['question']}", f"  Premise evidence: {refs or 'No factual premise declared; review neutrality.'}"])
     else:
         lines.append("No discovery questions were generated.")
+    lines.extend(["", "## Research coverage", ""])
+    coverage_by_topic = {item["topic_id"]: item for item in brief["coverage"]}
+    for topic_id, description in RESEARCH_TOPICS.items():
+        item = coverage_by_topic[topic_id]
+        lines.append(f"### {topic_id.replace('_', ' ').title()} — {item['status'].title()}")
+        lines.append(f"- {item['summary']}")
+        for evidence in item["evidence_refs"]:
+            lines.append(
+                f"  Coverage evidence [{evidence['source_id']}/{evidence['evidence_id']}]: {evidence['url']}"
+            )
+        lines.append(f"  Trusted topic: {description}")
+    lines.extend(["", "## Unresolved research topics", ""])
+    unresolved = [item for item in brief["coverage"] if item["status"] == "unresolved"]
+    if unresolved:
+        lines.extend(f"- {item['topic_id']}: {item['summary']}" for item in unresolved)
+    else:
+        lines.append("No trusted topics were marked unresolved.")
+    lines.extend(["", "## Relevant page candidates", ""])
+    if brief["relevant_candidates"]:
+        for candidate in brief["relevant_candidates"]:
+            topics = ", ".join(candidate["topic_ids"])
+            lines.append(
+                f"- {candidate['url']} — {candidate['disposition'].title()} "
+                f"({topics}): {candidate['reason']}"
+            )
+    else:
+        lines.append("No discovered pages were declared relevant beyond the pages already assessed.")
+    lines.extend(["", "## Remaining relevant candidates", ""])
+    pending = [item for item in brief["relevant_candidates"] if item["disposition"] == "pending"]
+    if pending:
+        lines.extend(f"- {item['url']}: {item['reason']}" for item in pending)
+    else:
+        lines.append("No relevant candidates remain pending.")
+    lines.extend([
+        "", "## Stopping decision", "",
+        f"- Code: {brief['stopping']['code']}",
+        f"- Summary: {brief['stopping']['summary']}",
+    ])
     lines.extend(["", "Evidence provenance and normalized offsets were checked; semantic support still needs human review.", ""])
     return "\n".join(lines)
 
@@ -168,7 +206,7 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
                 except Exception:
                     result = {"ok": False, "errors": ["tool_error"]}
         elif action.name == "submit_brief":
-            resolved, problems = sources.resolve(action.arguments, reader.pages)
+            resolved, problems = sources.resolve(action.arguments, reader.pages, reader)
             result = {"ok": not problems, "errors": problems}
             if not problems:
                 brief = resolved
@@ -209,9 +247,26 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
         "reader_cache_hits": sum(item["cached"] for item in reader.outcomes),
     }
     report = redact({"status": status, "reason": reason, "metadata": metadata}, secrets)
-    trace = redact({**report, "start_url": reader.root, "events": events,
-                    "pages": list(pages.values()), "sources": sources.items,
-                    "reader_outcomes": reader.outcomes}, secrets)
+    discovered_urls = [{
+        "url": url,
+        "visited": url in reader.pages,
+        "reader_errors": sorted({
+            item["error"] for item in reader.outcomes
+            if item["status"] == "failed"
+            and url in (item.get("requested_url"), item.get("final_url"))
+        }),
+    } for url in sorted(reader.allowed)]
+    trace_payload = {**report, "start_url": reader.root, "events": events,
+                     "pages": list(pages.values()), "sources": sources.items,
+                     "reader_outcomes": reader.outcomes,
+                     "discovered_urls": discovered_urls}
+    if brief is not None:
+        trace_payload["coverage_checkpoint"] = {
+            "coverage": brief["coverage"],
+            "relevant_candidates": brief["relevant_candidates"],
+            "stopping": brief["stopping"],
+        }
+    trace = redact(trace_payload, secrets)
     (run_dir / "trace.json").write_text(json.dumps(trace, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (run_dir / "result.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     if brief is not None:

@@ -73,7 +73,9 @@ class SourceTests(unittest.TestCase):
 
     def test_only_latest_draft_and_one_source_copy_resent_trace_unchanged(self):
         draft = submission()
-        events = [{'step': 1, 'action': {'name': 'fetch_page', 'arguments': {'url': ROOT}},
+        events = [{'step': 1, 'action': {'name': 'fetch_page', 'arguments': {
+                   'url': ROOT, 'purpose': 'Read the starting page.',
+                   'topic_ids': ['company_identity']}},
                    'result': {'ok': True, 'page': self.page}}]
         for step in range(2, 7):
             events.append({'step': step, 'action': {'name': 'submit_brief', 'arguments': draft},

@@ -44,6 +44,10 @@ A successful run produces structured JSON and a readable brief with:
   references where complete support crosses a span or source boundary;
 - unknowns;
 - zero or more discovery questions whose factual premises cite facts;
+- a checkpoint for the trusted identity, market, team, seller-service, lead-capture,
+  and public-follow-up topics, each marked covered with evidence or unresolved;
+- a bounded list of relevant discovered pages marked visited, skipped, blocked, or
+  pending, plus a concise stopping reason;
 - `qualification: {"status": "not_assessed"}`;
 - pages, calls, errors, duration, guide version, and enforced limits.
 

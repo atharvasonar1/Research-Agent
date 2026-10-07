@@ -10,7 +10,7 @@ The archive contains SHA-256 checksums, original ignored runs, pre-cleanup docs,
 the pre-cleanup Git status, and the preserved uncommitted documentation patch.
 No credentials are included.
 
-The current `phase1-reader-progress-v1` contract keeps the neutral brief,
+The current `phase1-coverage-v1` contract keeps the neutral brief,
 requires `qualification.status = not_assessed`, and permits zero discovery
 questions. It adds sentence-oriented evidence spans with exact normalized offsets
 and up to four ordered references per fact, capped at 1,800 combined characters.
@@ -36,6 +36,7 @@ not claims about the current live Keri Shull site.
 | Repository cleanup verification (2026-09-30) | 95 passed in 1.511 s |
 | Complete evidence references | 109 passed in 1.355 s |
 | Reader failure records and no-progress control | 122 passed in 2.259 s |
+| Research coverage and stopping checkpoint | 131 passed in 1.495 s |
 
 Coverage includes correction after invalid evidence; unfetched and wrong-page
 citations; external, undiscovered, private, mixed, multicast, and rebound DNS
@@ -51,6 +52,10 @@ consent/reporting-period failure patterns. Reader coverage includes declared and
 observed sizes, exact/over-cap boundaries, truncated lower bounds, cached
 deterministic failures, transient recovery, discovered alternatives, partial
 research preservation, no-progress reasons, call accounting, and redaction.
+Coverage tests add trusted-topic integrity, bounded fetch purposes, evidence-linked
+coverage, homepage-only completion, follow-up-page investigation, visited/skipped/
+blocked/pending dispositions, unresolved rendering, stopping summaries, discovered
+URL inventory, fabricated visit/block rejection, and unchanged call accounting.
 
 The current repository checks should be rerun with:
 

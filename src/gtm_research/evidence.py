@@ -6,6 +6,7 @@ import re
 from .schema import (
     MAX_COMBINED_EVIDENCE_CHARS,
     MAX_EVIDENCE_SPAN_CHARS,
+    RESEARCH_TOPICS,
     SUBMISSION_SCHEMA,
     normalize_text,
     schema_errors,
@@ -91,53 +92,64 @@ class Sources:
             }
         return self.by_url[page['url']]
 
-    def resolve(self, submission, pages):
+    def _resolve_references(self, selected_refs, source_orders, label, errors):
+        canonical = []
+        seen = set()
+        previous = None
+        combined_chars = 0
+        for ref_index, selected in enumerate(selected_refs):
+            item_label = f'{label}:evidence_ref:{ref_index}'
+            pair = (selected['source_id'], selected['evidence_id'])
+            if pair in seen:
+                errors.append(f'{item_label}:duplicate')
+                continue
+            seen.add(pair)
+            source = self.items.get(selected['source_id'])
+            if source is None:
+                errors.append(f'{item_label}:source_not_fetched')
+                continue
+            span = source['evidence'].get(selected['evidence_id'])
+            if span is None:
+                errors.append(f'{item_label}:evidence_not_found')
+                continue
+            source_order = source_orders[selected['source_id']]
+            order = (source_order, span['start'], span['end'])
+            if previous is not None and order <= previous:
+                errors.append(f'{item_label}:not_in_canonical_order')
+                continue
+            previous = order
+            combined_chars += len(span['text'])
+            canonical.append({
+                'source_id': selected['source_id'],
+                'evidence_id': selected['evidence_id'],
+                'url': source['url'],
+                'fetched_at': source['fetched_at'],
+                'start': span['start'], 'end': span['end'], 'text': span['text'],
+            })
+        if combined_chars > MAX_COMBINED_EVIDENCE_CHARS:
+            errors.append(f'{label}:combined_evidence_too_large')
+        return canonical
+
+    def resolve(self, submission, pages, reader=None):
         errors = schema_errors(submission, SUBMISSION_SCHEMA)
         if errors:
             return None, errors
         resolved = deepcopy(submission)
         source_orders = {source_id: order for order, source_id in enumerate(self.items, 1)}
         for index, claim in enumerate(submission['claims']):
-            canonical = []
-            seen = set()
-            previous = None
-            combined_chars = 0
-            for ref_index, selected in enumerate(claim['evidence_refs']):
-                label = f'claim:{index}:evidence_ref:{ref_index}'
-                pair = (selected['source_id'], selected['evidence_id'])
-                if pair in seen:
-                    errors.append(f'{label}:duplicate')
-                    continue
-                seen.add(pair)
-                source = self.items.get(selected['source_id'])
-                if source is None:
-                    errors.append(f'{label}:source_not_fetched')
-                    continue
-                span = source['evidence'].get(selected['evidence_id'])
-                if span is None:
-                    errors.append(f'{label}:evidence_not_found')
-                    continue
-                source_order = source_orders[selected['source_id']]
-                order = (source_order, span['start'], span['end'])
-                if previous is not None and order <= previous:
-                    errors.append(f'{label}:not_in_canonical_order')
-                    continue
-                previous = order
-                combined_chars += len(span['text'])
-                canonical.append({
-                    'source_id': selected['source_id'],
-                    'evidence_id': selected['evidence_id'],
-                    'url': source['url'],
-                    'fetched_at': source['fetched_at'],
-                    'start': span['start'], 'end': span['end'], 'text': span['text'],
-                })
-            if combined_chars > MAX_COMBINED_EVIDENCE_CHARS:
-                errors.append(f'claim:{index}:combined_evidence_too_large')
+            canonical = self._resolve_references(
+                claim['evidence_refs'], source_orders, f'claim:{index}', errors,
+            )
             resolved['claims'][index] = {'claim': claim['claim'], 'evidence_refs': canonical}
+        for index, coverage in enumerate(submission['coverage']):
+            canonical = self._resolve_references(
+                coverage['evidence_refs'], source_orders, f'coverage:{index}', errors,
+            )
+            resolved['coverage'][index] = {**coverage, 'evidence_refs': canonical}
         if errors:
             return None, errors
         # Keep fetched-page, exact-offset, and claim-reference checks together.
-        errors = validate_brief(resolved, pages)
+        errors = validate_brief(resolved, pages, reader)
         if errors:
             return None, errors
         return resolved, []
@@ -161,6 +173,11 @@ def model_state(reader, sources, events, remaining_steps, guide_version):
     state_sources = deepcopy(sources.items)
     for source in state_sources.values():
         source.pop('normalized_text', None)
+    trusted_topics = [
+        {'topic_id': topic_id, 'definition': definition}
+        for topic_id, definition in RESEARCH_TOPICS.items()
+    ]
     return {'start_url': reader.root, 'guide_version': guide_version,
+            'trusted_research_topics': trusted_topics,
             'allowed_urls': sorted(reader.allowed), 'sources': state_sources,
             'events': compact, 'remaining_steps_including_this': remaining_steps}
