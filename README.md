@@ -117,6 +117,21 @@ gtm-research verify-saved runs/<run-id>/trace.json \
 This command still makes a model-provider request. It reads the canonical
 candidate and evidence from disk and makes no website request.
 
+Review the development set without provider or website access:
+
+```sh
+.venv/bin/python scripts/render_support_development_set.py \
+  evaluation/factual_support_development.json \
+  --output evaluation/factual_support_development.md \
+  --verifier-input /tmp/factual-support-verifier-input.json
+```
+
+The JSON file is canonical; the Markdown view is generated from it. The optional
+verifier-input export contains candidate text and cited evidence but strips every
+proposed label, explanation, origin, and reviewer field. The current 30 fact cases
+cover Keri Shull and Jills Zeder only, so the three-company gate remains unmet.
+All current labels are proposed and unreviewed.
+
 Each invocation creates a unique ignored `runs/<id>/` directory containing
 `trace.json` and `result.json`. A verifier-accepted run also writes `brief.json` and
 `brief.md`. Exit code `0` means a mechanically valid and verifier-accepted submission, `1` means a failed or

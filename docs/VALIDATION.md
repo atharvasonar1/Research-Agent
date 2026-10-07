@@ -38,6 +38,7 @@ not claims about the current live Keri Shull site.
 | Reader failure records and no-progress control | 122 passed in 2.259 s |
 | Research coverage and stopping checkpoint | 131 passed in 1.495 s |
 | Bounded factual-support checker | 151 passed in 1.790 s |
+| Development-set preparation | 159 passed in 1.744 s; 8 focused integrity tests |
 
 Coverage includes correction after invalid evidence; unfetched and wrong-page
 citations; external, undiscovered, private, mixed, multicast, and rebound DNS
@@ -154,6 +155,33 @@ do not satisfy that size and company-diversity requirement. Therefore false
 acceptance, false rejection, supported-fact retention, question-verdict quality,
 token use, latency, and provider-failure gates remain unevaluated. Mocked tests
 must not be used to claim those gates passed.
+
+The development set now contains 30 distinct fact cases across the saved Keri
+Shull and Jills Zeder snapshots: 16 proposed supported, nine proposed partial, and
+five proposed unsupported. Four discovery-question cases are stored separately
+and excluded from the fact count. All 34 labels remain `proposed_unreviewed`; the
+archived Codex reviews are AI-proposed, while the user's Keri observations are
+retained as provenance rather than silently converted into approved taxonomy
+labels. The exact remaining gaps are one additional real company and human review
+of every reference label. Bartic's truncated 250,001-byte prefix and Matt O'Neill's
+no-page provider failure are inventoried but excluded from fact cases.
+
+Canonical data and generated review view:
+
+- `evaluation/factual_support_development.json`
+- `evaluation/factual_support_development.md`
+
+Regeneration and label-isolation command:
+
+```sh
+.venv/bin/python scripts/render_support_development_set.py \
+  evaluation/factual_support_development.json \
+  --output evaluation/factual_support_development.md \
+  --verifier-input /tmp/factual-support-verifier-input.json
+```
+
+No verifier or website call is made. The temporary verifier input deliberately
+contains no proposed grades, explanations, origins, or reviewer provenance.
 
 When that independent set exists, score saved prediction and run summaries with:
 

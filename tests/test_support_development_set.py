@@ -1,0 +1,88 @@
+"""Integrity checks for the human-review development set and label-free export."""
+
+from copy import deepcopy
+import json
+from pathlib import Path
+import unittest
+
+from scripts.render_support_development_set import (
+    render, summary, validate_dataset, verifier_cases,
+)
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DATASET = ROOT / "evaluation/factual_support_development.json"
+REVIEW = ROOT / "evaluation/factual_support_development.md"
+
+
+class SupportDevelopmentSetTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.data = json.loads(DATASET.read_text(encoding="utf-8"))
+
+    def test_dataset_is_valid_and_review_view_is_generated_from_it(self):
+        self.assertEqual(validate_dataset(self.data), [])
+        self.assertEqual(REVIEW.read_text(encoding="utf-8"), render(self.data))
+
+    def test_fact_balance_is_present_but_third_company_and_human_labels_are_missing(self):
+        stats = summary(self.data)
+        self.assertEqual(stats["fact_cases"], 30)
+        self.assertEqual(stats["question_cases"], 4)
+        self.assertEqual(stats["real_companies"], 2)
+        self.assertGreaterEqual(stats["supported"], 12)
+        self.assertGreaterEqual(stats["partial_or_unsupported"], 12)
+        self.assertEqual(stats["human_approved_fact_labels"], 0)
+        self.assertFalse(stats["proposed_shape_gate_met"])
+        self.assertFalse(stats["ready_for_reference_evaluation"])
+
+    def test_questions_are_separate_and_synthetic_companies_are_excluded(self):
+        for case in self.data["cases"]:
+            self.assertNotIn(case["domain"], {"team.example", "support-check.example"})
+            self.assertEqual(case["counts_toward_fact_requirement"], case["kind"] == "fact")
+
+    def test_required_failure_families_and_controls_are_represented(self):
+        required = {
+            "KERI-F009",  # wrong/generic excerpt for named guarantees
+            "KERI-F013",  # missing reporting period and bundled assertion
+            "KERI-F014",  # unsupported qualifier
+            "JILLS-F009", # split evidence and form collection assumption
+            "JILLS-F014", # form-to-workflow assumption
+            "JILLS-F001", # clearly supported control
+        }
+        self.assertTrue(required.issubset({item["case_id"] for item in self.data["cases"]}))
+
+    def test_cases_are_nonduplicate_and_evidence_has_exact_provenance(self):
+        signatures = []
+        for case in self.data["cases"]:
+            candidate = case.get("candidate_claim", case.get("candidate_question"))
+            signatures.append(json.dumps([case["kind"], candidate, [ref["text"] for ref in case["evidence_refs"]]], sort_keys=True))
+            for ref in case["evidence_refs"]:
+                self.assertEqual(ref["end"] - ref["start"], len(ref["text"]))
+                self.assertTrue(ref["url"].startswith("https://"))
+                self.assertIn("T", ref["fetched_at"])
+        self.assertEqual(len(signatures), len(set(signatures)))
+
+    def test_all_labels_remain_unreviewed_and_ai_proposed(self):
+        for case in self.data["cases"]:
+            self.assertEqual(case["label_status"], "proposed_unreviewed")
+            self.assertEqual(case["reviewer_provenance"]["label_authority"], "ai_proposed")
+            self.assertFalse(case["reviewer_provenance"]["human_approval"])
+
+    def test_verifier_export_contains_no_label_or_review_fields(self):
+        payload = verifier_cases(self.data)
+        forbidden = {"proposed_grade", "unsupported_clause", "explanation", "label_status",
+                     "reviewer_provenance", "case_origin", "origin_reference"}
+        for case in payload["cases"]:
+            self.assertTrue(forbidden.isdisjoint(case))
+        serialized = json.dumps(payload)
+        self.assertNotIn("proposed_unreviewed", serialized)
+        self.assertNotIn("ai_proposed", serialized)
+
+    def test_duplicate_id_is_rejected(self):
+        changed = deepcopy(self.data)
+        changed["cases"][1]["case_id"] = changed["cases"][0]["case_id"]
+        self.assertIn("case:1:case_id", validate_dataset(changed))
+
+
+if __name__ == "__main__":
+    unittest.main()
