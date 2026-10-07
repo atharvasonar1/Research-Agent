@@ -68,9 +68,32 @@ class SupportDevelopmentSetTests(unittest.TestCase):
             self.assertEqual(case["reviewer_provenance"]["label_authority"], "ai_proposed")
             self.assertFalse(case["reviewer_provenance"]["human_approval"])
 
+    def test_label_rubric_and_keri_strategy_revision_are_explicit(self):
+        rubric = self.data["label_policy"]["rubric"]
+        self.assertIn("entire claim", rubric["supported"])
+        self.assertIn("substantive part", rubric["partial"])
+        self.assertIn("central assertion", rubric["unsupported"])
+        self.assertIn("does not necessarily mean contradicted or false", rubric["unsupported"])
+        case = next(item for item in self.data["cases"] if item["case_id"] == "KERI-F008")
+        self.assertEqual(case["proposed_grade"], "unsupported")
+        self.assertEqual(case["label_status"], "proposed_unreviewed")
+        self.assertEqual(case["label_history"][0]["proposed_grade"], "partial")
+        self.assertEqual(case["label_history"][0]["status"], "superseded_unreviewed_proposal")
+
+    def test_third_company_plan_is_bounded_and_development_only(self):
+        plan = " ".join(self.data["bounded_third_company_capture_plan"])
+        self.assertIn("development-only", plan)
+        self.assertIn("exclude it from the future acceptance sample", plan)
+        self.assertIn("at most two", plan)
+        self.assertIn("without a generator or verifier", plan)
+        self.assertIn("every reader outcome", plan)
+        suggestions = self.data["third_company_case_suggestions"]
+        self.assertEqual(len(suggestions["supported_controls"]), 4)
+        self.assertEqual(len(suggestions["challenging_cases"]), 4)
+
     def test_verifier_export_contains_no_label_or_review_fields(self):
         payload = verifier_cases(self.data)
-        forbidden = {"proposed_grade", "unsupported_clause", "explanation", "label_status",
+        forbidden = {"proposed_grade", "unsupported_clause", "explanation", "label_status", "label_history",
                      "reviewer_provenance", "case_origin", "origin_reference"}
         for case in payload["cases"]:
             self.assertTrue(forbidden.isdisjoint(case))

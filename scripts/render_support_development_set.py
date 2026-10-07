@@ -18,6 +18,10 @@ def validate_dataset(data):
     snapshots = {item.get("snapshot_id"): item for item in data.get("snapshots", [])}
     if None in snapshots or len(snapshots) != len(data.get("snapshots", [])):
         errors.append("snapshot_ids")
+    rubric = data.get("label_policy", {}).get("rubric", {})
+    if set(rubric) != FACT_GRADES or not all(isinstance(value, str) and value.strip()
+                                             for value in rubric.values()):
+        errors.append("label_rubric")
     seen = set()
     for index, case in enumerate(data.get("cases", [])):
         label = f"case:{index}"
@@ -48,6 +52,9 @@ def validate_dataset(data):
                 errors.append(f"{label}:missing:{field}")
         if case.get("proposed_grade") in {"partial", "unsupported"} and not case.get("unsupported_clause", "").strip():
             errors.append(f"{label}:unsupported_clause")
+        for history_index, prior in enumerate(case.get("label_history", [])):
+            if prior.get("proposed_grade") not in allowed or prior.get("status") != "superseded_unreviewed_proposal":
+                errors.append(f"{label}:label_history:{history_index}")
         for ref_index, ref in enumerate(case.get("evidence_refs", [])):
             ref_label = f"{label}:evidence:{ref_index}"
             snapshot = snapshots.get(ref.get("snapshot_id"))
@@ -120,8 +127,13 @@ def render(data):
         f"- Human-approved fact labels: {stats['human_approved_fact_labels']}.",
         f"- Ready for reference evaluation: **{'yes' if stats['ready_for_reference_evaluation'] else 'no'}**.",
         "- Exact gap: the proposed case-count/class-balance targets are met, but only two real companies are represented and no taxonomy labels have human approval.", "",
-        "## Evidence inventory", "",
+        "## Labeling rubric", "",
     ]
+    for grade in ("supported", "partial", "unsupported"):
+        lines.append(f"- **{grade.title()}:** {data['label_policy']['rubric'][grade]}")
+    lines.extend(["",
+        "## Evidence inventory", "",
+    ])
     for item in data["snapshots"]:
         lines.append(f"- `{item['snapshot_id']}` — {item['company']}, {item['url']}, fetched {item['fetched_at']}; {item['observed_bytes']:,} bytes; complete reader snapshot: {str(item['complete_reader_snapshot']).lower()}.")
     lines.extend(["", "### Excluded evidence", ""])
@@ -132,6 +144,10 @@ def render(data):
         lines.append(f"- **{item['company']}:** {item['history']}")
     lines.extend(["", "## Bounded third-company capture plan", ""])
     lines.extend(f"{i}. {item}" for i, item in enumerate(data["bounded_third_company_capture_plan"], 1))
+    lines.extend(["", "### Suggested supported controls", ""])
+    lines.extend(f"- {item}" for item in data["third_company_case_suggestions"]["supported_controls"])
+    lines.extend(["", "### Suggested challenging cases", ""])
+    lines.extend(f"- {item}" for item in data["third_company_case_suggestions"]["challenging_cases"])
     for kind, heading in (("fact", "Fact cases"), ("question", "Discovery-question cases")):
         lines.extend(["", f"## {heading}", ""])
         for case in (item for item in data["cases"] if item["kind"] == kind):
@@ -144,6 +160,8 @@ def render(data):
                 f"- Status: `{case['label_status']}`; authority: `{case['reviewer_provenance']['label_authority']}`.",
                 f"- Origin: `{case['case_origin']}` — {case['origin_reference'] or 'new control derived from saved evidence'}",
             ])
+            for prior in case.get("label_history", []):
+                lines.append(f"- Label history: **{prior['proposed_grade']}** (`{prior['status']}`) — {prior['reason']}")
             for ref in case["evidence_refs"]:
                 lines.extend([
                     f"- Evidence `{ref['snapshot_id']}/{ref['source_id']}/{ref['evidence_id']}` — {ref['url']} — fetched {ref['fetched_at']} — offsets [{ref['start']}, {ref['end']}):",

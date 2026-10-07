@@ -3,6 +3,11 @@
   "dataset_id": "issue10-factual-support-development-2026-10-07",
   "purpose": "Development-only cases for reviewing the bounded factual-support checker; not a holdout or general accuracy benchmark.",
   "label_policy": {
+    "rubric": {
+      "supported": "The cited evidence supports the entire claim.",
+      "partial": "The cited evidence supports a substantive part of the claim, but another clause or qualifier is missing.",
+      "unsupported": "The cited evidence does not establish the claim's central assertion. Unsupported does not necessarily mean contradicted or false."
+    },
     "reference_labels_must_be_human_approved": true,
     "verifier_input_must_exclude_label_fields": true,
     "current_reference_label_count": 0,
@@ -34,11 +39,25 @@
     }
   ],
   "bounded_third_company_capture_plan": [
-    "Select one real estate team outside Keri Shull and Jills Zeder whose public homepage is readable under the unchanged 250,000-byte cap.",
-    "Capture the homepage and at most two same-host service/contact pages with the existing reader; retain exact timestamps, bytes, URLs, normalized text hashes, and trace provenance.",
-    "Create eight nonduplicate fact cases spanning identity, service/form observations, qualifiers, and workflow-assumption challenges, targeting four clearly supported and four partial/unsupported proposals.",
+    "Before selection, designate one real estate company outside Keri Shull and Jills Zeder as development-only and exclude it from the future acceptance sample; choose a public homepage readable under the unchanged 250,000-byte cap.",
+    "Use WebsiteReader directly without a generator or verifier. Capture the homepage and at most two relevant same-host pages selected from discovered links; retain exact normalized text, source and final URLs, timestamps, normalized text hashes, and every reader outcome, including redirects, observed bytes, declared size, completeness, or failure.",
+    "Create eight nonduplicate fact cases spanning identity, service/form observations, qualifiers, reporting periods, and workflow-assumption challenges, targeting four clearly supported and four partial/unsupported proposals without manufacturing unsupported wording solely to satisfy balance.",
     "Have a human reviewer approve or correct the full reference set without showing labels to the verifier; only human-approved fact labels count toward the issue gate."
   ],
+  "third_company_case_suggestions": {
+    "supported_controls": [
+      "Company identity or brokerage affiliation stated on the captured page.",
+      "A named service or market area stated without adding a qualifier.",
+      "A numeric result with its metric and reporting period retained when present.",
+      "A directly observable form field or contact channel described only as visible on the page."
+    ],
+    "challenging_cases": [
+      "A claim whose cited span mentions the topic but omits a named service, qualifier, or reporting period.",
+      "A bundled claim for which one substantive clause lacks support in the retained references.",
+      "A form-to-workflow claim that infers routing, response time, automation, or intent from visible fields.",
+      "A historical outcome reframed as a current service, guarantee, or operating practice."
+    ]
+  },
   "snapshots": [
     {
       "snapshot_id": "keri-home-20261005",
@@ -407,9 +426,16 @@
           "text": "T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate."
         }
       ],
-      "proposed_grade": "partial",
+      "proposed_grade": "unsupported",
       "unsupported_clause": "offers seller services including an off-market sales strategy",
-      "explanation": "The excerpt reports a past share of off-market deals but does not establish a currently offered seller service or strategy.",
+      "explanation": "The excerpt reports a past share of off-market deals, but that observation does not establish the claim's central assertion that an off-market seller strategy is currently offered. Unsupported here does not mean the strategy is false or contradicted.",
+      "label_history": [
+        {
+          "proposed_grade": "partial",
+          "status": "superseded_unreviewed_proposal",
+          "reason": "The initial proposal treated the historical off-market result as substantive support. Under the clarified rubric, it does not establish the central offered-strategy assertion."
+        }
+      ],
       "label_status": "proposed_unreviewed",
       "reviewer_provenance": {
         "label_authority": "ai_proposed",

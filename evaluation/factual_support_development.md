@@ -5,11 +5,17 @@
 ## Readiness
 
 - Fact cases: 30 across 2 real companies.
-- Proposed grades: 16 supported, 9 partial, 5 unsupported.
+- Proposed grades: 16 supported, 8 partial, 6 unsupported.
 - Discovery-question cases: 4 (excluded from the fact-case count).
 - Human-approved fact labels: 0.
 - Ready for reference evaluation: **no**.
 - Exact gap: the proposed case-count/class-balance targets are met, but only two real companies are represented and no taxonomy labels have human approval.
+
+## Labeling rubric
+
+- **Supported:** The cited evidence supports the entire claim.
+- **Partial:** The cited evidence supports a substantive part of the claim, but another clause or qualifier is missing.
+- **Unsupported:** The cited evidence does not establish the claim's central assertion. Unsupported does not necessarily mean contradicted or false.
 
 ## Evidence inventory
 
@@ -33,10 +39,24 @@
 
 ## Bounded third-company capture plan
 
-1. Select one real estate team outside Keri Shull and Jills Zeder whose public homepage is readable under the unchanged 250,000-byte cap.
-2. Capture the homepage and at most two same-host service/contact pages with the existing reader; retain exact timestamps, bytes, URLs, normalized text hashes, and trace provenance.
-3. Create eight nonduplicate fact cases spanning identity, service/form observations, qualifiers, and workflow-assumption challenges, targeting four clearly supported and four partial/unsupported proposals.
+1. Before selection, designate one real estate company outside Keri Shull and Jills Zeder as development-only and exclude it from the future acceptance sample; choose a public homepage readable under the unchanged 250,000-byte cap.
+2. Use WebsiteReader directly without a generator or verifier. Capture the homepage and at most two relevant same-host pages selected from discovered links; retain exact normalized text, source and final URLs, timestamps, normalized text hashes, and every reader outcome, including redirects, observed bytes, declared size, completeness, or failure.
+3. Create eight nonduplicate fact cases spanning identity, service/form observations, qualifiers, reporting periods, and workflow-assumption challenges, targeting four clearly supported and four partial/unsupported proposals without manufacturing unsupported wording solely to satisfy balance.
 4. Have a human reviewer approve or correct the full reference set without showing labels to the verifier; only human-approved fact labels count toward the issue gate.
+
+### Suggested supported controls
+
+- Company identity or brokerage affiliation stated on the captured page.
+- A named service or market area stated without adding a qualifier.
+- A numeric result with its metric and reporting period retained when present.
+- A directly observable form field or contact channel described only as visible on the page.
+
+### Suggested challenging cases
+
+- A claim whose cited span mentions the topic but omits a named service, qualifier, or reporting period.
+- A bundled claim for which one substantive clause lacks support in the retained references.
+- A form-to-workflow claim that infers routing, response time, automation, or intent from visible fields.
+- A historical outcome reframed as a current service, guarantee, or operating practice.
 
 ## Fact cases
 
@@ -127,11 +147,12 @@
 ### KERI-F008 — Keri Shull Team
 
 - Candidate: Keri Shull Team — offers seller services including: an off-market sales strategy
-- Proposed grade: **partial**
+- Proposed grade: **unsupported**
 - Unsupported clause: offers seller services including an off-market sales strategy
-- Explanation: The excerpt reports a past share of off-market deals but does not establish a currently offered seller service or strategy.
+- Explanation: The excerpt reports a past share of off-market deals, but that observation does not establish the claim's central assertion that an off-market seller strategy is currently offered. Unsupported here does not mean the strategy is false or contradicted.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
 - Origin: `observed_agent_failure` — run 4686ade6e2f34706ae3161249d46a97e C4
+- Label history: **partial** (`superseded_unreviewed_proposal`) — The initial proposal treated the historical off-market result as substantive support. Under the clarified rubric, it does not establish the central offered-strategy assertion.
 - Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
 
   > T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate.
