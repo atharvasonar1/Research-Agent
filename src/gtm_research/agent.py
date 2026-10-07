@@ -12,8 +12,9 @@ from uuid import uuid4
 from .bounds import bounded_call
 from .model import GUIDE_VERSION, ModelError, RetryableModelError
 from .reader import ToolError
-from .schema import FETCH_SCHEMA, RESEARCH_TOPICS, schema_errors
+from .schema import FETCH_SCHEMA, RESEARCH_TOPICS, schema_errors, validate_brief
 from .evidence import Sources, model_state
+from .support import accept_verified_candidate, candidate_for_verification
 
 
 def redact(value, secrets):
@@ -60,10 +61,8 @@ def readable_brief(brief):
         item = coverage_by_topic[topic_id]
         lines.append(f"### {topic_id.replace('_', ' ').title()} — {item['status'].title()}")
         lines.append(f"- {item['summary']}")
-        for evidence in item["evidence_refs"]:
-            lines.append(
-                f"  Coverage evidence [{evidence['source_id']}/{evidence['evidence_id']}]: {evidence['url']}"
-            )
+        if item["fact_refs"]:
+            lines.append("  Accepted facts: " + ", ".join(f"C{ref}" for ref in item["fact_refs"]))
         lines.append(f"  Trusted topic: {description}")
     lines.extend(["", "## Unresolved research topics", ""])
     unresolved = [item for item in brief["coverage"] if item["status"] == "unresolved"]
@@ -96,8 +95,8 @@ def readable_brief(brief):
     return "\n".join(lines)
 
 
-def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
-                 model_timeout=30, secrets=(), max_model_retries=3):
+def _run_candidate_research(model, reader, output_dir="runs", max_steps=6, max_seconds=120,
+                            model_timeout=30, secrets=(), max_model_retries=3):
     if not isinstance(max_steps, int) or isinstance(max_steps, bool) or max_steps < 1:
         raise ValueError("max_steps must be a positive integer")
     if any(not math.isfinite(value) or value <= 0 for value in (max_seconds, model_timeout)):
@@ -273,4 +272,175 @@ def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
         brief = redact({**brief, "metadata": metadata}, secrets)
         (run_dir / "brief.json").write_text(json.dumps(brief, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         (run_dir / "brief.md").write_text(readable_brief(brief), encoding="utf-8")
+    return {**report, "run_dir": str(run_dir)}
+
+
+def _usage_total(events):
+    totals = {}
+    for event in events:
+        for key, value in event.get("usage", {}).items():
+            if isinstance(value, (int, float)):
+                totals[key] = totals.get(key, 0) + value
+    return totals
+
+
+def run_research(model, reader, output_dir="runs", max_steps=8, max_seconds=120,
+                 model_timeout=30, secrets=(), max_model_retries=3, verifier=None):
+    """Research for at most six calls, then immediately verify within eight total."""
+    if not isinstance(max_steps, int) or isinstance(max_steps, bool) or not 1 <= max_steps <= 8:
+        raise ValueError("max_steps must be an integer from 1 to 8")
+    research_limit = min(6, max_steps)
+    result = _run_candidate_research(
+        model, reader, output_dir, research_limit, max_seconds, model_timeout,
+        secrets, max_model_retries,
+    )
+    run_dir = Path(result["run_dir"])
+    trace_path = run_dir / "trace.json"
+    result_path = run_dir / "result.json"
+    brief_path = run_dir / "brief.json"
+    markdown_path = run_dir / "brief.md"
+    trace = json.loads(trace_path.read_text(encoding="utf-8"))
+    elapsed = result["metadata"]["duration_seconds"]
+    candidate = None
+    if brief_path.exists():
+        candidate = json.loads(brief_path.read_text(encoding="utf-8"))
+        candidate.pop("metadata", None)
+        trace["candidate_brief"] = candidate
+        trace["candidate_coverage_checkpoint"] = trace.pop("coverage_checkpoint", None)
+        brief_path.unlink()
+        markdown_path.unlink(missing_ok=True)
+    if candidate is None:
+        trace["verification"] = {"status": "not_started", "reason": "no_valid_candidate"}
+        trace_path.write_text(json.dumps(redact(trace, secrets), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        return result
+
+    checker = verifier if verifier is not None else (model if hasattr(model, "verify") else None)
+    metadata = result["metadata"]
+    metadata["research_model_calls"] = metadata["model_calls"]
+    metadata["research_usage"] = _usage_total(trace["events"])
+    metadata["verification_calls"] = 0
+    metadata["verification_usage"] = {}
+    metadata["verifier_model"] = getattr(checker, "model", None) if checker else None
+    metadata["verifier_provider"] = getattr(checker, "provider", None) if checker else None
+    metadata["limits"].update({"max_steps": max_steps, "research_calls": research_limit,
+                               "verification_attempts": 2, "total_model_calls": max_steps})
+    verification = {"status": "failed", "attempts": [],
+                    "input": candidate_for_verification(candidate)}
+    verification_started = monotonic()
+    verification_budget = max_seconds - elapsed
+    final = None
+    failure_reason = None
+    if checker is None:
+        failure_reason = "verification_not_configured"
+    else:
+        for attempt in (1, 2):
+            if metadata["model_calls"] >= max_steps:
+                failure_reason = "model_call_budget_exhausted_before_verification"
+                break
+            remaining = verification_budget - (monotonic() - verification_started)
+            if remaining <= 0:
+                failure_reason = "time_limit_before_verification"
+                break
+            metadata["model_calls"] += 1
+            metadata["verification_calls"] += 1
+            event = {"attempt": attempt}
+            started = monotonic()
+            try:
+                raw = bounded_call(
+                    lambda: checker.verify(verification["input"], min(model_timeout, remaining)),
+                    min(model_timeout, remaining),
+                )
+                event["duration_seconds"] = round(monotonic() - started, 4)
+                usage = raw.pop("usage", {}) if isinstance(raw, dict) else {}
+                event["usage"] = usage
+                accepted, outcome = accept_verified_candidate(candidate, raw)
+                event["verdict"] = raw
+                if accepted is None:
+                    event["status"] = "rejected"
+                    event["errors"] = outcome["errors"]
+                    failure_reason = ("verification_invalid" if any(
+                        item.startswith("verifier") for item in outcome["errors"]
+                    ) else "semantic_rejection")
+                else:
+                    page_map = {page["url"]: page for page in trace["pages"]}
+                    final_errors = validate_brief(accepted, page_map, reader)
+                    if final_errors:
+                        event["status"] = "invalid_final"
+                        event["errors"] = final_errors
+                        failure_reason = "verification_invalid_final"
+                    else:
+                        final = accepted
+                        event["status"] = "accepted"
+                        verification["outcome"] = outcome
+                verification["attempts"].append(event)
+                break
+            except TimeoutError:
+                event.update(status="provider_failure", error="verifier_timeout",
+                             duration_seconds=round(monotonic() - started, 4))
+                verification["attempts"].append(event)
+                failure_reason = "verifier_timeout"
+                break
+            except RetryableModelError:
+                event.update(status="provider_failure", error="gemini_http_503", http_status=503,
+                             duration_seconds=round(monotonic() - started, 4))
+                verification["attempts"].append(event)
+                if attempt == 1 and metadata["model_calls"] < max_steps:
+                    delay = uniform(0.5, 1.0)
+                    remaining = verification_budget - (monotonic() - verification_started)
+                    if delay >= remaining:
+                        event["retry"] = {"scheduled": False, "stop_reason": "time_limit_before_verification_retry"}
+                        failure_reason = "time_limit_before_verification_retry"
+                        break
+                    event["retry"] = {"scheduled": True, "delay_seconds": round(delay, 6), "next_attempt": 2}
+                    before_sleep = monotonic()
+                    sleep(delay)
+                    event["retry"]["elapsed_sleep_seconds"] = round(monotonic() - before_sleep, 6)
+                    continue
+                failure_reason = "verification_provider_unavailable"
+                break
+            except ModelError as exc:
+                event.update(status="provider_failure", error=str(exc),
+                             duration_seconds=round(monotonic() - started, 4))
+                verification["attempts"].append(event)
+                failure_reason = str(exc)
+                break
+            except Exception:
+                event.update(status="provider_failure", error="verifier_error",
+                             duration_seconds=round(monotonic() - started, 4))
+                verification["attempts"].append(event)
+                failure_reason = "verifier_error"
+                break
+
+    metadata["verification_usage"] = _usage_total(verification["attempts"])
+    metadata["verification_latency_seconds"] = round(sum(
+        item.get("duration_seconds", 0) for item in verification["attempts"]
+    ), 4)
+    metadata["verification_provider_failures"] = sum(
+        item.get("status") == "provider_failure" for item in verification["attempts"]
+    )
+    metadata["duration_seconds"] = round(elapsed + monotonic() - verification_started, 4)
+    metadata["total_usage"] = {
+        key: metadata["research_usage"].get(key, 0) + metadata["verification_usage"].get(key, 0)
+        for key in set(metadata["research_usage"]) | set(metadata["verification_usage"])
+    }
+    if final is None:
+        result.update(status="failed", reason=failure_reason)
+        metadata["errors"].append(failure_reason)
+        verification.update(status="failed", reason=failure_reason)
+    else:
+        result.update(status="completed", reason="verified_submission")
+        verification.update(status="accepted", reason="verifier_approved_and_code_filtered")
+        final = redact({**final, "metadata": metadata}, secrets)
+        brief_path.write_text(json.dumps(final, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        markdown_path.write_text(readable_brief(final), encoding="utf-8")
+        trace["coverage_checkpoint"] = {
+            "coverage": final["coverage"], "relevant_candidates": final["relevant_candidates"],
+            "stopping": final["stopping"],
+        }
+    trace.update(status=result["status"], reason=result["reason"], metadata=metadata,
+                 verification=verification)
+    report = redact({"status": result["status"], "reason": result["reason"],
+                     "metadata": metadata}, secrets)
+    trace_path.write_text(json.dumps(redact(trace, secrets), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    result_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return {**report, "run_dir": str(run_dir)}

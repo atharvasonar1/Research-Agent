@@ -3,7 +3,8 @@
 import os
 from pathlib import Path
 
-KEYS = {"GEMINI_API_KEY", "GEMINI_MODEL", "OPENAI_API_KEY", "OPENAI_MODEL", "RESEARCH_PROVIDER"}
+KEYS = {"GEMINI_API_KEY", "GEMINI_MODEL", "OPENAI_API_KEY", "OPENAI_MODEL",
+        "RESEARCH_PROVIDER", "VERIFIER_PROVIDER", "VERIFIER_MODEL"}
 
 
 def load_config(env_file=None):

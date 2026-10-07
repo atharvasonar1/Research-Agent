@@ -7,7 +7,7 @@ import unittest
 import httpx2
 
 from gtm_research.agent import run_research
-from gtm_research.gemini import GeminiModel
+from gtm_research.gemini import GeminiModel, GeminiSupportVerifier
 from gtm_research.model import INSTRUCTIONS, ModelError
 from helpers import ROOT, brief, fixture_reader
 
@@ -49,6 +49,26 @@ class GeminiTests(unittest.TestCase):
         self.assertEqual(payload["toolConfig"]["functionCallingConfig"]["mode"], "ANY")
         self.assertEqual([d["name"] for d in payload["tools"][0]["functionDeclarations"]], ["fetch_page", "submit_brief"])
         self.assertEqual(len(seen), 1)
+
+    def test_verifier_uses_structured_json_and_no_tools(self):
+        seen = []
+        answer = {"fact_verdicts": [{"fact_id": "F1", "grade": "supported",
+                                      "explanation": "Cited text supports it.", "unsupported_clause": ""}],
+                  "question_verdicts": []}
+        def handler(request):
+            seen.append(json.loads(request.content))
+            return httpx2.Response(200, json={
+                "candidates": [{"finishReason": "STOP", "content": {"parts": [{"text": json.dumps(answer)}]}}],
+                "usageMetadata": {"promptTokenCount": 9, "candidatesTokenCount": 4, "totalTokenCount": 13},
+            })
+        client = httpx2.Client(transport=httpx2.MockTransport(handler))
+        checker = GeminiSupportVerifier("gemini-2.5-flash", "test-secret", client)
+        self.addCleanup(checker.close)
+        result = checker.verify({"facts": [], "questions": []}, 2)
+        self.assertEqual(result["fact_verdicts"][0]["fact_id"], "F1")
+        self.assertEqual(result["usage"]["total_tokens"], 13)
+        self.assertNotIn("tools", seen[0])
+        self.assertEqual(seen[0]["generationConfig"]["responseMimeType"], "application/json")
 
     def test_http_errors_are_sanitized_and_not_retried(self):
         for status, code in ((400, "model_bad_request"), (403, "model_auth_error"), (404, "model_unavailable"),
@@ -105,7 +125,9 @@ class GeminiTests(unittest.TestCase):
             requests.append(json.loads(request.content))
             return httpx2.Response(200, json=next(replies))
         with tempfile.TemporaryDirectory() as directory:
-            result = run_research(self.model(handler), fixture_reader(), directory, max_steps=3, secrets=("test-secret",))
+            from helpers import FakeModel
+            result = run_research(self.model(handler), fixture_reader(), directory, max_steps=4,
+                                  secrets=("test-secret",), verifier=FakeModel([]))
             self.assertEqual(result["status"], "completed")
             self.assertEqual(result["metadata"]["provider"], "gemini")
             trace = json.loads((Path(result["run_dir"]) / "trace.json").read_text())

@@ -141,11 +141,6 @@ class Sources:
                 claim['evidence_refs'], source_orders, f'claim:{index}', errors,
             )
             resolved['claims'][index] = {'claim': claim['claim'], 'evidence_refs': canonical}
-        for index, coverage in enumerate(submission['coverage']):
-            canonical = self._resolve_references(
-                coverage['evidence_refs'], source_orders, f'coverage:{index}', errors,
-            )
-            resolved['coverage'][index] = {**coverage, 'evidence_refs': canonical}
         if errors:
             return None, errors
         # Keep fetched-page, exact-offset, and claim-reference checks together.

@@ -69,15 +69,16 @@ QUALIFICATION_SCHEMA = object_schema({
         "description": "Qualification is deliberately not assessed in this phase.",
     },
 })
-COVERAGE_REFERENCE_LIST = {
-    "type": "array", "items": EVIDENCE_REFERENCE,
-    "maxItems": MAX_EVIDENCE_REFS_PER_CLAIM, "uniqueItems": True,
+COVERAGE_FACT_REFS = {
+    "type": "array", "items": {"type": "integer", "minimum": 1},
+    "maxItems": 30, "uniqueItems": True,
+    "description": "One-based candidate fact indices supporting this topic.",
 }
 COVERAGE_SCHEMA = object_schema({
     "topic_id": TOPIC_ID,
     "status": {"type": "string", "enum": ["covered", "unresolved"]},
     "summary": SHORT_TEXT,
-    "evidence_refs": COVERAGE_REFERENCE_LIST,
+    "fact_refs": COVERAGE_FACT_REFS,
 })
 CANDIDATE_SCHEMA = object_schema({
     "url": TEXT,
@@ -116,15 +117,7 @@ SUBMISSION_SCHEMA = {**BRIEF_SCHEMA, "properties": {**BRIEF_SCHEMA["properties"]
                    },
                })},
     "coverage": {"type": "array", "minItems": len(RESEARCH_TOPICS),
-                 "maxItems": len(RESEARCH_TOPICS), "items": object_schema({
-                     "topic_id": TOPIC_ID,
-                     "status": {"type": "string", "enum": ["covered", "unresolved"]},
-                     "summary": SHORT_TEXT,
-                     "evidence_refs": {
-                         "type": "array", "items": EVIDENCE_SELECTOR,
-                         "maxItems": MAX_EVIDENCE_REFS_PER_CLAIM, "uniqueItems": True,
-                     },
-                 })},
+                 "maxItems": len(RESEARCH_TOPICS), "items": COVERAGE_SCHEMA},
 }}
 FETCH_SCHEMA = object_schema({"url": TEXT, "purpose": PURPOSE_TEXT, "topic_ids": TOPIC_IDS})
 TOOLS = [
@@ -206,13 +199,15 @@ def validate_brief(brief, pages, reader=None):
         coverage_by_topic[topic_id] = coverage
         if not coverage["summary"].strip():
             errors.append(f"coverage:{index}:empty_summary")
-        if coverage["status"] == "covered" and not coverage["evidence_refs"]:
-            errors.append(f"coverage:{index}:covered_without_evidence")
-        if coverage["status"] == "unresolved" and coverage["evidence_refs"]:
-            errors.append(f"coverage:{index}:unresolved_with_evidence")
-        errors.extend(_validate_resolved_references(
-            coverage["evidence_refs"], pages, f"coverage:{index}",
-        ))
+        if coverage["status"] == "covered" and not coverage["fact_refs"]:
+            errors.append(f"coverage:{index}:covered_without_facts")
+        if coverage["status"] == "unresolved" and coverage["fact_refs"]:
+            errors.append(f"coverage:{index}:unresolved_with_facts")
+        for ref in coverage["fact_refs"]:
+            if type(ref) is not int:
+                errors.append(f"coverage:{index}:fact_ref_not_integer")
+            elif ref > len(brief["claims"]):
+                errors.append(f"coverage:{index}:fact_ref_not_found")
     for topic_id in RESEARCH_TOPICS:
         if topic_id not in coverage_by_topic:
             errors.append(f"coverage:missing_topic:{topic_id}")

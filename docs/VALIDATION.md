@@ -10,7 +10,7 @@ The archive contains SHA-256 checksums, original ignored runs, pre-cleanup docs,
 the pre-cleanup Git status, and the preserved uncommitted documentation patch.
 No credentials are included.
 
-The current `phase1-coverage-v1` contract keeps the neutral brief,
+The current `phase1-support-check-v1` contract keeps the neutral brief,
 requires `qualification.status = not_assessed`, and permits zero discovery
 questions. It adds sentence-oriented evidence spans with exact normalized offsets
 and up to four ordered references per fact, capped at 1,800 combined characters.
@@ -37,6 +37,7 @@ not claims about the current live Keri Shull site.
 | Complete evidence references | 109 passed in 1.355 s |
 | Reader failure records and no-progress control | 122 passed in 2.259 s |
 | Research coverage and stopping checkpoint | 131 passed in 1.495 s |
+| Bounded factual-support checker | 151 passed in 1.790 s |
 
 Coverage includes correction after invalid evidence; unfetched and wrong-page
 citations; external, undiscovered, private, mixed, multicast, and rebound DNS
@@ -52,10 +53,15 @@ consent/reporting-period failure patterns. Reader coverage includes declared and
 observed sizes, exact/over-cap boundaries, truncated lower bounds, cached
 deterministic failures, transient recovery, discovered alternatives, partial
 research preservation, no-progress reasons, call accounting, and redaction.
-Coverage tests add trusted-topic integrity, bounded fetch purposes, evidence-linked
+Coverage tests add trusted-topic integrity, bounded fetch purposes, fact-linked
 coverage, homepage-only completion, follow-up-page investigation, visited/skipped/
 blocked/pending dispositions, unresolved rendering, stopping summaries, discovered
 URL inventory, fabricated visit/block rejection, and unchanged call accounting.
+Support-checker tests separate schema/provenance checks from mocked semantic
+verdicts; cover supported, partial, unsupported and malformed outcomes; preserve
+accepted bytes; remove dependent questions; downgrade coverage; distinguish
+provider failure from semantic rejection; and enforce early verification, the
+six-call research cap, one 503 retry, eight-call ceiling, and shared deadline.
 
 The current repository checks should be rerun with:
 
@@ -135,11 +141,29 @@ questions. Homepage-only research also omitted relevant seller-service and lead
 capture evidence on other pages.
 
 The atomic schema improved inspectability but did not produce a reviewable brief:
-structure enforcement is not semantic verification. The stronger-model
+structure enforcement is not semantic verification. A bounded checker is now
+implemented as an experiment, but no live checker evaluation was made for issue
+#10. The stronger-model
 comparison was inconclusive because provider availability prevented submission.
-Further live prompt tuning was stopped. The evidence-first pipeline described in
-[ARCHITECTURE.md](ARCHITECTURE.md) is the next design decision for review; it has
-not been implemented.
+Further live prompt tuning was stopped.
+
+The provisional checker gates require at least 30 independently human-labeled
+items across three companies, including at least 12 supported and 12 partial or
+unsupported facts. The retained repository cases and archived Jills/Keri reviews
+do not satisfy that size and company-diversity requirement. Therefore false
+acceptance, false rejection, supported-fact retention, question-verdict quality,
+token use, latency, and provider-failure gates remain unevaluated. Mocked tests
+must not be used to claim those gates passed.
+
+When that independent set exists, score saved prediction and run summaries with:
+
+```sh
+gtm-research evaluate-support human-labels.json verifier-predictions.json \
+  --runs verifier-runs.json
+```
+
+This reports whether the sample minimums are met before reporting the provisional
+gates as evaluable. It never generates or substitutes reference labels.
 
 Phase 1 requires a completed three-site pilot, manual grading of every fact,
 inference, and question premise, useful discovery coverage, and measured

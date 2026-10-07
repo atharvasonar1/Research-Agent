@@ -31,7 +31,7 @@ def mark_covered(value, topic_ids, source_id="S1"):
             item.update(
                 status="covered",
                 summary=f"The fetched source addresses {item['topic_id']}.",
-                evidence_refs=[{"source_id": source_id, "evidence_id": "E1"}],
+                fact_refs=[1],
             )
 
 
@@ -59,10 +59,11 @@ class ResearchCoverageTests(unittest.TestCase):
             "code": "sufficient_coverage",
             "summary": "The homepage addressed every trusted topic and exposed no relevant follow-up page.",
         }
-        result, trace, saved, model, _ = self.run_agent([fetch(), submit(value)], site, 2)
+        result, trace, saved, model, _ = self.run_agent([fetch(), submit(value)], site, 3)
         self.assertEqual(result["status"], "completed")
         self.assertEqual(result["metadata"]["pages"], 1)
-        self.assertEqual(result["metadata"]["model_calls"], 2)
+        self.assertEqual(result["metadata"]["model_calls"], 3)
+        self.assertEqual(result["metadata"]["research_model_calls"], 2)
         self.assertTrue(all(item["status"] == "covered" for item in saved["coverage"]))
         self.assertEqual(trace["discovered_urls"], [{
             "url": ROOT, "visited": True, "reader_errors": [],
@@ -77,7 +78,7 @@ class ResearchCoverageTests(unittest.TestCase):
             "code": "budget_limited",
             "summary": "The final decision slot was used to preserve the unresolved seller research.",
         }
-        result, trace, saved, _, path = self.run_agent([fetch(), submit(value)], max_steps=2)
+        result, trace, saved, _, path = self.run_agent([fetch(), submit(value)], max_steps=3)
         self.assertEqual(result["status"], "completed")
         self.assertEqual(saved["relevant_candidates"][0]["disposition"], "pending")
         self.assertIn(SELLERS, [item["url"] for item in trace["discovered_urls"]])
@@ -98,10 +99,11 @@ class ResearchCoverageTests(unittest.TestCase):
             "summary": "The relevant seller page was reviewed and remaining gaps are explicit.",
         }
         result, trace, saved, _, _ = self.run_agent(
-            [fetch(), fetch(SELLERS), submit(value)], max_steps=3,
+            [fetch(), fetch(SELLERS), submit(value)], max_steps=4,
         )
         self.assertEqual(result["status"], "completed")
-        self.assertEqual(result["metadata"]["model_calls"], 3)
+        self.assertEqual(result["metadata"]["model_calls"], 4)
+        self.assertEqual(result["metadata"]["research_model_calls"], 3)
         self.assertEqual(result["metadata"]["tool_calls"], 3)
         self.assertEqual(saved["relevant_candidates"][0]["disposition"], "visited")
         self.assertEqual(trace["coverage_checkpoint"]["stopping"]["code"],
@@ -127,7 +129,7 @@ class ResearchCoverageTests(unittest.TestCase):
         }
         site = WebsiteReader(ROOT, resolver=lambda *unused: PUBLIC_IP, transport=transport)
         result, _, saved, _, _ = self.run_agent(
-            [fetch(), fetch(SELLERS), submit(blocked_value)], site, 3,
+            [fetch(), fetch(SELLERS), submit(blocked_value)], site, 4,
         )
         self.assertEqual(result["status"], "completed")
         self.assertEqual(saved["relevant_candidates"][0]["disposition"], "blocked")
@@ -141,7 +143,7 @@ class ResearchCoverageTests(unittest.TestCase):
             "code": "sufficient_coverage",
             "summary": "The skip is explicit and seller-service coverage remains unresolved.",
         }
-        result, _, saved, _, _ = self.run_agent([fetch(), submit(skipped_value)], max_steps=2)
+        result, _, saved, _, _ = self.run_agent([fetch(), submit(skipped_value)], max_steps=3)
         self.assertEqual(result["status"], "completed")
         self.assertEqual(saved["relevant_candidates"][0]["disposition"], "skipped")
 
@@ -149,9 +151,9 @@ class ResearchCoverageTests(unittest.TestCase):
         bad_ref = submission()
         seller = next(item for item in bad_ref["coverage"] if item["topic_id"] == "seller_services")
         seller.update(status="covered", summary="Seller services were covered.",
-                      evidence_refs=[{"source_id": "S1", "evidence_id": "E99"}])
+                      fact_refs=[99])
         result, _, _, _, _ = self.run_agent([fetch(), submit(bad_ref)], max_steps=2)
-        self.assertIn("coverage:3:evidence_ref:0:evidence_not_found", result["metadata"]["errors"])
+        self.assertIn("coverage:3:fact_ref_not_found", result["metadata"]["errors"])
 
         false_visit = submission()
         false_visit["relevant_candidates"] = [candidate(
@@ -205,24 +207,22 @@ class ResearchCoverageTests(unittest.TestCase):
                 self.assertTrue(any(item.startswith("schema:")
                                     for item in result["metadata"]["errors"]))
 
-    def test_coverage_status_controls_evidence_shape(self):
+    def test_coverage_status_controls_fact_references(self):
         covered_without_evidence = submission()
         covered_without_evidence["coverage"][3].update(
-            status="covered", summary="Claims coverage without a source.", evidence_refs=[],
+            status="covered", summary="Claims coverage without a fact.", fact_refs=[],
         )
         result, _, _, _, _ = self.run_agent(
             [fetch(), submit(covered_without_evidence)], max_steps=2,
         )
-        self.assertIn("coverage:3:covered_without_evidence", result["metadata"]["errors"])
+        self.assertIn("coverage:3:covered_without_facts", result["metadata"]["errors"])
 
         unresolved_with_evidence = submission()
-        unresolved_with_evidence["coverage"][3]["evidence_refs"] = [
-            {"source_id": "S1", "evidence_id": "E1"},
-        ]
+        unresolved_with_evidence["coverage"][3]["fact_refs"] = [1]
         result, _, _, _, _ = self.run_agent(
             [fetch(), submit(unresolved_with_evidence)], max_steps=2,
         )
-        self.assertIn("coverage:3:unresolved_with_evidence", result["metadata"]["errors"])
+        self.assertIn("coverage:3:unresolved_with_facts", result["metadata"]["errors"])
 
 
 if __name__ == "__main__":

@@ -80,22 +80,22 @@ class OfflineModel:
             "coverage": [
                 {"topic_id": "company_identity", "status": "covered",
                  "summary": "The homepage identifies Harbor Example Realty.",
-                 "evidence_refs": [{"source_id": "S1", "evidence_id": "E1"}]},
+                 "fact_refs": [1]},
                 {"topic_id": "markets", "status": "unresolved",
                  "summary": "The fetched fixture pages do not name a served market.",
-                 "evidence_refs": []},
+                 "fact_refs": []},
                 {"topic_id": "team", "status": "unresolved",
                  "summary": "The fetched fixture pages do not describe team composition.",
-                 "evidence_refs": []},
+                 "fact_refs": []},
                 {"topic_id": "seller_services", "status": "covered",
                  "summary": "The follow-up page describes home valuation consultations.",
-                 "evidence_refs": [{"source_id": "S2", "evidence_id": "E1"}]},
+                 "fact_refs": [2]},
                 {"topic_id": "lead_capture", "status": "covered",
                  "summary": "The follow-up page describes a website request form.",
-                 "evidence_refs": [{"source_id": "S2", "evidence_id": "E1"}]},
+                 "fact_refs": [2]},
                 {"topic_id": "public_follow_up", "status": "unresolved",
                  "summary": "The fetched fixture pages do not state follow-up timing or process.",
-                 "evidence_refs": []},
+                 "fact_refs": []},
             ],
             "relevant_candidates": [{
                 "url": REPORTING,
@@ -108,6 +108,16 @@ class OfflineModel:
                 "summary": "The relevant discovered page was reviewed; remaining topics are explicit unknowns.",
             },
         })
+
+    def verify(self, candidate, timeout):
+        return {
+            "fact_verdicts": [
+                {"fact_id": "F1", "grade": "supported", "explanation": "The cited homepage excerpt states the identity.", "unsupported_clause": ""},
+                {"fact_id": "F2", "grade": "supported", "explanation": "The cited excerpts preserve the amount and reporting period.", "unsupported_clause": ""},
+            ],
+            "question_verdicts": [],
+            "usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0},
+        }
 
 
 def fixture_transport(url, address, timeout, max_bytes):
@@ -123,7 +133,7 @@ def main(argv=None):
         resolver=lambda *unused: "93.184.216.34",
         transport=fixture_transport,
     )
-    result = run_research(OfflineModel(), reader, output_dir=args.output_dir, max_steps=3)
+    result = run_research(OfflineModel(), reader, output_dir=args.output_dir, max_steps=4)
     print("SCRIPTED OFFLINE EXAMPLE: no model provider or website network calls were made.")
     print(json.dumps(result, indent=2))
     print(f"Brief: {result['run_dir']}/brief.md")

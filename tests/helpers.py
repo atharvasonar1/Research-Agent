@@ -24,6 +24,19 @@ class FakeModel:
             raise action
         return action
 
+    def verify(self, candidate, timeout):
+        return {
+            "fact_verdicts": [
+                {"fact_id": f"F{i}", "grade": "supported", "explanation": "Fixture evidence supports the fact.", "unsupported_clause": ""}
+                for i, _ in enumerate(candidate["facts"], 1)
+            ],
+            "question_verdicts": [
+                {"question_id": f"Q{i}", "grade": "neutral" if not q["premise_fact_ids"] else "premise_supported", "explanation": "Fixture question is neutral or has supported premises.", "unsupported_clause": ""}
+                for i, q in enumerate(candidate["questions"], 1)
+            ],
+            "usage": {},
+        }
+
 
 def brief():
     reader = fixture_reader()
@@ -51,22 +64,22 @@ def _base_submission():
         "coverage": [
             {"topic_id": "company_identity", "status": "covered",
              "summary": "The fetched homepage identifies the company.",
-             "evidence_refs": [{"source_id": "S1", "evidence_id": "E1"}]},
+             "fact_refs": [1]},
             {"topic_id": "markets", "status": "covered",
              "summary": "The fetched homepage names a served market.",
-             "evidence_refs": [{"source_id": "S1", "evidence_id": "E1"}]},
+             "fact_refs": [2]},
             {"topic_id": "team", "status": "covered",
              "summary": "The fetched homepage describes the team.",
-             "evidence_refs": [{"source_id": "S1", "evidence_id": "E1"}]},
+             "fact_refs": [1]},
             {"topic_id": "seller_services", "status": "unresolved",
              "summary": "Seller-service details are unresolved in this reusable fixture brief.",
-             "evidence_refs": []},
+             "fact_refs": []},
             {"topic_id": "lead_capture", "status": "unresolved",
              "summary": "Lead-capture details are unresolved in this reusable fixture brief.",
-             "evidence_refs": []},
+             "fact_refs": []},
             {"topic_id": "public_follow_up", "status": "unresolved",
              "summary": "Public follow-up timing and process were not stated on the fetched pages.",
-             "evidence_refs": []},
+             "fact_refs": []},
         ],
         "relevant_candidates": [],
         "stopping": {
@@ -92,11 +105,6 @@ def submission(value=None):
         claim["evidence_refs"] = [
             {"source_id": ref["source_id"], "evidence_id": ref["evidence_id"]}
             for ref in claim.get("evidence_refs", [])
-        ]
-    for coverage in value.get("coverage", []):
-        coverage["evidence_refs"] = [
-            {"source_id": ref["source_id"], "evidence_id": ref["evidence_id"]}
-            for ref in coverage.get("evidence_refs", [])
         ]
     return value
 

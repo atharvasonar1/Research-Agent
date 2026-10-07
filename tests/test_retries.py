@@ -9,7 +9,7 @@ import httpx2
 
 from gtm_research.agent import run_research
 from gtm_research.gemini import GeminiModel
-from helpers import brief, fixture_reader
+from helpers import FakeModel, brief, fixture_reader
 from test_gemini import response
 
 
@@ -26,7 +26,7 @@ class RetryTests(unittest.TestCase):
             model = GeminiModel('gemini-3.8-flash', 'test-secret', client)
             try:
                 with patch('gtm_research.agent.sleep') as sleeper, patch('gtm_research.agent.uniform', side_effect=lambda low, high: high):
-                    result = run_research(model, fixture_reader(), directory, **limits)
+                    result = run_research(model, fixture_reader(), directory, verifier=FakeModel([]), **limits)
                 trace = json.loads((Path(result['run_dir']) / 'trace.json').read_text())
                 exists = (Path(result['run_dir']) / 'brief.json').exists()
             finally:
@@ -36,9 +36,10 @@ class RetryTests(unittest.TestCase):
     def test_503_then_success_uses_existing_loop_and_records_retry(self):
         result, trace, requests, sleeper, exists = self.run_sequence([
             (503, {'error': {'message': 'temporary'}}), (200, response()),
-            (200, response('submit_brief', submission()))], max_steps=3)
+            (200, response('submit_brief', submission()))], max_steps=4)
         self.assertEqual(result['status'], 'completed')
-        self.assertEqual(result['metadata']['model_calls'], 3)
+        self.assertEqual(result['metadata']['model_calls'], 4)
+        self.assertEqual(result['metadata']['research_model_calls'], 3)
         self.assertEqual(result['metadata']['tool_calls'], 2)
         self.assertEqual(len(requests), 3)
         sleeper.assert_called_once_with(1.0)
@@ -100,5 +101,5 @@ class RetryTests(unittest.TestCase):
     def test_exponential_delay_has_a_hard_cap(self):
         result, trace, requests, sleeper, exists = self.run_sequence(
             [(503, {})] * 6, max_model_retries=5, max_steps=8)
-        self.assertEqual(result['reason'], 'gemini_503_retry_limit')
+        self.assertEqual(result['reason'], 'model_call_budget_exhausted_after_503')
         self.assertEqual([call.args[0] for call in sleeper.call_args_list], [1, 2, 4, 8, 8])

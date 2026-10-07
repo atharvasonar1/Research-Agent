@@ -42,11 +42,11 @@ class AtomicFactsTests(unittest.TestCase):
         self.value['coverage'] = [
             {'topic_id': 'company_identity', 'status': 'covered',
              'summary': 'The saved source identifies the company.',
-             'evidence_refs': [deepcopy(self.value['claims'][0]['evidence_refs'][0])]},
+             'fact_refs': [1]},
             *[
                 {'topic_id': topic_id, 'status': 'unresolved',
                  'summary': f'{topic_id} was not assessed by this saved regression.',
-                 'evidence_refs': []}
+                 'fact_refs': []}
                 for topic_id in ('markets', 'team', 'seller_services', 'lead_capture', 'public_follow_up')
             ],
         ]

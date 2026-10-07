@@ -7,6 +7,7 @@ import httpx2
 
 from .model import Action, INSTRUCTIONS, ModelError, RetryableModelError
 from .schema import TOOLS
+from .support import VERIFIER_INSTRUCTIONS, VERIFIER_SCHEMA, parse_verifier_json
 
 API_ROOT = "https://generativelanguage.googleapis.com/v1beta"
 
@@ -115,3 +116,38 @@ class GeminiModel:
 
     def close(self):
         self.client.close()
+
+
+class GeminiSupportVerifier(GeminiModel):
+    """One structured GenerateContent judgment with no tools or synthesis."""
+
+    def verify(self, candidate, timeout):
+        payload = {
+            "systemInstruction": {"parts": [{"text": VERIFIER_INSTRUCTIONS}]},
+            "contents": [{"role": "user", "parts": [{"text": json.dumps(candidate, ensure_ascii=False)}]}],
+            "generationConfig": {
+                "candidateCount": 1, "maxOutputTokens": 8192,
+                "responseMimeType": "application/json",
+                "responseSchema": gemini_schema(VERIFIER_SCHEMA),
+            },
+        }
+        value = self._request("POST", ":generateContent", timeout, payload)
+        try:
+            candidates = value.get("candidates", [])
+            if len(candidates) != 1 or candidates[0].get("finishReason") != "STOP":
+                raise ModelError("verifier_incomplete_response")
+            parts = candidates[0].get("content", {}).get("parts", [])
+            texts = [part["text"] for part in parts if isinstance(part.get("text"), str)]
+            if len(texts) != 1:
+                raise ModelError("verifier_invalid_response")
+            verdict = parse_verifier_json(texts[0])
+            raw = value.get("usageMetadata", {})
+            verdict["usage"] = {target: raw.get(source) for target, source in (
+                ("input_tokens", "promptTokenCount"), ("output_tokens", "candidatesTokenCount"),
+                ("thinking_tokens", "thoughtsTokenCount"), ("total_tokens", "totalTokenCount"),
+            )}
+            return verdict
+        except ModelError:
+            raise
+        except (KeyError, TypeError, ValueError):
+            raise ModelError("verifier_invalid_response") from None

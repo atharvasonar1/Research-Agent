@@ -36,10 +36,10 @@ def candidate(refs, value="Evidence Example"):
         "coverage": [
             {"topic_id": "company_identity", "status": "covered",
              "summary": "The source identifies the example company.",
-             "evidence_refs": [{"source_id": "S1", "evidence_id": "E1"}]},
+             "fact_refs": [1]},
             *[
                 {"topic_id": topic_id, "status": "unresolved",
-                 "summary": f"{topic_id} remains unresolved.", "evidence_refs": []}
+                 "summary": f"{topic_id} remains unresolved.", "fact_refs": []}
                 for topic_id in ("markets", "team", "seller_services", "lead_capture", "public_follow_up")
             ],
         ],

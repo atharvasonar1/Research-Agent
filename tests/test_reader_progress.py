@@ -185,7 +185,7 @@ class ReaderProgressTests(unittest.TestCase):
         site = reader(transport)
         model = FakeModel([fetch(), fetch(SELLERS), fetch(SELLERS), fetch(OTHER), submit()])
         with tempfile.TemporaryDirectory() as directory:
-            result = run_research(model, site, directory, max_steps=5)
+            result = run_research(model, site, directory, max_steps=6)
         self.assertEqual(result["status"], "completed")
         self.assertEqual(result["metadata"]["pages"], 2)
         self.assertIn("response_too_large", result["metadata"]["errors"])
