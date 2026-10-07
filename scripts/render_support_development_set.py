@@ -131,6 +131,10 @@ def render(data):
     ]
     for grade in ("supported", "partial", "unsupported"):
         lines.append(f"- **{grade.title()}:** {data['label_policy']['rubric'][grade]}")
+    lines.extend([
+        f"- **Evidence-only rule:** {data['label_policy']['strict_evidence_only_rule']}",
+        f"- **Website attribution:** {data['label_policy']['website_attribution_rule']}",
+    ])
     lines.extend(["",
         "## Evidence inventory", "",
     ])
@@ -148,6 +152,13 @@ def render(data):
     lines.extend(f"- {item}" for item in data["third_company_case_suggestions"]["supported_controls"])
     lines.extend(["", "### Suggested challenging cases", ""])
     lines.extend(f"- {item}" for item in data["third_company_case_suggestions"]["challenging_cases"])
+    candidate = data["third_company_candidate"]
+    lines.extend([
+        "", "### Selected development-only candidate", "",
+        f"- **{candidate['company']}** (`{candidate['domain']}`), status: `{candidate['status']}`.",
+        f"- Excluded from issue #11 acceptance sample: **{str(candidate['excluded_from_issue_11_acceptance_sample']).lower()}**.",
+        f"- Rationale: {candidate['selection_rationale']}",
+    ])
     for kind, heading in (("fact", "Fact cases"), ("question", "Discovery-question cases")):
         lines.extend(["", f"## {heading}", ""])
         for case in (item for item in data["cases"] if item["kind"] == kind):
@@ -162,6 +173,12 @@ def render(data):
             ])
             for prior in case.get("label_history", []):
                 lines.append(f"- Label history: **{prior['proposed_grade']}** (`{prior['status']}`) — {prior['reason']}")
+            alternative = case.get("website_attributed_wording_proposal")
+            if alternative:
+                lines.extend([
+                    f"- Website-attributed alternative: “{alternative['text']}” (`{alternative['status']}`).",
+                    f"- Alternative support scope: {alternative['support_scope']}",
+                ])
             for ref in case["evidence_refs"]:
                 lines.extend([
                     f"- Evidence `{ref['snapshot_id']}/{ref['source_id']}/{ref['evidence_id']}` — {ref['url']} — fetched {ref['fetched_at']} — offsets [{ref['start']}, {ref['end']}):",

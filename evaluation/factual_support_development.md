@@ -16,6 +16,8 @@
 - **Supported:** The cited evidence supports the entire claim.
 - **Partial:** The cited evidence supports a substantive part of the claim, but another clause or qualifier is missing.
 - **Unsupported:** The cited evidence does not establish the claim's central assertion. Unsupported does not necessarily mean contradicted or false.
+- **Evidence-only rule:** Assign support using only the exact cited evidence. Outside geographic, industry, company, or general knowledge cannot supply a missing qualifier, reporting period, relationship, or operational detail.
+- **Website attribution:** A supported website-attributed claim means the citation supports that the website makes the statement. It does not establish that a marketing promise is independently true.
 
 ## Evidence inventory
 
@@ -57,6 +59,12 @@
 - A bundled claim for which one substantive clause lacks support in the retained references.
 - A form-to-workflow claim that infers routing, response time, automation, or intent from visible fields.
 - A historical outcome reframed as a current service, guarantee, or operating practice.
+
+### Selected development-only candidate
+
+- **The Goodhart Group** (`thegoodhartgroup.com`), status: `proposed_not_fetched`.
+- Excluded from issue #11 acceptance sample: **true**.
+- Rationale: It is a real estate team distinct from the two development companies and is expected to expose public company, service, market, and contact material suitable for supported controls and missing-context challenges. Suitability under the current reader cap and same-host rules remains to be established by the proposed capture; no availability claim is made before that capture.
 
 ## Fact cases
 
@@ -241,6 +249,8 @@
 - Explanation: The marketing copy says the programs eliminate “typical risks”; it does not support the absolute qualifier “all.”
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
 - Origin: `deliberately_constructed_challenge` — unsupported-absolute-qualifier challenge
+- Website-attributed alternative: “The Keri Shull Team website says its guarantee programs eliminate typical risks associated with buying or selling properties.” (`proposed_unreviewed_alternative`).
+- Alternative support scope: This wording measures whether the cited evidence supports that the website makes the statement; it does not assess whether the marketing promise is true.
 - Evidence `keri-home-20261005/S1/E3` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [1189, 1599):
 
   > The team has helped thousands of families buy or sell their home in VA, DC, & MD. Keri offers her clients several GUARANTEE programs that eliminate the typical risks associated with buying or selling properties. Get in touch today for amazing results! Play Video Neighborhoods Washington Arlington Alexandria Falls Church McLean Vienna Fairfax Leesburg Chevy Chase Bethesda View All Client Success Stories 1 B.
