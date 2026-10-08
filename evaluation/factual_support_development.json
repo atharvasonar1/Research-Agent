@@ -62,12 +62,12 @@
   },
   "third_company_candidate": {
     "company": "The Goodhart Group",
-    "domain": "thegoodhartgroup.com",
-    "status": "capture_blocked_host",
+    "domain": "www.thegoodhartgroup.com",
+    "status": "capture_complete",
     "development_only": true,
     "excluded_from_issue_11_acceptance_sample": true,
-    "selection_rationale": "It is a real estate team distinct from the two development companies and was selected for public company, service, market, and contact material. The requested exact host redirected to www.thegoodhartgroup.com; WebsiteReader blocked that cross-host redirect before reading a body, so no cases can be created from this attempt.",
-    "capture_artifact": "evaluation/evidence/thegoodhartgroup_capture_2026-10-07.json"
+    "selection_rationale": "The separately authorized www hostname produced three complete guarded-reader snapshots: the homepage and two relevant same-host pages discovered from it. It remains development-only and excluded from issue #11's acceptance sample.",
+    "capture_artifact": "evaluation/evidence/thegoodhartgroup_capture_2026-10-08.json"
   },
   "snapshots": [
     {
@@ -145,6 +145,45 @@
       "eligible_for_cases": true,
       "provenance": "archive://Research-Agent-Issue1-Evidence-Archive-2026-09-30/original-runs/issue1-gemini-3.8-live/9f8bc7bd43754d9ea01b7dd6b1e67682/trace.json",
       "note": "Available saved page; no submitted brief was produced in this run."
+    },
+    {
+      "snapshot_id": "goodhart-home-20261008",
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "url": "https://www.thegoodhartgroup.com/",
+      "fetched_at": "2026-10-08T11:12:53.888439+00:00",
+      "observed_bytes": 240420,
+      "declared_content_length": null,
+      "normalized_text_sha256": "56ee8f0391b69b8f84d777d7e8f03a40f17c626de21ced21530a8729c16894db",
+      "complete_reader_snapshot": true,
+      "eligible_for_cases": true,
+      "provenance": "evaluation/evidence/thegoodhartgroup_capture_2026-10-08.json"
+    },
+    {
+      "snapshot_id": "goodhart-team-20261008",
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "url": "https://www.thegoodhartgroup.com/meet-our-real-estate-team/",
+      "fetched_at": "2026-10-08T11:13:40.032921+00:00",
+      "observed_bytes": 187224,
+      "declared_content_length": null,
+      "normalized_text_sha256": "b3d48bda2fa265fa1082edc2868bc1ed0ad3d030858af3266fdf310e8065570a",
+      "complete_reader_snapshot": true,
+      "eligible_for_cases": true,
+      "provenance": "evaluation/evidence/thegoodhartgroup_capture_2026-10-08.json"
+    },
+    {
+      "snapshot_id": "goodhart-selling-20261008",
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "url": "https://www.thegoodhartgroup.com/selling-your-home/",
+      "fetched_at": "2026-10-08T11:13:41.625042+00:00",
+      "observed_bytes": 239517,
+      "declared_content_length": null,
+      "normalized_text_sha256": "c08061d868552ef8cb4365337b336b48729dc780e7f4eb10462f0e4c10d67515",
+      "complete_reader_snapshot": true,
+      "eligible_for_cases": true,
+      "provenance": "evaluation/evidence/thegoodhartgroup_capture_2026-10-08.json"
     }
   ],
   "excluded_snapshot_inventory": [
@@ -172,7 +211,7 @@
       "domain": "thegoodhartgroup.com",
       "artifact": "evaluation/evidence/thegoodhartgroup_capture_2026-10-07.json",
       "observed_bytes": 0,
-      "reason": "The requested exact host returned HTTP 301 to www.thegoodhartgroup.com. The guarded reader rejected the cross-host redirect before reading a response body; no alternate-host retry was made and no evidence cases were created."
+      "reason": "The requested exact host returned HTTP 301 to www.thegoodhartgroup.com. The guarded reader rejected the cross-host redirect before reading a response body; no alternate-host retry was made and no evidence cases were created. This earlier blocked attempt is retained separately from the later authorized www-host capture."
     }
   ],
   "cases": [
@@ -212,146 +251,6 @@
       "origin_reference": ""
     },
     {
-      "case_id": "KERI-F002",
-      "kind": "fact",
-      "counts_toward_fact_requirement": true,
-      "company": "Keri Shull Team",
-      "domain": "kerishull.com",
-      "candidate_claim": {
-        "subject": "The Keri Shull Team website",
-        "relation": "reports serving",
-        "value": "Virginia, Maryland, and DC"
-      },
-      "evidence_refs": [
-        {
-          "snapshot_id": "keri-home-20261005",
-          "source_id": "S1",
-          "evidence_id": "E2",
-          "url": "https://kerishull.com/",
-          "fetched_at": "2026-10-05T16:45:04.517401+00:00",
-          "start": 600,
-          "end": 1188,
-          "text": "T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate."
-        }
-      ],
-      "proposed_grade": "supported",
-      "unsupported_clause": "",
-      "explanation": "The cited excerpt explicitly names all three jurisdictions.",
-      "label_status": "proposed_unreviewed",
-      "reviewer_provenance": {
-        "label_authority": "ai_proposed",
-        "proposal_source": "Codex preparation of issue #10 development set",
-        "human_approval": false
-      },
-      "case_origin": "supported_control",
-      "origin_reference": ""
-    },
-    {
-      "case_id": "KERI-F003",
-      "kind": "fact",
-      "counts_toward_fact_requirement": true,
-      "company": "Keri Shull Team",
-      "domain": "kerishull.com",
-      "candidate_claim": {
-        "subject": "The Keri Shull Team website",
-        "relation": "reports a client database of",
-        "value": "159,000+ clients who receive newsletters and marketing campaigns"
-      },
-      "evidence_refs": [
-        {
-          "snapshot_id": "keri-home-20261005",
-          "source_id": "S1",
-          "evidence_id": "E2",
-          "url": "https://kerishull.com/",
-          "fetched_at": "2026-10-05T16:45:04.517401+00:00",
-          "start": 600,
-          "end": 1188,
-          "text": "T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate."
-        }
-      ],
-      "proposed_grade": "supported",
-      "unsupported_clause": "",
-      "explanation": "The number and described newsletter/marketing use appear together in the cited excerpt.",
-      "label_status": "proposed_unreviewed",
-      "reviewer_provenance": {
-        "label_authority": "ai_proposed",
-        "proposal_source": "Codex preparation of issue #10 development set",
-        "human_approval": false
-      },
-      "case_origin": "supported_control",
-      "origin_reference": ""
-    },
-    {
-      "case_id": "KERI-F004",
-      "kind": "fact",
-      "counts_toward_fact_requirement": true,
-      "company": "Keri Shull Team",
-      "domain": "kerishull.com",
-      "candidate_claim": {
-        "subject": "The Keri Shull Team website",
-        "relation": "reports sales volume of",
-        "value": "$5B+"
-      },
-      "evidence_refs": [
-        {
-          "snapshot_id": "keri-home-20261005",
-          "source_id": "S1",
-          "evidence_id": "E2",
-          "url": "https://kerishull.com/",
-          "fetched_at": "2026-10-05T16:45:04.517401+00:00",
-          "start": 600,
-          "end": 1188,
-          "text": "T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate."
-        }
-      ],
-      "proposed_grade": "supported",
-      "unsupported_clause": "",
-      "explanation": "The cited excerpt explicitly displays “$5B+ in sales volume.”",
-      "label_status": "proposed_unreviewed",
-      "reviewer_provenance": {
-        "label_authority": "ai_proposed",
-        "proposal_source": "Codex preparation of issue #10 development set",
-        "human_approval": false
-      },
-      "case_origin": "supported_control",
-      "origin_reference": ""
-    },
-    {
-      "case_id": "KERI-F005",
-      "kind": "fact",
-      "counts_toward_fact_requirement": true,
-      "company": "Keri Shull Team",
-      "domain": "kerishull.com",
-      "candidate_claim": {
-        "subject": "The Keri Shull Team website",
-        "relation": "reports social-media followers totaling",
-        "value": "70K+"
-      },
-      "evidence_refs": [
-        {
-          "snapshot_id": "keri-home-20261005",
-          "source_id": "S1",
-          "evidence_id": "E2",
-          "url": "https://kerishull.com/",
-          "fetched_at": "2026-10-05T16:45:04.517401+00:00",
-          "start": 600,
-          "end": 1188,
-          "text": "T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate."
-        }
-      ],
-      "proposed_grade": "supported",
-      "unsupported_clause": "",
-      "explanation": "The cited excerpt explicitly displays “70K+ Followers.”",
-      "label_status": "proposed_unreviewed",
-      "reviewer_provenance": {
-        "label_authority": "ai_proposed",
-        "proposal_source": "Codex preparation of issue #10 development set",
-        "human_approval": false
-      },
-      "case_origin": "supported_control",
-      "origin_reference": ""
-    },
-    {
       "case_id": "KERI-F006",
       "kind": "fact",
       "counts_toward_fact_requirement": true,
@@ -377,41 +276,6 @@
       "proposed_grade": "supported",
       "unsupported_clause": "",
       "explanation": "The cited excerpt explicitly reports that over 22% of deals were sold off-market.",
-      "label_status": "proposed_unreviewed",
-      "reviewer_provenance": {
-        "label_authority": "ai_proposed",
-        "proposal_source": "Codex preparation of issue #10 development set",
-        "human_approval": false
-      },
-      "case_origin": "supported_control",
-      "origin_reference": ""
-    },
-    {
-      "case_id": "KERI-F007",
-      "kind": "fact",
-      "counts_toward_fact_requirement": true,
-      "company": "Keri Shull Team",
-      "domain": "kerishull.com",
-      "candidate_claim": {
-        "subject": "The Keri Shull Team website",
-        "relation": "describes the team as",
-        "value": "the Top Producing Real Estate Team in the DC Metro area"
-      },
-      "evidence_refs": [
-        {
-          "snapshot_id": "keri-home-20261005",
-          "source_id": "S1",
-          "evidence_id": "E2",
-          "url": "https://kerishull.com/",
-          "fetched_at": "2026-10-05T16:45:04.517401+00:00",
-          "start": 600,
-          "end": 1188,
-          "text": "T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate."
-        }
-      ],
-      "proposed_grade": "supported",
-      "unsupported_clause": "",
-      "explanation": "The description appears verbatim and is attributed to the website rather than independently asserted.",
       "label_status": "proposed_unreviewed",
       "reviewer_provenance": {
         "label_authority": "ai_proposed",
@@ -905,111 +769,6 @@
       "origin_reference": "archived atomic run C3 and AI-proposed review"
     },
     {
-      "case_id": "JILLS-F006",
-      "kind": "fact",
-      "counts_toward_fact_requirement": true,
-      "company": "The Jills Zeder Group",
-      "domain": "jillszeder.com",
-      "candidate_claim": {
-        "subject": "The Jills Zeder Group website",
-        "relation": "lists an office in",
-        "value": "Miami Beach"
-      },
-      "evidence_refs": [
-        {
-          "snapshot_id": "jills-home-20260927",
-          "source_id": "S1",
-          "evidence_id": "E2",
-          "url": "https://jillszeder.com/",
-          "fetched_at": "2026-09-27T14:10:48.266541+00:00",
-          "start": 595,
-          "end": 1194,
-          "text": "Luxury Rentals Buyers Buy With Us Neighborhood Guides Relocation Sellers List With Us Our Numbers Marketing Masters Global Connections Industry Experts Distinctive Sales About Us The Jills Zeder Group Client Reviews In The Media Blog Press Videos Contact Us MIAMI BEACH OFFICE 305.341.7447 1682 Jefferson Avenue Miami Beach, FL 33139 CORAL GABLES OFFICE 305.722.5721 4000 Ponce de Leon Blvd Suite 700 Coral Gables, FL 33146 FOLLOW US ON: Coral Gables Miami Beach LEAVE A MESSAGE First Name Last Name Email Address Phone Number Message By checking this box, I consent to receive text messages related"
-        }
-      ],
-      "proposed_grade": "supported",
-      "unsupported_clause": "",
-      "explanation": "The cited excerpt labels a Miami Beach office and gives its address.",
-      "label_status": "proposed_unreviewed",
-      "reviewer_provenance": {
-        "label_authority": "ai_proposed",
-        "proposal_source": "Codex preparation of issue #10 development set",
-        "human_approval": false
-      },
-      "case_origin": "supported_control",
-      "origin_reference": "narrow control from archived source-ID C3 evidence"
-    },
-    {
-      "case_id": "JILLS-F007",
-      "kind": "fact",
-      "counts_toward_fact_requirement": true,
-      "company": "The Jills Zeder Group",
-      "domain": "jillszeder.com",
-      "candidate_claim": {
-        "subject": "The Jills Zeder Group website",
-        "relation": "lists an office in",
-        "value": "Coral Gables"
-      },
-      "evidence_refs": [
-        {
-          "snapshot_id": "jills-home-20260927",
-          "source_id": "S1",
-          "evidence_id": "E2",
-          "url": "https://jillszeder.com/",
-          "fetched_at": "2026-09-27T14:10:48.266541+00:00",
-          "start": 595,
-          "end": 1194,
-          "text": "Luxury Rentals Buyers Buy With Us Neighborhood Guides Relocation Sellers List With Us Our Numbers Marketing Masters Global Connections Industry Experts Distinctive Sales About Us The Jills Zeder Group Client Reviews In The Media Blog Press Videos Contact Us MIAMI BEACH OFFICE 305.341.7447 1682 Jefferson Avenue Miami Beach, FL 33139 CORAL GABLES OFFICE 305.722.5721 4000 Ponce de Leon Blvd Suite 700 Coral Gables, FL 33146 FOLLOW US ON: Coral Gables Miami Beach LEAVE A MESSAGE First Name Last Name Email Address Phone Number Message By checking this box, I consent to receive text messages related"
-        }
-      ],
-      "proposed_grade": "supported",
-      "unsupported_clause": "",
-      "explanation": "The cited excerpt labels a Coral Gables office and gives its address.",
-      "label_status": "proposed_unreviewed",
-      "reviewer_provenance": {
-        "label_authority": "ai_proposed",
-        "proposal_source": "Codex preparation of issue #10 development set",
-        "human_approval": false
-      },
-      "case_origin": "supported_control",
-      "origin_reference": "narrow control from archived source-ID C3 evidence"
-    },
-    {
-      "case_id": "JILLS-F008",
-      "kind": "fact",
-      "counts_toward_fact_requirement": true,
-      "company": "The Jills Zeder Group",
-      "domain": "jillszeder.com",
-      "candidate_claim": {
-        "subject": "The Jills Zeder Group website",
-        "relation": "displays a message form with fields for",
-        "value": "name, email, phone number, and message"
-      },
-      "evidence_refs": [
-        {
-          "snapshot_id": "jills-home-20260927",
-          "source_id": "S1",
-          "evidence_id": "E2",
-          "url": "https://jillszeder.com/",
-          "fetched_at": "2026-09-27T14:10:48.266541+00:00",
-          "start": 595,
-          "end": 1194,
-          "text": "Luxury Rentals Buyers Buy With Us Neighborhood Guides Relocation Sellers List With Us Our Numbers Marketing Masters Global Connections Industry Experts Distinctive Sales About Us The Jills Zeder Group Client Reviews In The Media Blog Press Videos Contact Us MIAMI BEACH OFFICE 305.341.7447 1682 Jefferson Avenue Miami Beach, FL 33139 CORAL GABLES OFFICE 305.722.5721 4000 Ponce de Leon Blvd Suite 700 Coral Gables, FL 33146 FOLLOW US ON: Coral Gables Miami Beach LEAVE A MESSAGE First Name Last Name Email Address Phone Number Message By checking this box, I consent to receive text messages related"
-        }
-      ],
-      "proposed_grade": "supported",
-      "unsupported_clause": "",
-      "explanation": "All four field labels are visible in the cited excerpt; the claim does not assert successful submission or delivery.",
-      "label_status": "proposed_unreviewed",
-      "reviewer_provenance": {
-        "label_authority": "ai_proposed",
-        "proposal_source": "Codex preparation of issue #10 development set",
-        "human_approval": false
-      },
-      "case_origin": "supported_control",
-      "origin_reference": "narrow form-surface control from archived evidence"
-    },
-    {
       "case_id": "JILLS-F009",
       "kind": "fact",
       "counts_toward_fact_requirement": true,
@@ -1095,76 +854,6 @@
       },
       "case_origin": "supported_control",
       "origin_reference": "multi-reference consent control derived from archived split-sentence failure"
-    },
-    {
-      "case_id": "JILLS-F011",
-      "kind": "fact",
-      "counts_toward_fact_requirement": true,
-      "company": "The Jills Zeder Group",
-      "domain": "jillszeder.com",
-      "candidate_claim": {
-        "subject": "The Jills Zeder Group website",
-        "relation": "displays",
-        "value": "a newsletter signup"
-      },
-      "evidence_refs": [
-        {
-          "snapshot_id": "jills-home-20260927",
-          "source_id": "S1",
-          "evidence_id": "E13",
-          "url": "https://jillszeder.com/",
-          "fetched_at": "2026-09-27T14:10:48.266541+00:00",
-          "start": 6419,
-          "end": 6908,
-          "text": "Luxury Living Sign up for the latest lifestyle trends, market insights, and exclusive property updates. First Name Last Name Email Address Phone Number Message Stay in touch with The Jills Zeder exclusive newsletter. By checking this box, I consent to receive text messages related to information requests and showing requests from The Jills Zeder Group. You can reply \"STOP\" at any time to opt-out. Message and data rates may apply. Message frequency may vary. Text \"HELP\" for assistance."
-        }
-      ],
-      "proposed_grade": "supported",
-      "unsupported_clause": "",
-      "explanation": "The excerpt explicitly says “Sign up” and identifies an exclusive newsletter.",
-      "label_status": "proposed_unreviewed",
-      "reviewer_provenance": {
-        "label_authority": "ai_proposed",
-        "proposal_source": "Codex preparation of issue #10 development set",
-        "human_approval": false
-      },
-      "case_origin": "supported_control",
-      "origin_reference": "narrow control from archived atomic run C6 evidence"
-    },
-    {
-      "case_id": "JILLS-F012",
-      "kind": "fact",
-      "counts_toward_fact_requirement": true,
-      "company": "The Jills Zeder Group",
-      "domain": "jillszeder.com",
-      "candidate_claim": {
-        "subject": "The Jills Zeder Group newsletter signup",
-        "relation": "offers updates about",
-        "value": "lifestyle trends, market insights, and exclusive properties"
-      },
-      "evidence_refs": [
-        {
-          "snapshot_id": "jills-home-20260927",
-          "source_id": "S1",
-          "evidence_id": "E13",
-          "url": "https://jillszeder.com/",
-          "fetched_at": "2026-09-27T14:10:48.266541+00:00",
-          "start": 6419,
-          "end": 6908,
-          "text": "Luxury Living Sign up for the latest lifestyle trends, market insights, and exclusive property updates. First Name Last Name Email Address Phone Number Message Stay in touch with The Jills Zeder exclusive newsletter. By checking this box, I consent to receive text messages related to information requests and showing requests from The Jills Zeder Group. You can reply \"STOP\" at any time to opt-out. Message and data rates may apply. Message frequency may vary. Text \"HELP\" for assistance."
-        }
-      ],
-      "proposed_grade": "supported",
-      "unsupported_clause": "",
-      "explanation": "All three content categories appear explicitly in the cited signup excerpt.",
-      "label_status": "proposed_unreviewed",
-      "reviewer_provenance": {
-        "label_authority": "ai_proposed",
-        "proposal_source": "Codex preparation of issue #10 development set",
-        "human_approval": false
-      },
-      "case_origin": "supported_control",
-      "origin_reference": "archived atomic run C6; AI-proposed review marked span-supported"
     },
     {
       "case_id": "JILLS-F013",
@@ -1285,6 +974,356 @@
       },
       "case_origin": "deliberately_constructed_challenge",
       "origin_reference": "wrong-excerpt control pairing the supported JILLS-F001 claim with unrelated archived E10 evidence"
+    },
+    {
+      "case_id": "GOODHART-F001",
+      "kind": "fact",
+      "counts_toward_fact_requirement": true,
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "candidate_claim": {
+        "subject": "The website",
+        "relation": "identifies the organization as",
+        "value": "The Goodhart Group"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "goodhart-home-20261008",
+          "source_id": "S1",
+          "evidence_id": "E1",
+          "url": "https://www.thegoodhartgroup.com/",
+          "fetched_at": "2026-10-08T11:12:53.888439+00:00",
+          "start": 0,
+          "end": 54,
+          "text": "The Goodhart Group | Top Alexandria Real Estate Agents"
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The exact homepage title names The Goodhart Group.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+    },
+    {
+      "case_id": "GOODHART-F002",
+      "kind": "fact",
+      "counts_toward_fact_requirement": true,
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "candidate_claim": {
+        "subject": "The Goodhart Group website",
+        "relation": "describes assistance for",
+        "value": "buying, selling, relocating, and investing in new construction"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "goodhart-home-20261008",
+          "source_id": "S1",
+          "evidence_id": "E2",
+          "url": "https://www.thegoodhartgroup.com/",
+          "fetched_at": "2026-10-08T11:12:53.888439+00:00",
+          "start": 1458,
+          "end": 1628,
+          "text": "Whether you’re buying, selling, relocating, or investing in new construction, having top Alexandria real estate agents in your corner will make your next move successful."
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "All four activities appear in the cited website sentence.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+    },
+    {
+      "case_id": "GOODHART-F003",
+      "kind": "fact",
+      "counts_toward_fact_requirement": true,
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "candidate_claim": {
+        "subject": "The Goodhart Group homepage",
+        "relation": "displays contact fields for",
+        "value": "name, email, phone number, and a help request"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "goodhart-home-20261008",
+          "source_id": "S1",
+          "evidence_id": "E3",
+          "url": "https://www.thegoodhartgroup.com/",
+          "fetched_at": "2026-10-08T11:12:53.888439+00:00",
+          "start": 1805,
+          "end": 1875,
+          "text": "Your name * Your email * Your phone number How can we help you? Send Δ"
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The four visible field labels appear together; the claim does not assert submission or collection.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+    },
+    {
+      "case_id": "GOODHART-F004",
+      "kind": "fact",
+      "counts_toward_fact_requirement": true,
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "candidate_claim": {
+        "subject": "The team page",
+        "relation": "lists",
+        "value": "Sue Goodhart as CEO, Allison Goodhart DuShuttle as COO, and Marty Goodhart as CFO"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "goodhart-team-20261008",
+          "source_id": "S2",
+          "evidence_id": "E1",
+          "url": "https://www.thegoodhartgroup.com/meet-our-real-estate-team/",
+          "fetched_at": "2026-10-08T11:13:40.032921+00:00",
+          "start": 2562,
+          "end": 2727,
+          "text": "Sue Goodhart CEO & Top Producing Agent, VA | DC Meet Sue Allison Goodhart DuShuttle COO & Lead Licensed Agent (VA, DC, MD) Meet Allison Marty Goodhart CFO Meet Marty"
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The cited team excerpt pairs each named person with the stated role.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+    },
+    {
+      "case_id": "GOODHART-F005",
+      "kind": "fact",
+      "counts_toward_fact_requirement": true,
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "candidate_claim": {
+        "subject": "The Goodhart Group website",
+        "relation": "reports selling",
+        "value": "over 3,000 homes"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "goodhart-selling-20261008",
+          "source_id": "S3",
+          "evidence_id": "E1",
+          "url": "https://www.thegoodhartgroup.com/selling-your-home/",
+          "fetched_at": "2026-10-08T11:13:41.625042+00:00",
+          "start": 2521,
+          "end": 2736,
+          "text": "Our dedicated team members and unique marketing has allowed us to sell over 3,000+ homes through our local expertise in the DC Metro area, including Northern Virginia, Washington DC, Maryland, as well as Alexandria."
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The attributed claim retains the website's reported figure without supplying a period.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+    },
+    {
+      "case_id": "GOODHART-F006",
+      "kind": "fact",
+      "counts_toward_fact_requirement": true,
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "candidate_claim": {
+        "subject": "The Goodhart Group website",
+        "relation": "reports selling over 3,000 homes",
+        "value": "since 2020"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "goodhart-selling-20261008",
+          "source_id": "S3",
+          "evidence_id": "E1",
+          "url": "https://www.thegoodhartgroup.com/selling-your-home/",
+          "fetched_at": "2026-10-08T11:13:41.625042+00:00",
+          "start": 2521,
+          "end": 2736,
+          "text": "Our dedicated team members and unique marketing has allowed us to sell over 3,000+ homes through our local expertise in the DC Metro area, including Northern Virginia, Washington DC, Maryland, as well as Alexandria."
+        }
+      ],
+      "proposed_grade": "partial",
+      "unsupported_clause": "since 2020",
+      "explanation": "The cited excerpt supports the reported volume but contains no “since 2020” reporting period.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "deliberately_constructed_challenge",
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+    },
+    {
+      "case_id": "GOODHART-F007",
+      "kind": "fact",
+      "counts_toward_fact_requirement": true,
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "candidate_claim": {
+        "subject": "The Goodhart Group website",
+        "relation": "says its seller marketing uses",
+        "value": "direct mail, paper advertising, social media, email marketing, digital ads, and its website"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "goodhart-selling-20261008",
+          "source_id": "S3",
+          "evidence_id": "E2",
+          "url": "https://www.thegoodhartgroup.com/selling-your-home/",
+          "fetched_at": "2026-10-08T11:13:41.625042+00:00",
+          "start": 4345,
+          "end": 4777,
+          "text": "Our strategy is a combination of traditional and new media to showcase your home; using direct mail and paper advertising, as well as social media and email marketing, digital ads, and a prominent feature on our highly-trafficked website. Your listing will be published in local publications and magazines that showcase high-end listings, and the community newsletter that reaches approximately 12,000 people in the Alexandria area."
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "Every listed channel appears in the cited website description.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+    },
+    {
+      "case_id": "GOODHART-F008",
+      "kind": "fact",
+      "counts_toward_fact_requirement": true,
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "candidate_claim": {
+        "subject": "The Goodhart Group community newsletter",
+        "relation": "reaches exactly",
+        "value": "12,000 active subscribers"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "goodhart-selling-20261008",
+          "source_id": "S3",
+          "evidence_id": "E2",
+          "url": "https://www.thegoodhartgroup.com/selling-your-home/",
+          "fetched_at": "2026-10-08T11:13:41.625042+00:00",
+          "start": 4345,
+          "end": 4777,
+          "text": "Our strategy is a combination of traditional and new media to showcase your home; using direct mail and paper advertising, as well as social media and email marketing, digital ads, and a prominent feature on our highly-trafficked website. Your listing will be published in local publications and magazines that showcase high-end listings, and the community newsletter that reaches approximately 12,000 people in the Alexandria area."
+        }
+      ],
+      "proposed_grade": "partial",
+      "unsupported_clause": "exactly; active subscribers",
+      "explanation": "The excerpt says the newsletter reaches approximately 12,000 people; it does not support “exactly” or characterize them as active subscribers.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "deliberately_constructed_challenge",
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+    },
+    {
+      "case_id": "GOODHART-F009",
+      "kind": "fact",
+      "counts_toward_fact_requirement": true,
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "candidate_claim": {
+        "subject": "The Goodhart Group homepage form",
+        "relation": "automatically routes",
+        "value": "every inquiry to a licensed agent in its CRM"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "goodhart-home-20261008",
+          "source_id": "S1",
+          "evidence_id": "E3",
+          "url": "https://www.thegoodhartgroup.com/",
+          "fetched_at": "2026-10-08T11:12:53.888439+00:00",
+          "start": 1805,
+          "end": 1875,
+          "text": "Your name * Your email * Your phone number How can we help you? Send Δ"
+        }
+      ],
+      "proposed_grade": "unsupported",
+      "unsupported_clause": "automatically routes every inquiry to a licensed agent in its CRM",
+      "explanation": "Visible fields do not establish routing, recipients, a CRM, successful submission, or any automated workflow.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "deliberately_constructed_challenge",
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+    },
+    {
+      "case_id": "GOODHART-F010",
+      "kind": "fact",
+      "counts_toward_fact_requirement": true,
+      "company": "The Goodhart Group",
+      "domain": "www.thegoodhartgroup.com",
+      "candidate_claim": {
+        "subject": "The Goodhart Group",
+        "relation": "is affiliated with",
+        "value": "Compass"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "goodhart-team-20261008",
+          "source_id": "S2",
+          "evidence_id": "E1",
+          "url": "https://www.thegoodhartgroup.com/meet-our-real-estate-team/",
+          "fetched_at": "2026-10-08T11:13:40.032921+00:00",
+          "start": 2562,
+          "end": 2727,
+          "text": "Sue Goodhart CEO & Top Producing Agent, VA | DC Meet Sue Allison Goodhart DuShuttle COO & Lead Licensed Agent (VA, DC, MD) Meet Allison Marty Goodhart CFO Meet Marty"
+        }
+      ],
+      "proposed_grade": "unsupported",
+      "unsupported_clause": "is affiliated with Compass",
+      "explanation": "The cited team-role excerpt says nothing about a brokerage affiliation; outside company knowledge and uncited page text cannot supply it.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "deliberately_constructed_challenge",
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
     },
     {
       "case_id": "KERI-Q001",
@@ -1429,6 +1468,378 @@
       },
       "case_origin": "observed_agent_failure",
       "origin_reference": "deliberately constructed neutral control"
+    }
+  ],
+  "retired_cases": [
+    {
+      "case_id": "KERI-F002",
+      "kind": "fact",
+      "counts_toward_fact_requirement": false,
+      "company": "Keri Shull Team",
+      "domain": "kerishull.com",
+      "candidate_claim": {
+        "subject": "The Keri Shull Team website",
+        "relation": "reports serving",
+        "value": "Virginia, Maryland, and DC"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "keri-home-20261005",
+          "source_id": "S1",
+          "evidence_id": "E2",
+          "url": "https://kerishull.com/",
+          "fetched_at": "2026-10-05T16:45:04.517401+00:00",
+          "start": 600,
+          "end": 1188,
+          "text": "T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate."
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The cited excerpt explicitly names all three jurisdictions.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "",
+      "retirement_status": "retired_unreviewed_for_company_balance",
+      "retirement_reason": "Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company."
+    },
+    {
+      "case_id": "KERI-F003",
+      "kind": "fact",
+      "counts_toward_fact_requirement": false,
+      "company": "Keri Shull Team",
+      "domain": "kerishull.com",
+      "candidate_claim": {
+        "subject": "The Keri Shull Team website",
+        "relation": "reports a client database of",
+        "value": "159,000+ clients who receive newsletters and marketing campaigns"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "keri-home-20261005",
+          "source_id": "S1",
+          "evidence_id": "E2",
+          "url": "https://kerishull.com/",
+          "fetched_at": "2026-10-05T16:45:04.517401+00:00",
+          "start": 600,
+          "end": 1188,
+          "text": "T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate."
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The number and described newsletter/marketing use appear together in the cited excerpt.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "",
+      "retirement_status": "retired_unreviewed_for_company_balance",
+      "retirement_reason": "Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company."
+    },
+    {
+      "case_id": "KERI-F004",
+      "kind": "fact",
+      "counts_toward_fact_requirement": false,
+      "company": "Keri Shull Team",
+      "domain": "kerishull.com",
+      "candidate_claim": {
+        "subject": "The Keri Shull Team website",
+        "relation": "reports sales volume of",
+        "value": "$5B+"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "keri-home-20261005",
+          "source_id": "S1",
+          "evidence_id": "E2",
+          "url": "https://kerishull.com/",
+          "fetched_at": "2026-10-05T16:45:04.517401+00:00",
+          "start": 600,
+          "end": 1188,
+          "text": "T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate."
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The cited excerpt explicitly displays “$5B+ in sales volume.”",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "",
+      "retirement_status": "retired_unreviewed_for_company_balance",
+      "retirement_reason": "Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company."
+    },
+    {
+      "case_id": "KERI-F005",
+      "kind": "fact",
+      "counts_toward_fact_requirement": false,
+      "company": "Keri Shull Team",
+      "domain": "kerishull.com",
+      "candidate_claim": {
+        "subject": "The Keri Shull Team website",
+        "relation": "reports social-media followers totaling",
+        "value": "70K+"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "keri-home-20261005",
+          "source_id": "S1",
+          "evidence_id": "E2",
+          "url": "https://kerishull.com/",
+          "fetched_at": "2026-10-05T16:45:04.517401+00:00",
+          "start": 600,
+          "end": 1188,
+          "text": "T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate."
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The cited excerpt explicitly displays “70K+ Followers.”",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "",
+      "retirement_status": "retired_unreviewed_for_company_balance",
+      "retirement_reason": "Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company."
+    },
+    {
+      "case_id": "KERI-F007",
+      "kind": "fact",
+      "counts_toward_fact_requirement": false,
+      "company": "Keri Shull Team",
+      "domain": "kerishull.com",
+      "candidate_claim": {
+        "subject": "The Keri Shull Team website",
+        "relation": "describes the team as",
+        "value": "the Top Producing Real Estate Team in the DC Metro area"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "keri-home-20261005",
+          "source_id": "S1",
+          "evidence_id": "E2",
+          "url": "https://kerishull.com/",
+          "fetched_at": "2026-10-05T16:45:04.517401+00:00",
+          "start": 600,
+          "end": 1188,
+          "text": "T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate."
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The description appears verbatim and is attributed to the website rather than independently asserted.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "",
+      "retirement_status": "retired_unreviewed_for_company_balance",
+      "retirement_reason": "Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company."
+    },
+    {
+      "case_id": "JILLS-F006",
+      "kind": "fact",
+      "counts_toward_fact_requirement": false,
+      "company": "The Jills Zeder Group",
+      "domain": "jillszeder.com",
+      "candidate_claim": {
+        "subject": "The Jills Zeder Group website",
+        "relation": "lists an office in",
+        "value": "Miami Beach"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "jills-home-20260927",
+          "source_id": "S1",
+          "evidence_id": "E2",
+          "url": "https://jillszeder.com/",
+          "fetched_at": "2026-09-27T14:10:48.266541+00:00",
+          "start": 595,
+          "end": 1194,
+          "text": "Luxury Rentals Buyers Buy With Us Neighborhood Guides Relocation Sellers List With Us Our Numbers Marketing Masters Global Connections Industry Experts Distinctive Sales About Us The Jills Zeder Group Client Reviews In The Media Blog Press Videos Contact Us MIAMI BEACH OFFICE 305.341.7447 1682 Jefferson Avenue Miami Beach, FL 33139 CORAL GABLES OFFICE 305.722.5721 4000 Ponce de Leon Blvd Suite 700 Coral Gables, FL 33146 FOLLOW US ON: Coral Gables Miami Beach LEAVE A MESSAGE First Name Last Name Email Address Phone Number Message By checking this box, I consent to receive text messages related"
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The cited excerpt labels a Miami Beach office and gives its address.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "narrow control from archived source-ID C3 evidence",
+      "retirement_status": "retired_unreviewed_for_company_balance",
+      "retirement_reason": "Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company."
+    },
+    {
+      "case_id": "JILLS-F007",
+      "kind": "fact",
+      "counts_toward_fact_requirement": false,
+      "company": "The Jills Zeder Group",
+      "domain": "jillszeder.com",
+      "candidate_claim": {
+        "subject": "The Jills Zeder Group website",
+        "relation": "lists an office in",
+        "value": "Coral Gables"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "jills-home-20260927",
+          "source_id": "S1",
+          "evidence_id": "E2",
+          "url": "https://jillszeder.com/",
+          "fetched_at": "2026-09-27T14:10:48.266541+00:00",
+          "start": 595,
+          "end": 1194,
+          "text": "Luxury Rentals Buyers Buy With Us Neighborhood Guides Relocation Sellers List With Us Our Numbers Marketing Masters Global Connections Industry Experts Distinctive Sales About Us The Jills Zeder Group Client Reviews In The Media Blog Press Videos Contact Us MIAMI BEACH OFFICE 305.341.7447 1682 Jefferson Avenue Miami Beach, FL 33139 CORAL GABLES OFFICE 305.722.5721 4000 Ponce de Leon Blvd Suite 700 Coral Gables, FL 33146 FOLLOW US ON: Coral Gables Miami Beach LEAVE A MESSAGE First Name Last Name Email Address Phone Number Message By checking this box, I consent to receive text messages related"
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The cited excerpt labels a Coral Gables office and gives its address.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "narrow control from archived source-ID C3 evidence",
+      "retirement_status": "retired_unreviewed_for_company_balance",
+      "retirement_reason": "Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company."
+    },
+    {
+      "case_id": "JILLS-F008",
+      "kind": "fact",
+      "counts_toward_fact_requirement": false,
+      "company": "The Jills Zeder Group",
+      "domain": "jillszeder.com",
+      "candidate_claim": {
+        "subject": "The Jills Zeder Group website",
+        "relation": "displays a message form with fields for",
+        "value": "name, email, phone number, and message"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "jills-home-20260927",
+          "source_id": "S1",
+          "evidence_id": "E2",
+          "url": "https://jillszeder.com/",
+          "fetched_at": "2026-09-27T14:10:48.266541+00:00",
+          "start": 595,
+          "end": 1194,
+          "text": "Luxury Rentals Buyers Buy With Us Neighborhood Guides Relocation Sellers List With Us Our Numbers Marketing Masters Global Connections Industry Experts Distinctive Sales About Us The Jills Zeder Group Client Reviews In The Media Blog Press Videos Contact Us MIAMI BEACH OFFICE 305.341.7447 1682 Jefferson Avenue Miami Beach, FL 33139 CORAL GABLES OFFICE 305.722.5721 4000 Ponce de Leon Blvd Suite 700 Coral Gables, FL 33146 FOLLOW US ON: Coral Gables Miami Beach LEAVE A MESSAGE First Name Last Name Email Address Phone Number Message By checking this box, I consent to receive text messages related"
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "All four field labels are visible in the cited excerpt; the claim does not assert successful submission or delivery.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "narrow form-surface control from archived evidence",
+      "retirement_status": "retired_unreviewed_for_company_balance",
+      "retirement_reason": "Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company."
+    },
+    {
+      "case_id": "JILLS-F011",
+      "kind": "fact",
+      "counts_toward_fact_requirement": false,
+      "company": "The Jills Zeder Group",
+      "domain": "jillszeder.com",
+      "candidate_claim": {
+        "subject": "The Jills Zeder Group website",
+        "relation": "displays",
+        "value": "a newsletter signup"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "jills-home-20260927",
+          "source_id": "S1",
+          "evidence_id": "E13",
+          "url": "https://jillszeder.com/",
+          "fetched_at": "2026-09-27T14:10:48.266541+00:00",
+          "start": 6419,
+          "end": 6908,
+          "text": "Luxury Living Sign up for the latest lifestyle trends, market insights, and exclusive property updates. First Name Last Name Email Address Phone Number Message Stay in touch with The Jills Zeder exclusive newsletter. By checking this box, I consent to receive text messages related to information requests and showing requests from The Jills Zeder Group. You can reply \"STOP\" at any time to opt-out. Message and data rates may apply. Message frequency may vary. Text \"HELP\" for assistance."
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "The excerpt explicitly says “Sign up” and identifies an exclusive newsletter.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "narrow control from archived atomic run C6 evidence",
+      "retirement_status": "retired_unreviewed_for_company_balance",
+      "retirement_reason": "Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company."
+    },
+    {
+      "case_id": "JILLS-F012",
+      "kind": "fact",
+      "counts_toward_fact_requirement": false,
+      "company": "The Jills Zeder Group",
+      "domain": "jillszeder.com",
+      "candidate_claim": {
+        "subject": "The Jills Zeder Group newsletter signup",
+        "relation": "offers updates about",
+        "value": "lifestyle trends, market insights, and exclusive properties"
+      },
+      "evidence_refs": [
+        {
+          "snapshot_id": "jills-home-20260927",
+          "source_id": "S1",
+          "evidence_id": "E13",
+          "url": "https://jillszeder.com/",
+          "fetched_at": "2026-09-27T14:10:48.266541+00:00",
+          "start": 6419,
+          "end": 6908,
+          "text": "Luxury Living Sign up for the latest lifestyle trends, market insights, and exclusive property updates. First Name Last Name Email Address Phone Number Message Stay in touch with The Jills Zeder exclusive newsletter. By checking this box, I consent to receive text messages related to information requests and showing requests from The Jills Zeder Group. You can reply \"STOP\" at any time to opt-out. Message and data rates may apply. Message frequency may vary. Text \"HELP\" for assistance."
+        }
+      ],
+      "proposed_grade": "supported",
+      "unsupported_clause": "",
+      "explanation": "All three content categories appear explicitly in the cited signup excerpt.",
+      "label_status": "proposed_unreviewed",
+      "reviewer_provenance": {
+        "label_authority": "ai_proposed",
+        "proposal_source": "Codex preparation of issue #10 development set",
+        "human_approval": false
+      },
+      "case_origin": "supported_control",
+      "origin_reference": "archived atomic run C6; AI-proposed review marked span-supported",
+      "retirement_status": "retired_unreviewed_for_company_balance",
+      "retirement_reason": "Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company."
     }
   ]
 }

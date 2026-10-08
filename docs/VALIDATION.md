@@ -38,7 +38,7 @@ not claims about the current live Keri Shull site.
 | Reader failure records and no-progress control | 122 passed in 2.259 s |
 | Research coverage and stopping checkpoint | 131 passed in 1.495 s |
 | Bounded factual-support checker | 151 passed in 1.790 s |
-| Development-only capture and dataset revision | 161 passed in 1.827 s; 10 focused integrity tests |
+| Development-only capture and three-company rebalance | 162 passed in 1.708 s; 11 focused integrity tests |
 
 Coverage includes correction after invalid evidence; unfetched and wrong-page
 citations; external, undiscovered, private, mixed, multicast, and rebound DNS
@@ -150,20 +150,22 @@ Further live prompt tuning was stopped.
 
 The provisional checker gates require at least 30 independently human-labeled
 items across three companies, including at least 12 supported and 12 partial or
-unsupported facts. The retained repository cases and archived Jills/Keri reviews
-do not satisfy that size and company-diversity requirement. Therefore false
+unsupported facts. The development set now satisfies that proposed shape, but its
+labels do not have independent human approval. Therefore false
 acceptance, false rejection, supported-fact retention, question-verdict quality,
 token use, latency, and provider-failure gates remain unevaluated. Mocked tests
 must not be used to claim those gates passed.
 
-The development set now contains 30 distinct fact cases across the saved Keri
-Shull and Jills Zeder snapshots: 16 proposed supported, seven proposed partial, and
-seven proposed unsupported. Four discovery-question cases are stored separately
-and excluded from the fact count. All 34 labels remain `proposed_unreviewed`; the
+The development set now contains 30 active fact cases across saved Keri Shull,
+Jills Zeder, and Goodhart Group snapshots: 12 proposed supported, nine proposed
+partial, and nine proposed unsupported, with ten active cases per company. Four
+discovery-question cases are stored separately and excluded from the fact count.
+Ten displaced Keri/Jills controls remain under `retired_cases` with their evidence
+and proposal history. All active and retired labels remain `proposed_unreviewed`; the
 archived Codex reviews are AI-proposed, while the user's Keri observations are
 retained as provenance rather than silently converted into approved taxonomy
-labels. The exact remaining gaps are one additional real company and human review
-of every reference label. Bartic's truncated 250,001-byte prefix and Matt O'Neill's
+labels. The remaining reference-data gap is human review of every proposed label.
+Bartic's truncated 250,001-byte prefix and Matt O'Neill's
 no-page provider failure are inventoried but excluded from fact cases.
 
 Canonical data and generated review view:
@@ -190,6 +192,15 @@ reader rejected the cross-host redirect with `blocked_host` before reading a bod
 No alternate-host retry was made, no size limit changed, and no Goodhart evidence
 case was created. The preserved outcome is
 `evaluation/evidence/thegoodhartgroup_capture_2026-10-07.json`.
+
+On October 8, 2026, the user separately authorized
+`https://www.thegoodhartgroup.com/` as the starting boundary. The unchanged reader
+captured the homepage and the homepage-discovered team and seller pages with
+complete HTTP 200 reads of 240,420, 187,224, and 239,517 bytes. No redirects,
+generator calls, verifier calls, cap changes, or automatic retries occurred. The
+full normalized source text, hashes, timestamps, link inventory, reader settings,
+and outcomes are preserved in
+`evaluation/evidence/thegoodhartgroup_capture_2026-10-08.json`.
 
 When that independent set exists, score saved prediction and run summaries with:
 

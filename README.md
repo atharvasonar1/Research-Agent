@@ -128,9 +128,10 @@ Review the development set without provider or website access:
 
 The JSON file is canonical; the Markdown view is generated from it. The optional
 verifier-input export contains candidate text and cited evidence but strips every
-proposed label, explanation, origin, and reviewer field. The current 30 fact cases
-cover Keri Shull and Jills Zeder only, so the three-company gate remains unmet.
-All current labels are proposed and unreviewed.
+proposed label, explanation, origin, and reviewer field. The current 30 active fact
+cases cover Keri Shull, Jills Zeder, and The Goodhart Group, with ten cases per
+company. The shape and class-balance gates are met; all labels remain proposed and
+unreviewed, so the set is not ready for reference evaluation.
 
 Each invocation creates a unique ignored `runs/<id>/` directory containing
 `trace.json` and `result.json`. A verifier-accepted run also writes `brief.json` and

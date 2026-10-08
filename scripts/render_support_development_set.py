@@ -126,7 +126,7 @@ def render(data):
         f"- Discovery-question cases: {stats['question_cases']} (excluded from the fact-case count).",
         f"- Human-approved fact labels: {stats['human_approved_fact_labels']}.",
         f"- Ready for reference evaluation: **{'yes' if stats['ready_for_reference_evaluation'] else 'no'}**.",
-        "- Exact gap: the proposed case-count/class-balance targets are met, but only two real companies are represented and no taxonomy labels have human approval.", "",
+        f"- Exact gap: the proposed case-count, class-balance, and three-company targets are {'met' if stats['proposed_shape_gate_met'] else 'not met'}; no taxonomy labels have human approval.", "",
         "## Labeling rubric", "",
     ]
     for grade in ("supported", "partial", "unsupported"):
@@ -191,6 +191,14 @@ def render(data):
                     f"- Evidence `{ref['snapshot_id']}/{ref['source_id']}/{ref['evidence_id']}` — {ref['url']} — fetched {ref['fetched_at']} — offsets [{ref['start']}, {ref['end']}):",
                     "", f"  > {ref['text']}", "",
                 ])
+    retired = data.get("retired_cases", [])
+    if retired:
+        lines.extend(["", "## Retired cases retained for history", "",
+                      "These cases do not count toward the active development-set totals. Their original evidence and proposals remain in the canonical JSON.", ""])
+        for case in retired:
+            lines.extend([
+                f"- `{case['case_id']}` — {claim_text(case)} — proposed **{case['proposed_grade']}** (`{case['label_status']}`); {case['retirement_reason']}",
+            ])
     return "\n".join(lines).rstrip() + "\n"
 
 

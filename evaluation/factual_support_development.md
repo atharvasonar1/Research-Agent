@@ -4,12 +4,12 @@
 
 ## Readiness
 
-- Fact cases: 30 across 2 real companies.
-- Proposed grades: 16 supported, 7 partial, 7 unsupported.
+- Fact cases: 30 across 3 real companies.
+- Proposed grades: 12 supported, 9 partial, 9 unsupported.
 - Discovery-question cases: 4 (excluded from the fact-case count).
 - Human-approved fact labels: 0.
 - Ready for reference evaluation: **no**.
-- Exact gap: the proposed case-count/class-balance targets are met, but only two real companies are represented and no taxonomy labels have human approval.
+- Exact gap: the proposed case-count, class-balance, and three-company targets are met; no taxonomy labels have human approval.
 
 ## Labeling rubric
 
@@ -27,13 +27,16 @@
 - `jills-about-20260927` — The Jills Zeder Group, https://jillszeder.com/about-us/, fetched 2026-09-27T12:28:14.641256+00:00; 105,241 bytes; complete reader snapshot: true.
 - `jills-list-with-us-20260927` — The Jills Zeder Group, https://jillszeder.com/list-with-us/, fetched 2026-09-27T12:28:20.934265+00:00; 113,187 bytes; complete reader snapshot: true.
 - `jills-contact-us-20260927` — The Jills Zeder Group, https://jillszeder.com/contact-us/, fetched 2026-09-27T12:28:25.154017+00:00; 103,867 bytes; complete reader snapshot: true.
+- `goodhart-home-20261008` — The Goodhart Group, https://www.thegoodhartgroup.com/, fetched 2026-10-08T11:12:53.888439+00:00; 240,420 bytes; complete reader snapshot: true.
+- `goodhart-team-20261008` — The Goodhart Group, https://www.thegoodhartgroup.com/meet-our-real-estate-team/, fetched 2026-10-08T11:13:40.032921+00:00; 187,224 bytes; complete reader snapshot: true.
+- `goodhart-selling-20261008` — The Goodhart Group, https://www.thegoodhartgroup.com/selling-your-home/, fetched 2026-10-08T11:13:41.625042+00:00; 239,517 bytes; complete reader snapshot: true.
 
 ### Excluded evidence
 
 - Bartic Group (barticgroup.com): Truncated oversized-response prefix, not a completed reader snapshot; excluded from claim/evidence cases.
 - Matt O'Neill Real Estate (www.mattoneillrealestate.com): Provider failed before any page fetch; no evidence snapshot exists.
 - Harbor Example Realty (team.example): Synthetic fixture company; excluded from real-company development counts.
-- The Goodhart Group (thegoodhartgroup.com): The requested exact host returned HTTP 301 to www.thegoodhartgroup.com. The guarded reader rejected the cross-host redirect before reading a response body; no alternate-host retry was made and no evidence cases were created.
+- The Goodhart Group (thegoodhartgroup.com): The requested exact host returned HTTP 301 to www.thegoodhartgroup.com. The guarded reader rejected the cross-host redirect before reading a response body; no alternate-host retry was made and no evidence cases were created. This earlier blocked attempt is retained separately from the later authorized www-host capture.
 
 ## Review history
 
@@ -63,9 +66,9 @@
 
 ### Selected development-only candidate
 
-- **The Goodhart Group** (`thegoodhartgroup.com`), status: `capture_blocked_host`.
+- **The Goodhart Group** (`www.thegoodhartgroup.com`), status: `capture_complete`.
 - Excluded from issue #11 acceptance sample: **true**.
-- Rationale: It is a real estate team distinct from the two development companies and was selected for public company, service, market, and contact material. The requested exact host redirected to www.thegoodhartgroup.com; WebsiteReader blocked that cross-host redirect before reading a body, so no cases can be created from this attempt.
+- Rationale: The separately authorized www hostname produced three complete guarded-reader snapshots: the homepage and two relevant same-host pages discovered from it. It remains development-only and excluded from issue #11's acceptance sample.
 
 ## Fact cases
 
@@ -81,72 +84,12 @@
 
   > Virginia, Maryland, & DC Real Estate Agents | Keri Shull Team Home Search Home Valuation Cities Contact Us menu About About Us Careers Giving Back Properties Featured Properties Past Transactions Arlington Properties Home Search Arlington Alexandria Washington DC Falls Church Vienna McLean Search All Homes Cities Discover Arlington Home Valuation Client Success Stories Guarantees Buyer Guarantee Seller Guarantee Move Up Guarantees Relocation Guarantees Mortgage Calculator Financing Options Press & Media Condos Blog All Blogs Lifestyle Blogs Real Estate Blogs Videos Contact Us My Search Portal
 
-### KERI-F002 — Keri Shull Team
-
-- Candidate: The Keri Shull Team website — reports serving: Virginia, Maryland, and DC
-- Proposed grade: **supported**
-- Unsupported clause: None proposed
-- Explanation: The cited excerpt explicitly names all three jurisdictions.
-- Status: `proposed_unreviewed`; authority: `ai_proposed`.
-- Origin: `supported_control` — new control derived from saved evidence
-- Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
-
-  > T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate.
-
-### KERI-F003 — Keri Shull Team
-
-- Candidate: The Keri Shull Team website — reports a client database of: 159,000+ clients who receive newsletters and marketing campaigns
-- Proposed grade: **supported**
-- Unsupported clause: None proposed
-- Explanation: The number and described newsletter/marketing use appear together in the cited excerpt.
-- Status: `proposed_unreviewed`; authority: `ai_proposed`.
-- Origin: `supported_control` — new control derived from saved evidence
-- Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
-
-  > T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate.
-
-### KERI-F004 — Keri Shull Team
-
-- Candidate: The Keri Shull Team website — reports sales volume of: $5B+
-- Proposed grade: **supported**
-- Unsupported clause: None proposed
-- Explanation: The cited excerpt explicitly displays “$5B+ in sales volume.”
-- Status: `proposed_unreviewed`; authority: `ai_proposed`.
-- Origin: `supported_control` — new control derived from saved evidence
-- Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
-
-  > T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate.
-
-### KERI-F005 — Keri Shull Team
-
-- Candidate: The Keri Shull Team website — reports social-media followers totaling: 70K+
-- Proposed grade: **supported**
-- Unsupported clause: None proposed
-- Explanation: The cited excerpt explicitly displays “70K+ Followers.”
-- Status: `proposed_unreviewed`; authority: `ai_proposed`.
-- Origin: `supported_control` — new control derived from saved evidence
-- Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
-
-  > T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate.
-
 ### KERI-F006 — Keri Shull Team
 
 - Candidate: The Keri Shull Team website — reports that the share of deals sold off-market exceeds: 22%
 - Proposed grade: **supported**
 - Unsupported clause: None proposed
 - Explanation: The cited excerpt explicitly reports that over 22% of deals were sold off-market.
-- Status: `proposed_unreviewed`; authority: `ai_proposed`.
-- Origin: `supported_control` — new control derived from saved evidence
-- Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
-
-  > T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate.
-
-### KERI-F007 — Keri Shull Team
-
-- Candidate: The Keri Shull Team website — describes the team as: the Top Producing Real Estate Team in the DC Metro area
-- Proposed grade: **supported**
-- Unsupported clause: None proposed
-- Explanation: The description appears verbatim and is attributed to the website rather than independently asserted.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
 - Origin: `supported_control` — new control derived from saved evidence
 - Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
@@ -316,42 +259,6 @@
 
   > Servicing Miami Beach and Coral Gables FOR THE 6TH YEAR IN A ROW AS RANKED IN 2026 REALTRENDS VERIFIED AS PUBLISHED IN THE WALL STREET JOURNAL Let's Get Started Learn More I am a buyer I am a seller Schedule Consultation Featured Listings View Details Key Biscayne 485 Matheson Drive $237,000,000 5 Beds 9 Baths 11,528 SqFt View Details Golden Beach 355 Ocean Boulevard $89,000,000 13 Beds 21 Baths 23,695 SqFt View Details Golden Beach 105 + 115 Ocean Boulevard $67,500,000 10 Beds 18 Baths 13,323 SqFt View Details Golden Beach 105 + 115 Ocean Boulevard $67,500,000 View Details Miami Beach 36
 
-### JILLS-F006 — The Jills Zeder Group
-
-- Candidate: The Jills Zeder Group website — lists an office in: Miami Beach
-- Proposed grade: **supported**
-- Unsupported clause: None proposed
-- Explanation: The cited excerpt labels a Miami Beach office and gives its address.
-- Status: `proposed_unreviewed`; authority: `ai_proposed`.
-- Origin: `supported_control` — narrow control from archived source-ID C3 evidence
-- Evidence `jills-home-20260927/S1/E2` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [595, 1194):
-
-  > Luxury Rentals Buyers Buy With Us Neighborhood Guides Relocation Sellers List With Us Our Numbers Marketing Masters Global Connections Industry Experts Distinctive Sales About Us The Jills Zeder Group Client Reviews In The Media Blog Press Videos Contact Us MIAMI BEACH OFFICE 305.341.7447 1682 Jefferson Avenue Miami Beach, FL 33139 CORAL GABLES OFFICE 305.722.5721 4000 Ponce de Leon Blvd Suite 700 Coral Gables, FL 33146 FOLLOW US ON: Coral Gables Miami Beach LEAVE A MESSAGE First Name Last Name Email Address Phone Number Message By checking this box, I consent to receive text messages related
-
-### JILLS-F007 — The Jills Zeder Group
-
-- Candidate: The Jills Zeder Group website — lists an office in: Coral Gables
-- Proposed grade: **supported**
-- Unsupported clause: None proposed
-- Explanation: The cited excerpt labels a Coral Gables office and gives its address.
-- Status: `proposed_unreviewed`; authority: `ai_proposed`.
-- Origin: `supported_control` — narrow control from archived source-ID C3 evidence
-- Evidence `jills-home-20260927/S1/E2` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [595, 1194):
-
-  > Luxury Rentals Buyers Buy With Us Neighborhood Guides Relocation Sellers List With Us Our Numbers Marketing Masters Global Connections Industry Experts Distinctive Sales About Us The Jills Zeder Group Client Reviews In The Media Blog Press Videos Contact Us MIAMI BEACH OFFICE 305.341.7447 1682 Jefferson Avenue Miami Beach, FL 33139 CORAL GABLES OFFICE 305.722.5721 4000 Ponce de Leon Blvd Suite 700 Coral Gables, FL 33146 FOLLOW US ON: Coral Gables Miami Beach LEAVE A MESSAGE First Name Last Name Email Address Phone Number Message By checking this box, I consent to receive text messages related
-
-### JILLS-F008 — The Jills Zeder Group
-
-- Candidate: The Jills Zeder Group website — displays a message form with fields for: name, email, phone number, and message
-- Proposed grade: **supported**
-- Unsupported clause: None proposed
-- Explanation: All four field labels are visible in the cited excerpt; the claim does not assert successful submission or delivery.
-- Status: `proposed_unreviewed`; authority: `ai_proposed`.
-- Origin: `supported_control` — narrow form-surface control from archived evidence
-- Evidence `jills-home-20260927/S1/E2` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [595, 1194):
-
-  > Luxury Rentals Buyers Buy With Us Neighborhood Guides Relocation Sellers List With Us Our Numbers Marketing Masters Global Connections Industry Experts Distinctive Sales About Us The Jills Zeder Group Client Reviews In The Media Blog Press Videos Contact Us MIAMI BEACH OFFICE 305.341.7447 1682 Jefferson Avenue Miami Beach, FL 33139 CORAL GABLES OFFICE 305.722.5721 4000 Ponce de Leon Blvd Suite 700 Coral Gables, FL 33146 FOLLOW US ON: Coral Gables Miami Beach LEAVE A MESSAGE First Name Last Name Email Address Phone Number Message By checking this box, I consent to receive text messages related
-
 ### JILLS-F009 — The Jills Zeder Group
 
 - Candidate: The Jills Zeder Group — collects contact information via a form for: information requests and showing requests
@@ -380,30 +287,6 @@
 - Evidence `jills-home-20260927/S1/E3` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [1195, 1754):
 
   > to information requests and showing requests from The Jills Zeder Group. You can reply "STOP" at any time to opt-out. Message and data rates may apply. Message frequency may vary. Text "HELP" for assistance. For more information, please visit our Privacy Policy and SMS Terms & Conditions Please prove you are human by selecting the tree . Submit Form Connect With Us Join Our VIP List Join Our VIP List Join our VIP list By checking this box, I consent to receive text messages related to information requests and showing requests from The Jills Zeder Group.
-
-### JILLS-F011 — The Jills Zeder Group
-
-- Candidate: The Jills Zeder Group website — displays: a newsletter signup
-- Proposed grade: **supported**
-- Unsupported clause: None proposed
-- Explanation: The excerpt explicitly says “Sign up” and identifies an exclusive newsletter.
-- Status: `proposed_unreviewed`; authority: `ai_proposed`.
-- Origin: `supported_control` — narrow control from archived atomic run C6 evidence
-- Evidence `jills-home-20260927/S1/E13` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [6419, 6908):
-
-  > Luxury Living Sign up for the latest lifestyle trends, market insights, and exclusive property updates. First Name Last Name Email Address Phone Number Message Stay in touch with The Jills Zeder exclusive newsletter. By checking this box, I consent to receive text messages related to information requests and showing requests from The Jills Zeder Group. You can reply "STOP" at any time to opt-out. Message and data rates may apply. Message frequency may vary. Text "HELP" for assistance.
-
-### JILLS-F012 — The Jills Zeder Group
-
-- Candidate: The Jills Zeder Group newsletter signup — offers updates about: lifestyle trends, market insights, and exclusive properties
-- Proposed grade: **supported**
-- Unsupported clause: None proposed
-- Explanation: All three content categories appear explicitly in the cited signup excerpt.
-- Status: `proposed_unreviewed`; authority: `ai_proposed`.
-- Origin: `supported_control` — archived atomic run C6; AI-proposed review marked span-supported
-- Evidence `jills-home-20260927/S1/E13` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [6419, 6908):
-
-  > Luxury Living Sign up for the latest lifestyle trends, market insights, and exclusive property updates. First Name Last Name Email Address Phone Number Message Stay in touch with The Jills Zeder exclusive newsletter. By checking this box, I consent to receive text messages related to information requests and showing requests from The Jills Zeder Group. You can reply "STOP" at any time to opt-out. Message and data rates may apply. Message frequency may vary. Text "HELP" for assistance.
 
 ### JILLS-F013 — The Jills Zeder Group
 
@@ -443,6 +326,126 @@
 - Evidence `jills-home-20260927/S1/E10` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [4839, 5332):
 
   > List With Us Follow Us On Instagram @JILLSZEDERBEACH @JILLSZEDERGABLES Call To Actions NEIGHBORHOOD GUIDES Explore LUXURY CONDOS Explore PROPERTY SEARCH Explore In The Media The Jills Zeder Group is regularly featured in both national and local media, appearing in The Wall Street Journal, CNBC, Curbed, Forbes, Haute Living, Mansion Global, Miami Magazine, Ocean Drive magazine, Robb Report, South Florida Business Journal, The Real Deal, the Miami Herald, and the Sun Sentinel, among others.
+
+### GOODHART-F001 — The Goodhart Group
+
+- Candidate: The website — identifies the organization as: The Goodhart Group
+- Proposed grade: **supported**
+- Unsupported clause: None proposed
+- Explanation: The exact homepage title names The Goodhart Group.
+- Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
+- Evidence `goodhart-home-20261008/S1/E1` — https://www.thegoodhartgroup.com/ — fetched 2026-10-08T11:12:53.888439+00:00 — offsets [0, 54):
+
+  > The Goodhart Group | Top Alexandria Real Estate Agents
+
+### GOODHART-F002 — The Goodhart Group
+
+- Candidate: The Goodhart Group website — describes assistance for: buying, selling, relocating, and investing in new construction
+- Proposed grade: **supported**
+- Unsupported clause: None proposed
+- Explanation: All four activities appear in the cited website sentence.
+- Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
+- Evidence `goodhart-home-20261008/S1/E2` — https://www.thegoodhartgroup.com/ — fetched 2026-10-08T11:12:53.888439+00:00 — offsets [1458, 1628):
+
+  > Whether you’re buying, selling, relocating, or investing in new construction, having top Alexandria real estate agents in your corner will make your next move successful.
+
+### GOODHART-F003 — The Goodhart Group
+
+- Candidate: The Goodhart Group homepage — displays contact fields for: name, email, phone number, and a help request
+- Proposed grade: **supported**
+- Unsupported clause: None proposed
+- Explanation: The four visible field labels appear together; the claim does not assert submission or collection.
+- Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
+- Evidence `goodhart-home-20261008/S1/E3` — https://www.thegoodhartgroup.com/ — fetched 2026-10-08T11:12:53.888439+00:00 — offsets [1805, 1875):
+
+  > Your name * Your email * Your phone number How can we help you? Send Δ
+
+### GOODHART-F004 — The Goodhart Group
+
+- Candidate: The team page — lists: Sue Goodhart as CEO, Allison Goodhart DuShuttle as COO, and Marty Goodhart as CFO
+- Proposed grade: **supported**
+- Unsupported clause: None proposed
+- Explanation: The cited team excerpt pairs each named person with the stated role.
+- Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
+- Evidence `goodhart-team-20261008/S2/E1` — https://www.thegoodhartgroup.com/meet-our-real-estate-team/ — fetched 2026-10-08T11:13:40.032921+00:00 — offsets [2562, 2727):
+
+  > Sue Goodhart CEO & Top Producing Agent, VA | DC Meet Sue Allison Goodhart DuShuttle COO & Lead Licensed Agent (VA, DC, MD) Meet Allison Marty Goodhart CFO Meet Marty
+
+### GOODHART-F005 — The Goodhart Group
+
+- Candidate: The Goodhart Group website — reports selling: over 3,000 homes
+- Proposed grade: **supported**
+- Unsupported clause: None proposed
+- Explanation: The attributed claim retains the website's reported figure without supplying a period.
+- Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
+- Evidence `goodhart-selling-20261008/S3/E1` — https://www.thegoodhartgroup.com/selling-your-home/ — fetched 2026-10-08T11:13:41.625042+00:00 — offsets [2521, 2736):
+
+  > Our dedicated team members and unique marketing has allowed us to sell over 3,000+ homes through our local expertise in the DC Metro area, including Northern Virginia, Washington DC, Maryland, as well as Alexandria.
+
+### GOODHART-F006 — The Goodhart Group
+
+- Candidate: The Goodhart Group website — reports selling over 3,000 homes: since 2020
+- Proposed grade: **partial**
+- Unsupported clause: since 2020
+- Explanation: The cited excerpt supports the reported volume but contains no “since 2020” reporting period.
+- Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- Origin: `deliberately_constructed_challenge` — development-only Goodhart guarded-reader capture; no generator output exists
+- Evidence `goodhart-selling-20261008/S3/E1` — https://www.thegoodhartgroup.com/selling-your-home/ — fetched 2026-10-08T11:13:41.625042+00:00 — offsets [2521, 2736):
+
+  > Our dedicated team members and unique marketing has allowed us to sell over 3,000+ homes through our local expertise in the DC Metro area, including Northern Virginia, Washington DC, Maryland, as well as Alexandria.
+
+### GOODHART-F007 — The Goodhart Group
+
+- Candidate: The Goodhart Group website — says its seller marketing uses: direct mail, paper advertising, social media, email marketing, digital ads, and its website
+- Proposed grade: **supported**
+- Unsupported clause: None proposed
+- Explanation: Every listed channel appears in the cited website description.
+- Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
+- Evidence `goodhart-selling-20261008/S3/E2` — https://www.thegoodhartgroup.com/selling-your-home/ — fetched 2026-10-08T11:13:41.625042+00:00 — offsets [4345, 4777):
+
+  > Our strategy is a combination of traditional and new media to showcase your home; using direct mail and paper advertising, as well as social media and email marketing, digital ads, and a prominent feature on our highly-trafficked website. Your listing will be published in local publications and magazines that showcase high-end listings, and the community newsletter that reaches approximately 12,000 people in the Alexandria area.
+
+### GOODHART-F008 — The Goodhart Group
+
+- Candidate: The Goodhart Group community newsletter — reaches exactly: 12,000 active subscribers
+- Proposed grade: **partial**
+- Unsupported clause: exactly; active subscribers
+- Explanation: The excerpt says the newsletter reaches approximately 12,000 people; it does not support “exactly” or characterize them as active subscribers.
+- Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- Origin: `deliberately_constructed_challenge` — development-only Goodhart guarded-reader capture; no generator output exists
+- Evidence `goodhart-selling-20261008/S3/E2` — https://www.thegoodhartgroup.com/selling-your-home/ — fetched 2026-10-08T11:13:41.625042+00:00 — offsets [4345, 4777):
+
+  > Our strategy is a combination of traditional and new media to showcase your home; using direct mail and paper advertising, as well as social media and email marketing, digital ads, and a prominent feature on our highly-trafficked website. Your listing will be published in local publications and magazines that showcase high-end listings, and the community newsletter that reaches approximately 12,000 people in the Alexandria area.
+
+### GOODHART-F009 — The Goodhart Group
+
+- Candidate: The Goodhart Group homepage form — automatically routes: every inquiry to a licensed agent in its CRM
+- Proposed grade: **unsupported**
+- Unsupported clause: automatically routes every inquiry to a licensed agent in its CRM
+- Explanation: Visible fields do not establish routing, recipients, a CRM, successful submission, or any automated workflow.
+- Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- Origin: `deliberately_constructed_challenge` — development-only Goodhart guarded-reader capture; no generator output exists
+- Evidence `goodhart-home-20261008/S1/E3` — https://www.thegoodhartgroup.com/ — fetched 2026-10-08T11:12:53.888439+00:00 — offsets [1805, 1875):
+
+  > Your name * Your email * Your phone number How can we help you? Send Δ
+
+### GOODHART-F010 — The Goodhart Group
+
+- Candidate: The Goodhart Group — is affiliated with: Compass
+- Proposed grade: **unsupported**
+- Unsupported clause: is affiliated with Compass
+- Explanation: The cited team-role excerpt says nothing about a brokerage affiliation; outside company knowledge and uncited page text cannot supply it.
+- Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- Origin: `deliberately_constructed_challenge` — development-only Goodhart guarded-reader capture; no generator output exists
+- Evidence `goodhart-team-20261008/S2/E1` — https://www.thegoodhartgroup.com/meet-our-real-estate-team/ — fetched 2026-10-08T11:13:40.032921+00:00 — offsets [2562, 2727):
+
+  > Sue Goodhart CEO & Top Producing Agent, VA | DC Meet Sue Allison Goodhart DuShuttle COO & Lead Licensed Agent (VA, DC, MD) Meet Allison Marty Goodhart CFO Meet Marty
 
 
 ## Discovery-question cases
@@ -502,3 +505,19 @@
 - Evidence `jills-home-20260927/S1/E7` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [3256, 3837):
 
   > The Jills® and The Zeder Team combining over four decades of experience, unparalleled expertise, and superior business savvy have come together to become The Jills Zeder Group, affiliated with Coldwell Banker Realty. The Jills Zeder Group is a powerhouse team of real estate experts specializing in the most magnificent properties in South Florida. And with their increased footprint, global reach, and worldwide marketing platform, The Jills Zeder Group has closed over $13 Billion worth of sales. Their combined track record speaks for itself: you are in extremely capable hands.
+
+
+## Retired cases retained for history
+
+These cases do not count toward the active development-set totals. Their original evidence and proposals remain in the canonical JSON.
+
+- `KERI-F002` — The Keri Shull Team website — reports serving: Virginia, Maryland, and DC — proposed **supported** (`proposed_unreviewed`); Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company.
+- `KERI-F003` — The Keri Shull Team website — reports a client database of: 159,000+ clients who receive newsletters and marketing campaigns — proposed **supported** (`proposed_unreviewed`); Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company.
+- `KERI-F004` — The Keri Shull Team website — reports sales volume of: $5B+ — proposed **supported** (`proposed_unreviewed`); Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company.
+- `KERI-F005` — The Keri Shull Team website — reports social-media followers totaling: 70K+ — proposed **supported** (`proposed_unreviewed`); Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company.
+- `KERI-F007` — The Keri Shull Team website — describes the team as: the Top Producing Real Estate Team in the DC Metro area — proposed **supported** (`proposed_unreviewed`); Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company.
+- `JILLS-F006` — The Jills Zeder Group website — lists an office in: Miami Beach — proposed **supported** (`proposed_unreviewed`); Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company.
+- `JILLS-F007` — The Jills Zeder Group website — lists an office in: Coral Gables — proposed **supported** (`proposed_unreviewed`); Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company.
+- `JILLS-F008` — The Jills Zeder Group website — displays a message form with fields for: name, email, phone number, and message — proposed **supported** (`proposed_unreviewed`); Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company.
+- `JILLS-F011` — The Jills Zeder Group website — displays: a newsletter signup — proposed **supported** (`proposed_unreviewed`); Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company.
+- `JILLS-F012` — The Jills Zeder Group newsletter signup — offers updates about: lifestyle trends, market insights, and exclusive properties — proposed **supported** (`proposed_unreviewed`); Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company.
