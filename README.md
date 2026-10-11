@@ -123,7 +123,8 @@ Review the development set without provider or website access:
 .venv/bin/python scripts/render_support_development_set.py \
   evaluation/factual_support_development.json \
   --output evaluation/factual_support_development.md \
-  --verifier-input /tmp/factual-support-verifier-input.json
+  --verifier-input /tmp/factual-support-verifier-input.json \
+  --ai-labels /tmp/factual-support-ai-labels.json
 ```
 
 The JSON file is canonical; the Markdown view is generated from it. The optional
@@ -132,6 +133,23 @@ proposed label, explanation, origin, and reviewer field. The current 30 active f
 cases cover Keri Shull, Jills Zeder, and The Goodhart Group, with ten cases per
 company. The shape and class-balance gates are met; all labels remain proposed and
 unreviewed, so the set is not ready for reference evaluation.
+
+The AI-label export is for exploratory scoring only and is never verifier input.
+After verifier predictions and run measurements exist, score it with:
+
+```sh
+gtm-research evaluate-support \
+  /tmp/factual-support-ai-labels.json \
+  runs/support-development/verifier-predictions.json \
+  --runs runs/support-development/verifier-runs.json \
+  --reference-mode ai-exploratory
+```
+
+This reports supported-versus-not-supported filtering, exact three-grade
+agreement, ambiguity sensitivity, separate question results, usage, latency,
+provider failures, and incomplete responses. AI mode cannot satisfy the human
+acceptance gate. `verify-saved` accepts a research trace, but no batch command yet
+turns the development-set export into the prediction and run files above.
 
 Each invocation creates a unique ignored `runs/<id>/` directory containing
 `trace.json` and `result.json`. A verifier-accepted run also writes `brief.json` and

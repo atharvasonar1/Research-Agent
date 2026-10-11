@@ -1,6 +1,7 @@
 """Offline checks of the installed CLI and configuration errors."""
 
 from importlib.metadata import version
+import json
 import os
 import shutil
 import subprocess
@@ -107,3 +108,25 @@ class CliSmokeTests(unittest.TestCase):
             self.assertEqual(result, 0)
             outputs = list(Path(directory).glob("*/verified-brief.json"))
             self.assertEqual(len(outputs), 1)
+
+    def test_ai_exploratory_scoring_never_activates_human_gate(self):
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            labels = [{
+                "case_id": f"F{i}", "company": f"Company-{i % 3}", "kind": "fact",
+                "ai_label": "supported" if i <= 12 else "partial",
+                "ambiguous": False, "ambiguity_note": "", "reviewer_kind": "ai",
+            } for i in range(1, 31)]
+            predictions = [{"case_id": item["case_id"], "grade": item["ai_label"]} for item in labels]
+            labels_path, predictions_path = root / "labels.json", root / "predictions.json"
+            labels_path.write_text(json.dumps(labels))
+            predictions_path.write_text(json.dumps(predictions))
+            with patch("builtins.print") as output:
+                result = main(["evaluate-support", str(labels_path), str(predictions_path),
+                               "--reference-mode", "ai-exploratory"])
+            metrics = json.loads(output.call_args.args[0])
+            self.assertEqual(result, 0)
+            self.assertTrue(metrics["exploratory_shape_evaluable"])
+            self.assertFalse(metrics["acceptance_gate_applicable"])
+            self.assertFalse(metrics["provisional_gates_evaluable"])

@@ -39,6 +39,7 @@ not claims about the current live Keri Shull site.
 | Research coverage and stopping checkpoint | 131 passed in 1.495 s |
 | Bounded factual-support checker | 151 passed in 1.790 s |
 | Development-only capture and three-company rebalance | 162 passed in 1.708 s; 11 focused integrity tests |
+| AI-reviewed exploratory scoring mode | 166 passed in 1.697 s; 13 dataset integrity tests |
 
 Coverage includes correction after invalid evidence; unfetched and wrong-page
 citations; external, undiscovered, private, mixed, multicast, and rebound DNS
@@ -165,6 +166,11 @@ and proposal history. All active and retired labels remain `proposed_unreviewed`
 archived Codex reviews are AI-proposed, while the user's Keri observations are
 retained as provenance rather than silently converted into approved taxonomy
 labels. The remaining reference-data gap is human review of every proposed label.
+ChatGPT's October 11 review is recorded separately as AI review and retains every
+active proposed grade. KERI-F010, KERI-F014, JILLS-F009, and KERI-Q002 carry
+ambiguity notes. KERI-Q002 retains its original unsupported proposal and is
+excluded from definitive exploratory question accuracy while its prediction stays
+visible.
 Bartic's truncated 250,001-byte prefix and Matt O'Neill's
 no-page provider failure are inventoried but excluded from fact cases.
 
@@ -179,11 +185,14 @@ Regeneration and label-isolation command:
 .venv/bin/python scripts/render_support_development_set.py \
   evaluation/factual_support_development.json \
   --output evaluation/factual_support_development.md \
-  --verifier-input /tmp/factual-support-verifier-input.json
+  --verifier-input /tmp/factual-support-verifier-input.json \
+  --ai-labels /tmp/factual-support-ai-labels.json
 ```
 
 No verifier or website call is made. The temporary verifier input deliberately
-contains no proposed grades, explanations, origins, or reviewer provenance.
+contains no proposed grades, AI reviews, ambiguity notes, explanations, origins,
+histories, or reviewer provenance. The separate AI-label file is for exploratory
+scoring and must never be sent to the verifier.
 
 The authorized development-only Goodhart Group capture attempted
 `https://thegoodhartgroup.com/` through the unchanged guarded reader on October 7,
@@ -202,15 +211,34 @@ full normalized source text, hashes, timestamps, link inventory, reader settings
 and outcomes are preserved in
 `evaluation/evidence/thegoodhartgroup_capture_2026-10-08.json`.
 
-When that independent set exists, score saved prediction and run summaries with:
+After predictions exist, exploratory AI-reference scoring is available with:
+
+```sh
+gtm-research evaluate-support \
+  /tmp/factual-support-ai-labels.json \
+  runs/support-development/verifier-predictions.json \
+  --runs runs/support-development/verifier-runs.json \
+  --reference-mode ai-exploratory
+```
+
+It reports binary supported filtering and exact three-grade agreement separately,
+shows inclusive and ambiguity-excluded fact metrics, excludes ambiguous KERI-Q002
+from definitive question accuracy while displaying its result, and totals usage,
+latency, provider failures, incomplete responses, and missing usage. AI mode never
+evaluates or passes the human acceptance gate.
+
+When independently approved labels exist, score the human reference with:
 
 ```sh
 gtm-research evaluate-support human-labels.json verifier-predictions.json \
-  --runs verifier-runs.json
+  --runs verifier-runs.json --reference-mode human
 ```
 
 This reports whether the sample minimums are met before reporting the provisional
-gates as evaluable. It never generates or substitutes reference labels.
+gates as evaluable. It never generates or substitutes reference labels. The
+development-set batch verifier adapter that must create `verifier-predictions.json`
+and `verifier-runs.json` is not implemented; `verify-saved` only accepts one saved
+research trace and does not record latency.
 
 Phase 1 requires a completed three-site pilot, manual grading of every fact,
 inference, and question premise, useful discovery coverage, and measured

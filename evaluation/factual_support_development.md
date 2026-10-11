@@ -79,6 +79,7 @@
 - Unsupported clause: None proposed
 - Explanation: The cited title names the Keri Shull Team.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — new control derived from saved evidence
 - Evidence `keri-home-20261005/S1/E1` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [0, 599):
 
@@ -91,6 +92,7 @@
 - Unsupported clause: None proposed
 - Explanation: The cited excerpt explicitly reports that over 22% of deals were sold off-market.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — new control derived from saved evidence
 - Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
 
@@ -103,6 +105,7 @@
 - Unsupported clause: offers seller services including an off-market sales strategy
 - Explanation: The excerpt reports a past share of off-market deals, but that observation does not establish the claim's central assertion that an off-market seller strategy is currently offered. Unsupported here does not mean the strategy is false or contradicted.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`reviewed`); human approval: **false**.
 - Origin: `observed_agent_failure` — run 4686ade6e2f34706ae3161249d46a97e C4
 - Label history: **partial** (`superseded_unreviewed_proposal`) — The initial proposal treated the historical off-market result as substantive support. Under the clarified rubric, it does not establish the central offered-strategy assertion.
 - Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
@@ -116,6 +119,7 @@
 - Unsupported clause: buyer, seller, move-up, and relocation guarantees
 - Explanation: The excerpt supports that several guarantee programs exist but does not name the four programs.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **partial** (`reviewed`); human approval: **false**.
 - Origin: `observed_agent_failure` — run 4686ade6e2f34706ae3161249d46a97e C5
 - Evidence `keri-home-20261005/S1/E3` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [1189, 1599):
 
@@ -128,7 +132,9 @@
 - Unsupported clause: call, email, and text message
 - Explanation: This continuation mentions text and opt-out terms but omits the beginning of the consent sentence establishing agreement to call and email contact.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **partial** (`ambiguous`); human approval: **false**.
 - Origin: `observed_agent_failure` — run 4686ade6e2f34706ae3161249d46a97e C6
+- Ambiguity note: Partial versus unsupported is debatable: the citation supports text consent, but the claim's call and email elements are absent from the cited continuation.
 - Evidence `keri-home-20261005/S1/E12` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [6244, 6666):
 
   > text for real estate services. To opt out, you can reply 'stop' at any time or reply 'help' for assistance. You can also click the unsubscribe link in the emails. Message and data rates may apply. Message frequency may vary. Privacy Policy . Submit Sending... Sent! T: 703-609-5183 E: [email protected] × Thanks, please provide more information to help serve you Email Trigger Source Phone Number Interest Interested in...
@@ -140,6 +146,7 @@
 - Unsupported clause: automatically routes every inquiry to an available agent
 - Explanation: The form and consent text do not describe automated routing, delivery, recipients, or operational behavior.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`reviewed`); human approval: **false**.
 - Origin: `deliberately_constructed_challenge` — form-to-workflow assumption built from saved Keri form evidence
 - Evidence `keri-home-20261005/S1/E11` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [5646, 6243):
 
@@ -156,6 +163,7 @@
 - Unsupported clause: responds quickly to all incoming leads
 - Explanation: The evidence is one customer testimonial about an individual agent during a transaction, not a team-wide lead-response policy or measured performance.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`reviewed`); human approval: **false**.
 - Origin: `deliberately_constructed_challenge` — wrong-subject and wrong-excerpt challenge from saved testimonial
 - Evidence `keri-home-20261005/S1/E4` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [1600, 2195):
 
@@ -168,6 +176,7 @@
 - Unsupported clause: since 2021
 - Explanation: The excerpt supports the sales figure and website ranking claim but contains no “since 2021” reporting period.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **partial** (`reviewed`); human approval: **false**.
 - Origin: `deliberately_constructed_challenge` — missing-period bundled-assertion challenge
 - Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
 
@@ -180,7 +189,9 @@
 - Unsupported clause: active
 - Explanation: The excerpt reports a client database used for newsletters and campaigns but does not establish that every record is active.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **partial** (`ambiguous`); human approval: **false**.
 - Origin: `deliberately_constructed_challenge` — unsupported-qualifier challenge
+- Ambiguity note: “Active database” can mean currently used for campaigns or individually current and engaged records; the excerpt supports the former more readily than the latter.
 - Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
 
   > T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate.
@@ -192,6 +203,7 @@
 - Unsupported clause: all transaction risks
 - Explanation: The marketing copy says the programs eliminate “typical risks”; it does not support the absolute qualifier “all.”
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **partial** (`reviewed`); human approval: **false**.
 - Origin: `deliberately_constructed_challenge` — unsupported-absolute-qualifier challenge
 - Website-attributed alternative: “The Keri Shull Team website says its guarantee programs eliminate typical risks associated with buying or selling properties.” (`proposed_unreviewed_alternative`).
 - Alternative support scope: This wording measures whether the cited evidence supports that the website makes the statement; it does not assess whether the marketing promise is true.
@@ -206,6 +218,7 @@
 - Unsupported clause: None proposed
 - Explanation: The cited excerpt explicitly states the affiliation.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — archived atomic run C2; AI-proposed review marked supported
 - Evidence `jills-home-20260927/S1/E7` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [3256, 3837):
 
@@ -218,6 +231,7 @@
 - Unsupported clause: None proposed
 - Explanation: The cited excerpt explicitly reports closed sales over $13 billion.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — archived atomic run C4; AI-proposed review marked supported
 - Evidence `jills-home-20260927/S1/E7` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [3256, 3837):
 
@@ -230,6 +244,7 @@
 - Unsupported clause: since 2021
 - Explanation: The amount appears, but the cited excerpt omits the “since 2021” period found in an uncited neighboring span.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **partial** (`reviewed`); human approval: **false**.
 - Origin: `observed_agent_failure` — archived atomic/source-ID reviews: reporting-period omission
 - Evidence `jills-home-20260927/S1/E7` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [3256, 3837):
 
@@ -242,6 +257,7 @@
 - Unsupported clause: the #1 real estate team in the U.S.A. in 2026
 - Explanation: The cited excerpt contains neither the #1 ranking nor the 2026 qualifier.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`reviewed`); human approval: **false**.
 - Origin: `observed_agent_failure` — archived atomic run C1 and AI-proposed review
 - Evidence `jills-home-20260927/S1/E4` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [1755, 2070):
 
@@ -254,6 +270,7 @@
 - Unsupported clause: Florida
 - Explanation: Miami Beach and Coral Gables are stated, but the selected span does not attach the Florida qualifier to both markets.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **partial** (`reviewed`); human approval: **false**.
 - Origin: `observed_agent_failure` — archived atomic run C3 and AI-proposed review
 - Evidence `jills-home-20260927/S1/E5` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [2071, 2666):
 
@@ -266,7 +283,9 @@
 - Unsupported clause: collects contact information; information requests and showing requests
 - Explanation: The cited excerpt displays fields and only the beginning of consent text. Displayed fields do not establish the claim's central assertion that contact information is actually collected, and the stated request purposes continue in uncited E3.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`ambiguous`); human approval: **false**.
 - Origin: `observed_agent_failure` — archived atomic run C5 and AI-proposed review
+- Ambiguity note: “Collects” can describe a form that solicits fields or an operational process that receives and stores submissions; the current unsupported proposal uses the operational meaning.
 - Label history: **partial** (`superseded_unreviewed_proposal`) — The earlier proposal treated the displayed form fields as substantive support for collection. Under the clarified central-assertion rubric, a visible form does not establish actual collection.
 - Evidence `jills-home-20260927/S1/E2` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [595, 1194):
 
@@ -279,6 +298,7 @@
 - Unsupported clause: None proposed
 - Explanation: The two cited contiguous spans preserve the complete consent statement and both purposes without claiming messages were sent.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — multi-reference consent control derived from archived split-sentence failure
 - Evidence `jills-home-20260927/S1/E2` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [595, 1194):
 
@@ -295,6 +315,7 @@
 - Unsupported clause: None proposed
 - Explanation: The cited excerpt explicitly self-describes those three marketing channels and the claim preserves website attribution.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — narrow control from archived homepage evidence
 - Evidence `jills-home-20260927/S1/E9` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [4403, 4838):
 
@@ -307,6 +328,7 @@
 - Unsupported clause: trigger automated lead follow-up in the team’s CRM
 - Explanation: A signup surface and consent language do not establish a CRM, automation, successful submission, or follow-up workflow.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`reviewed`); human approval: **false**.
 - Origin: `deliberately_constructed_challenge` — form-to-workflow assumption built from saved Jills evidence
 - Evidence `jills-home-20260927/S1/E13` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [6419, 6908):
 
@@ -319,6 +341,7 @@
 - Unsupported clause: is affiliated with Coldwell Banker Realty
 - Explanation: The cited span contains navigation labels and media coverage but says nothing about a brokerage affiliation. The same claim is supported elsewhere in JILLS-F001, making this a controlled wrong-excerpt case.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`reviewed`); human approval: **false**.
 - Origin: `deliberately_constructed_challenge` — wrong-excerpt control pairing the supported JILLS-F001 claim with unrelated archived E10 evidence
 - Case history (`superseded_unreviewed_case_definition`): The Jills Zeder Group — offers property search, relocation assistance, and: digital marketing strategies for luxury listings
 - Prior proposal: **unsupported**; unsupported clause: relocation assistance and digital marketing strategies for luxury listings; explanation: The cited span contains navigation labels and media coverage; it does not establish relocation assistance or the claimed digital-marketing service.
@@ -334,6 +357,7 @@
 - Unsupported clause: None proposed
 - Explanation: The exact homepage title names The Goodhart Group.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
 - Evidence `goodhart-home-20261008/S1/E1` — https://www.thegoodhartgroup.com/ — fetched 2026-10-08T11:12:53.888439+00:00 — offsets [0, 54):
 
@@ -346,6 +370,7 @@
 - Unsupported clause: None proposed
 - Explanation: All four activities appear in the cited website sentence.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
 - Evidence `goodhart-home-20261008/S1/E2` — https://www.thegoodhartgroup.com/ — fetched 2026-10-08T11:12:53.888439+00:00 — offsets [1458, 1628):
 
@@ -358,6 +383,7 @@
 - Unsupported clause: None proposed
 - Explanation: The four visible field labels appear together; the claim does not assert submission or collection.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
 - Evidence `goodhart-home-20261008/S1/E3` — https://www.thegoodhartgroup.com/ — fetched 2026-10-08T11:12:53.888439+00:00 — offsets [1805, 1875):
 
@@ -370,6 +396,7 @@
 - Unsupported clause: None proposed
 - Explanation: The cited team excerpt pairs each named person with the stated role.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
 - Evidence `goodhart-team-20261008/S2/E1` — https://www.thegoodhartgroup.com/meet-our-real-estate-team/ — fetched 2026-10-08T11:13:40.032921+00:00 — offsets [2562, 2727):
 
@@ -382,6 +409,7 @@
 - Unsupported clause: None proposed
 - Explanation: The attributed claim retains the website's reported figure without supplying a period.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
 - Evidence `goodhart-selling-20261008/S3/E1` — https://www.thegoodhartgroup.com/selling-your-home/ — fetched 2026-10-08T11:13:41.625042+00:00 — offsets [2521, 2736):
 
@@ -394,6 +422,7 @@
 - Unsupported clause: since 2020
 - Explanation: The cited excerpt supports the reported volume but contains no “since 2020” reporting period.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **partial** (`reviewed`); human approval: **false**.
 - Origin: `deliberately_constructed_challenge` — development-only Goodhart guarded-reader capture; no generator output exists
 - Evidence `goodhart-selling-20261008/S3/E1` — https://www.thegoodhartgroup.com/selling-your-home/ — fetched 2026-10-08T11:13:41.625042+00:00 — offsets [2521, 2736):
 
@@ -406,6 +435,7 @@
 - Unsupported clause: None proposed
 - Explanation: Every listed channel appears in the cited website description.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **supported** (`reviewed`); human approval: **false**.
 - Origin: `supported_control` — development-only Goodhart guarded-reader capture; no generator output exists
 - Evidence `goodhart-selling-20261008/S3/E2` — https://www.thegoodhartgroup.com/selling-your-home/ — fetched 2026-10-08T11:13:41.625042+00:00 — offsets [4345, 4777):
 
@@ -418,6 +448,7 @@
 - Unsupported clause: exactly; active subscribers
 - Explanation: The excerpt says the newsletter reaches approximately 12,000 people; it does not support “exactly” or characterize them as active subscribers.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **partial** (`reviewed`); human approval: **false**.
 - Origin: `deliberately_constructed_challenge` — development-only Goodhart guarded-reader capture; no generator output exists
 - Evidence `goodhart-selling-20261008/S3/E2` — https://www.thegoodhartgroup.com/selling-your-home/ — fetched 2026-10-08T11:13:41.625042+00:00 — offsets [4345, 4777):
 
@@ -430,6 +461,7 @@
 - Unsupported clause: automatically routes every inquiry to a licensed agent in its CRM
 - Explanation: Visible fields do not establish routing, recipients, a CRM, successful submission, or any automated workflow.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`reviewed`); human approval: **false**.
 - Origin: `deliberately_constructed_challenge` — development-only Goodhart guarded-reader capture; no generator output exists
 - Evidence `goodhart-home-20261008/S1/E3` — https://www.thegoodhartgroup.com/ — fetched 2026-10-08T11:12:53.888439+00:00 — offsets [1805, 1875):
 
@@ -442,6 +474,7 @@
 - Unsupported clause: is affiliated with Compass
 - Explanation: The cited team-role excerpt says nothing about a brokerage affiliation; outside company knowledge and uncited page text cannot supply it.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`reviewed`); human approval: **false**.
 - Origin: `deliberately_constructed_challenge` — development-only Goodhart guarded-reader capture; no generator output exists
 - Evidence `goodhart-team-20261008/S2/E1` — https://www.thegoodhartgroup.com/meet-our-real-estate-team/ — fetched 2026-10-08T11:13:40.032921+00:00 — offsets [2562, 2727):
 
@@ -457,6 +490,7 @@
 - Unsupported clause: currently qualify and distribute incoming leads
 - Explanation: Identity and marketing metrics do not establish incoming lead flow, qualification, or distribution.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`reviewed`); human approval: **false**.
 - Origin: `observed_agent_failure` — run 4686ade6e2f34706ae3161249d46a97e Q1
 - Evidence `keri-home-20261005/S1/E1` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [0, 599):
 
@@ -473,7 +507,9 @@
 - Unsupported clause: off-market inventory is typically available
 - Explanation: A historical share of off-market deals does not establish current off-market inventory or typical availability.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`ambiguous`); human approval: **false**.
 - Origin: `observed_agent_failure` — run 4686ade6e2f34706ae3161249d46a97e Q2
+- Ambiguity note: The question can be read as neutrally asking whether any inventory is available, or as presupposing that off-market inventory is typically available. The original unsupported proposal is retained.
 - Evidence `keri-home-20261005/S1/E2` — https://kerishull.com/ — fetched 2026-10-05T16:45:04.517401+00:00 — offsets [600, 1188):
 
   > T: 703-609-5183 E: [email protected] The KS Team Selling Virginia, Maryland, & DC The KS Team Selling Virginia, Maryland, & DC Home Valuation join our team home search proven success 159,000+ Clients in our database that receive our newsletter & marketing campaigns $5B+ in sales volume 70K+ Followers on our social media platforms for The KS Team Over 22% of our deals were sold off-market At the KS Team, we believe that every client is special. Ranked as the Top Producing Real Estate Team in the DC Metro area, Keri Shull and her team have sold nearly $5 billion of local real estate.
@@ -485,6 +521,7 @@
 - Unsupported clause: integrated into the existing sales workflow
 - Explanation: The pages show form surfaces but do not establish lead intake, integration, or an existing sales workflow.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **unsupported** (`reviewed`); human approval: **false**.
 - Origin: `observed_agent_failure` — archived atomic run Q2
 - Evidence `jills-home-20260927/S1/E2` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [595, 1194):
 
@@ -501,6 +538,7 @@
 - Unsupported clause: None proposed
 - Explanation: The wording asks about an unknown without assuming that a CRM exists.
 - Status: `proposed_unreviewed`; authority: `ai_proposed`.
+- AI review: **neutral** (`reviewed`); human approval: **false**.
 - Origin: `observed_agent_failure` — deliberately constructed neutral control
 - Evidence `jills-home-20260927/S1/E7` — https://jillszeder.com/ — fetched 2026-09-27T14:10:48.266541+00:00 — offsets [3256, 3837):
 

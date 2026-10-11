@@ -248,7 +248,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": ""
+      "origin_reference": "",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "KERI-F006",
@@ -283,7 +292,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": ""
+      "origin_reference": "",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "KERI-F008",
@@ -327,7 +345,16 @@
         "prior_human_observation_source": "project conversation review of run 4686ade6e2f34706ae3161249d46a97e"
       },
       "case_origin": "observed_agent_failure",
-      "origin_reference": "run 4686ade6e2f34706ae3161249d46a97e C4"
+      "origin_reference": "run 4686ade6e2f34706ae3161249d46a97e C4",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "KERI-F009",
@@ -364,7 +391,16 @@
         "prior_human_observation_source": "project conversation review of run 4686ade6e2f34706ae3161249d46a97e"
       },
       "case_origin": "observed_agent_failure",
-      "origin_reference": "run 4686ade6e2f34706ae3161249d46a97e C5"
+      "origin_reference": "run 4686ade6e2f34706ae3161249d46a97e C5",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "partial",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "KERI-F010",
@@ -401,7 +437,16 @@
         "prior_human_observation_source": "project conversation review of run 4686ade6e2f34706ae3161249d46a97e"
       },
       "case_origin": "observed_agent_failure",
-      "origin_reference": "run 4686ade6e2f34706ae3161249d46a97e C6"
+      "origin_reference": "run 4686ade6e2f34706ae3161249d46a97e C6",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "partial",
+        "status": "ambiguous",
+        "ambiguity_note": "Partial versus unsupported is debatable: the citation supports text consent, but the claim's call and email elements are absent from the cited continuation.",
+        "human_approval": false
+      }
     },
     {
       "case_id": "KERI-F011",
@@ -446,7 +491,16 @@
         "human_approval": false
       },
       "case_origin": "deliberately_constructed_challenge",
-      "origin_reference": "form-to-workflow assumption built from saved Keri form evidence"
+      "origin_reference": "form-to-workflow assumption built from saved Keri form evidence",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "KERI-F012",
@@ -481,7 +535,16 @@
         "human_approval": false
       },
       "case_origin": "deliberately_constructed_challenge",
-      "origin_reference": "wrong-subject and wrong-excerpt challenge from saved testimonial"
+      "origin_reference": "wrong-subject and wrong-excerpt challenge from saved testimonial",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "KERI-F013",
@@ -516,7 +579,16 @@
         "human_approval": false
       },
       "case_origin": "deliberately_constructed_challenge",
-      "origin_reference": "missing-period bundled-assertion challenge"
+      "origin_reference": "missing-period bundled-assertion challenge",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "partial",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "KERI-F014",
@@ -551,7 +623,16 @@
         "human_approval": false
       },
       "case_origin": "deliberately_constructed_challenge",
-      "origin_reference": "unsupported-qualifier challenge"
+      "origin_reference": "unsupported-qualifier challenge",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "partial",
+        "status": "ambiguous",
+        "ambiguity_note": "“Active database” can mean currently used for campaigns or individually current and engaged records; the excerpt supports the former more readily than the latter.",
+        "human_approval": false
+      }
     },
     {
       "case_id": "KERI-F015",
@@ -591,7 +672,16 @@
         "human_approval": false
       },
       "case_origin": "deliberately_constructed_challenge",
-      "origin_reference": "unsupported-absolute-qualifier challenge"
+      "origin_reference": "unsupported-absolute-qualifier challenge",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "partial",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-F001",
@@ -626,7 +716,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": "archived atomic run C2; AI-proposed review marked supported"
+      "origin_reference": "archived atomic run C2; AI-proposed review marked supported",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-F002",
@@ -661,7 +760,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": "archived atomic run C4; AI-proposed review marked supported"
+      "origin_reference": "archived atomic run C4; AI-proposed review marked supported",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-F003",
@@ -696,7 +804,16 @@
         "human_approval": false
       },
       "case_origin": "observed_agent_failure",
-      "origin_reference": "archived atomic/source-ID reviews: reporting-period omission"
+      "origin_reference": "archived atomic/source-ID reviews: reporting-period omission",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "partial",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-F004",
@@ -731,7 +848,16 @@
         "human_approval": false
       },
       "case_origin": "observed_agent_failure",
-      "origin_reference": "archived atomic run C1 and AI-proposed review"
+      "origin_reference": "archived atomic run C1 and AI-proposed review",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-F005",
@@ -766,7 +892,16 @@
         "human_approval": false
       },
       "case_origin": "observed_agent_failure",
-      "origin_reference": "archived atomic run C3 and AI-proposed review"
+      "origin_reference": "archived atomic run C3 and AI-proposed review",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "partial",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-F009",
@@ -808,7 +943,16 @@
         "human_approval": false
       },
       "case_origin": "observed_agent_failure",
-      "origin_reference": "archived atomic run C5 and AI-proposed review"
+      "origin_reference": "archived atomic run C5 and AI-proposed review",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "ambiguous",
+        "ambiguity_note": "“Collects” can describe a form that solicits fields or an operational process that receives and stores submissions; the current unsupported proposal uses the operational meaning.",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-F010",
@@ -853,7 +997,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": "multi-reference consent control derived from archived split-sentence failure"
+      "origin_reference": "multi-reference consent control derived from archived split-sentence failure",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-F013",
@@ -888,7 +1041,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": "narrow control from archived homepage evidence"
+      "origin_reference": "narrow control from archived homepage evidence",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-F014",
@@ -923,7 +1085,16 @@
         "human_approval": false
       },
       "case_origin": "deliberately_constructed_challenge",
-      "origin_reference": "form-to-workflow assumption built from saved Jills evidence"
+      "origin_reference": "form-to-workflow assumption built from saved Jills evidence",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-F015",
@@ -973,7 +1144,16 @@
         "human_approval": false
       },
       "case_origin": "deliberately_constructed_challenge",
-      "origin_reference": "wrong-excerpt control pairing the supported JILLS-F001 claim with unrelated archived E10 evidence"
+      "origin_reference": "wrong-excerpt control pairing the supported JILLS-F001 claim with unrelated archived E10 evidence",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "GOODHART-F001",
@@ -1008,7 +1188,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "GOODHART-F002",
@@ -1043,7 +1232,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "GOODHART-F003",
@@ -1078,7 +1276,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "GOODHART-F004",
@@ -1113,7 +1320,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "GOODHART-F005",
@@ -1148,7 +1364,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "GOODHART-F006",
@@ -1183,7 +1408,16 @@
         "human_approval": false
       },
       "case_origin": "deliberately_constructed_challenge",
-      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "partial",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "GOODHART-F007",
@@ -1218,7 +1452,16 @@
         "human_approval": false
       },
       "case_origin": "supported_control",
-      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "supported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "GOODHART-F008",
@@ -1253,7 +1496,16 @@
         "human_approval": false
       },
       "case_origin": "deliberately_constructed_challenge",
-      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "partial",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "GOODHART-F009",
@@ -1288,7 +1540,16 @@
         "human_approval": false
       },
       "case_origin": "deliberately_constructed_challenge",
-      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "GOODHART-F010",
@@ -1323,7 +1584,16 @@
         "human_approval": false
       },
       "case_origin": "deliberately_constructed_challenge",
-      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists"
+      "origin_reference": "development-only Goodhart guarded-reader capture; no generator output exists",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "KERI-Q001",
@@ -1364,7 +1634,16 @@
         "human_approval": false
       },
       "case_origin": "observed_agent_failure",
-      "origin_reference": "run 4686ade6e2f34706ae3161249d46a97e Q1"
+      "origin_reference": "run 4686ade6e2f34706ae3161249d46a97e Q1",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "KERI-Q002",
@@ -1395,7 +1674,16 @@
         "human_approval": false
       },
       "case_origin": "observed_agent_failure",
-      "origin_reference": "run 4686ade6e2f34706ae3161249d46a97e Q2"
+      "origin_reference": "run 4686ade6e2f34706ae3161249d46a97e Q2",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "ambiguous",
+        "ambiguity_note": "The question can be read as neutrally asking whether any inventory is available, or as presupposing that off-market inventory is typically available. The original unsupported proposal is retained.",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-Q001",
@@ -1436,7 +1724,16 @@
         "human_approval": false
       },
       "case_origin": "observed_agent_failure",
-      "origin_reference": "archived atomic run Q2"
+      "origin_reference": "archived atomic run Q2",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "unsupported",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     },
     {
       "case_id": "JILLS-Q002",
@@ -1467,7 +1764,16 @@
         "human_approval": false
       },
       "case_origin": "observed_agent_failure",
-      "origin_reference": "deliberately constructed neutral control"
+      "origin_reference": "deliberately constructed neutral control",
+      "ai_review": {
+        "reviewer": "ChatGPT",
+        "reviewer_kind": "ai",
+        "reviewed_on": "2026-10-11",
+        "grade": "neutral",
+        "status": "reviewed",
+        "ambiguity_note": "",
+        "human_approval": false
+      }
     }
   ],
   "retired_cases": [
@@ -1841,5 +2147,13 @@
       "retirement_status": "retired_unreviewed_for_company_balance",
       "retirement_reason": "Retained with its proposal and evidence history while the active development set is rebalanced toward ten cases per company."
     }
-  ]
+  ],
+  "ai_review_policy": {
+    "reviewer": "ChatGPT",
+    "reviewer_kind": "ai",
+    "reviewed_on": "2026-10-11",
+    "scope": "Exploratory development review only; preserves original proposals and does not create human-approved reference labels.",
+    "filtering_boundary": "supported versus partial_or_unsupported",
+    "atomicity_policy": "Factual support and atomicity are separate. A bundled claim remains supported when the cited evidence supports every bundled assertion."
+  }
 }

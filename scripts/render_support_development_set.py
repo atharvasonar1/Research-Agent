@@ -33,6 +33,14 @@ def validate_dataset(data):
         allowed = FACT_GRADES if kind == "fact" else QUESTION_GRADES if kind == "question" else set()
         if case.get("proposed_grade") not in allowed:
             errors.append(f"{label}:grade")
+        ai_review = case.get("ai_review", {})
+        if (ai_review.get("reviewer_kind") != "ai"
+                or ai_review.get("grade") != case.get("proposed_grade")
+                or ai_review.get("status") not in {"reviewed", "ambiguous"}
+                or ai_review.get("human_approval") is not False):
+            errors.append(f"{label}:ai_review")
+        if ai_review.get("status") == "ambiguous" and not ai_review.get("ambiguity_note", "").strip():
+            errors.append(f"{label}:ai_review_ambiguity")
         if case.get("label_status") not in {"proposed_unreviewed", "human_approved"}:
             errors.append(f"{label}:label_status")
         if case.get("case_origin") not in ORIGINS:
@@ -108,6 +116,17 @@ def verifier_cases(data):
     return {"schema_version": "support-verifier-development-input-v1", "cases": result}
 
 
+def ai_reference_labels(data):
+    """Export AI-reviewed references for exploratory scoring, never model input."""
+    return [{
+        "case_id": case["case_id"], "company": case["company"], "kind": case["kind"],
+        "ai_label": case["ai_review"]["grade"],
+        "ambiguous": case["ai_review"]["status"] == "ambiguous",
+        "ambiguity_note": case["ai_review"]["ambiguity_note"],
+        "reviewer_kind": "ai",
+    } for case in data["cases"]]
+
+
 def claim_text(case):
     if case["kind"] == "question":
         return case["candidate_question"]
@@ -169,8 +188,11 @@ def render(data):
                 f"- Unsupported clause: {case['unsupported_clause'] or 'None proposed'}",
                 f"- Explanation: {case['explanation']}",
                 f"- Status: `{case['label_status']}`; authority: `{case['reviewer_provenance']['label_authority']}`.",
+                f"- AI review: **{case['ai_review']['grade']}** (`{case['ai_review']['status']}`); human approval: **false**.",
                 f"- Origin: `{case['case_origin']}` — {case['origin_reference'] or 'new control derived from saved evidence'}",
             ])
+            if case["ai_review"]["ambiguity_note"]:
+                lines.append(f"- Ambiguity note: {case['ai_review']['ambiguity_note']}")
             for prior in case.get("label_history", []):
                 lines.append(f"- Label history: **{prior['proposed_grade']}** (`{prior['status']}`) — {prior['reason']}")
             for prior in case.get("case_history", []):
@@ -207,6 +229,7 @@ def main(argv=None):
     parser.add_argument("dataset")
     parser.add_argument("--output", required=True)
     parser.add_argument("--verifier-input", help="Optional label-free JSON export; no model call is made")
+    parser.add_argument("--ai-labels", help="Optional AI-review reference export for exploratory scoring only")
     args = parser.parse_args(argv)
     data = json.loads(Path(args.dataset).read_text(encoding="utf-8"))
     errors = validate_dataset(data)
@@ -215,6 +238,8 @@ def main(argv=None):
     Path(args.output).write_text(render(data), encoding="utf-8")
     if args.verifier_input:
         Path(args.verifier_input).write_text(json.dumps(verifier_cases(data), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    if args.ai_labels:
+        Path(args.ai_labels).write_text(json.dumps(ai_reference_labels(data), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps(summary(data), indent=2))
     return 0
 

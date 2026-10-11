@@ -102,6 +102,15 @@ identity fact or loss of all usable facts fails the run. Provider failure and
 semantic rejection use distinct reasons. Candidate content, original coverage,
 verdicts, omissions, usage, and latency remain in the trace.
 
+Evaluation has two reference-authority modes. `human` is the default and is the
+only mode allowed to evaluate the provisional acceptance gate. `ai-exploratory`
+uses separately exported AI-review labels to inspect supported-versus-not-supported
+filtering, exact three-grade agreement, and ambiguity sensitivity; it cannot mark
+the gate passed. Question results remain separate from fact metrics, and ambiguous
+questions remain visible while being excluded from definitive question accuracy.
+Reference labels, ambiguity notes, histories, and reviewer provenance are excluded
+from verifier input by an explicit field allowlist.
+
 The harness defines six trusted topics: company identity, markets, team, seller
 services, lead capture, and public follow-up. A submitted brief contains each
 topic exactly once as `covered` or `unresolved`. Covered topics reference one or
@@ -172,5 +181,7 @@ account support before migration. It is not a fallback for availability errors.
   reader limitation, not justification to enlarge the cap for one site.
 - The neutral contract is implemented; assessed qualification remains deferred.
 - The bounded checker experiment is implemented without a repair or synthesis
-  pass. Its model-quality gates remain unevaluated until a sufficiently large,
-  independently human-labeled development set is available.
+  pass. AI-reviewed development labels support exploratory scoring only. Its
+  model-quality gates remain unevaluated until the labels receive independent
+  human approval. A batch adapter from the label-free development export to saved
+  verifier predictions and run measurements is still missing.

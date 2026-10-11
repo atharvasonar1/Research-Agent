@@ -188,61 +188,169 @@ def parse_verifier_json(text):
     return value
 
 
-def evaluate_human_labels(labels, predictions, runs=()):
-    """Compute transparent experiment metrics; labels must come from humans."""
-    by_id = {item["case_id"]: item for item in predictions}
-    counts = {"total": len(labels), "companies": len({item["company"] for item in labels}),
-              "supported": 0, "negative": 0, "questions": 0,
-              "false_acceptances": 0, "false_rejections": 0,
-              "supported_facts_retained": 0, "question_matches": 0,
-              "missing_predictions": 0}
+def _rate(numerator, denominator):
+    return None if denominator == 0 else round(numerator / denominator, 4)
+
+
+def _fact_metrics(labels, by_id):
+    counts = {
+        "total": len(labels), "supported": 0, "not_supported": 0,
+        "supported_retained": 0, "supported_rejected": 0,
+        "not_supported_accepted": 0, "not_supported_rejected": 0,
+        "exact_three_grade_matches": 0, "missing_predictions": 0,
+    }
     for label in labels:
-        expected = label["human_label"]
+        expected = label["reference_label"]
         prediction = by_id.get(label["case_id"])
-        if label["kind"] == "question":
-            counts["questions"] += 1
-            if prediction and prediction.get("grade") == expected:
-                counts["question_matches"] += 1
-            if prediction is None:
-                counts["missing_predictions"] += 1
-            continue
-        if expected == "supported":
-            counts["supported"] += 1
-            if prediction and prediction.get("grade") == "supported":
-                counts["supported_facts_retained"] += 1
-            else:
-                counts["false_rejections"] += 1
-        else:
-            counts["negative"] += 1
-            if prediction and prediction.get("grade") == "supported":
-                counts["false_acceptances"] += 1
+        predicted = prediction.get("grade") if prediction else None
         if prediction is None:
             counts["missing_predictions"] += 1
-    def rate(numerator, denominator):
-        return None if denominator == 0 else round(numerator / denominator, 4)
-    metrics = {
+        if predicted == expected:
+            counts["exact_three_grade_matches"] += 1
+        if expected == "supported":
+            counts["supported"] += 1
+            if predicted == "supported":
+                counts["supported_retained"] += 1
+            else:
+                counts["supported_rejected"] += 1
+        else:
+            counts["not_supported"] += 1
+            if predicted == "supported":
+                counts["not_supported_accepted"] += 1
+            elif predicted is not None:
+                counts["not_supported_rejected"] += 1
+    return {
         **counts,
-        "false_acceptance_rate": rate(counts["false_acceptances"], counts["negative"]),
-        "false_rejection_rate": rate(counts["false_rejections"], counts["supported"]),
-        "supported_fact_retention": rate(counts["supported_facts_retained"], counts["supported"]),
-        "question_verdict_accuracy": rate(counts["question_matches"], counts["questions"]),
+        "supported_vs_not_supported_accuracy": _rate(
+            counts["supported_retained"] + counts["not_supported_rejected"], counts["total"]),
+        "false_acceptance_rate": _rate(counts["not_supported_accepted"], counts["not_supported"]),
+        "false_rejection_rate": _rate(counts["supported_rejected"], counts["supported"]),
+        "supported_fact_retention": _rate(counts["supported_retained"], counts["supported"]),
+        "exact_three_grade_agreement": _rate(counts["exact_three_grade_matches"], counts["total"]),
     }
-    metrics["provisional_gates_evaluable"] = (
-        counts["total"] >= 30 and counts["companies"] >= 3
-        and counts["supported"] >= 12 and counts["negative"] >= 12
-        and counts["missing_predictions"] == 0
+
+
+def evaluate_reference_labels(labels, predictions, runs=(), reference_mode="human"):
+    """Score verifier output while keeping AI exploration outside human gates."""
+    if reference_mode not in ("human", "ai-exploratory"):
+        raise ValueError("invalid_reference_mode")
+    label_key = "human_label" if reference_mode == "human" else "ai_label"
+    normalized = []
+    for item in labels:
+        normalized.append({
+            **item,
+            "reference_label": item[label_key],
+            "ambiguous": bool(item.get("ambiguous", False)),
+        })
+    by_id = {item["case_id"]: item for item in predictions}
+    facts = [item for item in normalized if item["kind"] == "fact"]
+    questions = [item for item in normalized if item["kind"] == "question"]
+    definitive_facts = [item for item in facts if not item["ambiguous"]]
+    definitive_questions = [item for item in questions if not item["ambiguous"]]
+    inclusive = _fact_metrics(facts, by_id)
+    definitive = _fact_metrics(definitive_facts, by_id)
+
+    question_results = []
+    for item in questions:
+        prediction = by_id.get(item["case_id"])
+        predicted = prediction.get("grade") if prediction else None
+        question_results.append({
+            "case_id": item["case_id"],
+            "reference_grade": item["reference_label"],
+            "predicted_grade": predicted,
+            "ambiguous": item["ambiguous"],
+            "included_in_definitive_accuracy": not item["ambiguous"],
+            "match": predicted == item["reference_label"],
+        })
+    definitive_question_matches = sum(item["match"] for item in question_results
+                                      if item["included_in_definitive_accuracy"])
+    inclusive_question_matches = sum(item["match"] for item in question_results)
+    ambiguous_cases = [{
+        "case_id": item["case_id"], "kind": item["kind"],
+        "reference_grade": item["reference_label"],
+        "predicted_grade": by_id.get(item["case_id"], {}).get("grade"),
+        "ambiguity_note": item.get("ambiguity_note", ""),
+    } for item in normalized if item["ambiguous"]]
+
+    companies = len({item["company"] for item in facts})
+    exploratory_shape = (len(facts) >= 30 and companies >= 3
+                         and inclusive["supported"] >= 12
+                         and inclusive["not_supported"] >= 12)
+    metrics = {
+        "reference_mode": reference_mode,
+        "acceptance_gate_applicable": reference_mode == "human",
+        "companies": companies,
+        "facts": {"inclusive": inclusive, "definitive": definitive},
+        "questions": {
+            "total": len(questions),
+            "definitive": len(definitive_questions),
+            "ambiguous": len(questions) - len(definitive_questions),
+            "inclusive_exact_agreement": _rate(inclusive_question_matches, len(questions)),
+            "definitive_exact_agreement": _rate(definitive_question_matches, len(definitive_questions)),
+            "results": question_results,
+        },
+        "ambiguous_cases": ambiguous_cases,
+        "ambiguity_effect": {
+            "fact_supported_vs_not_supported_accuracy_delta": (
+                None if inclusive["supported_vs_not_supported_accuracy"] is None
+                or definitive["supported_vs_not_supported_accuracy"] is None else
+                round(inclusive["supported_vs_not_supported_accuracy"]
+                      - definitive["supported_vs_not_supported_accuracy"], 4)),
+            "fact_exact_three_grade_agreement_delta": (
+                None if inclusive["exact_three_grade_agreement"] is None
+                or definitive["exact_three_grade_agreement"] is None else
+                round(inclusive["exact_three_grade_agreement"]
+                      - definitive["exact_three_grade_agreement"], 4)),
+        },
+        "exploratory_shape_evaluable": exploratory_shape,
+    }
+    # Preserve the original top-level names for existing human-mode consumers.
+    metrics.update({
+        "total": len(normalized), "supported": inclusive["supported"],
+        "negative": inclusive["not_supported"], "questions_count": len(questions),
+        "false_acceptances": inclusive["not_supported_accepted"],
+        "false_rejections": inclusive["supported_rejected"],
+        "supported_facts_retained": inclusive["supported_retained"],
+        "missing_predictions": inclusive["missing_predictions"] + sum(
+            item["predicted_grade"] is None for item in question_results),
+        "false_acceptance_rate": inclusive["false_acceptance_rate"],
+        "false_rejection_rate": inclusive["false_rejection_rate"],
+        "supported_fact_retention": inclusive["supported_fact_retention"],
+        "question_verdict_accuracy": metrics["questions"]["definitive_exact_agreement"],
+    })
+    metrics["provisional_gates_evaluable"] = bool(
+        reference_mode == "human" and exploratory_shape
+        and metrics["missing_predictions"] == 0
     )
-    metrics["provisional_gates_passed"] = (metrics["provisional_gates_evaluable"]
+    metrics["provisional_gates_passed"] = bool(
+        metrics["provisional_gates_evaluable"]
         and metrics["false_acceptance_rate"] <= .10
         and metrics["false_rejection_rate"] <= .20
-        and metrics["supported_fact_retention"] >= .70)
+        and metrics["supported_fact_retention"] >= .70
+    )
+
     latencies = [item.get("latency_seconds") for item in runs
                  if isinstance(item.get("latency_seconds"), (int, float))]
-    tokens = [item.get("tokens") for item in runs
-              if isinstance(item.get("tokens"), (int, float))]
+    token_fields = ("input_tokens", "output_tokens", "thinking_tokens", "total_tokens")
+    usage = {field: sum(item.get(field, 0) for item in runs
+                        if isinstance(item.get(field), (int, float))) for field in token_fields}
+    legacy_tokens = sum(item.get("tokens", 0) for item in runs
+                        if isinstance(item.get("tokens"), (int, float)))
     metrics["model_evaluation_runs"] = len(runs)
-    metrics["tokens_total"] = sum(tokens)
+    metrics["usage"] = usage
+    metrics["tokens_total"] = usage["total_tokens"] or legacy_tokens
+    metrics["missing_usage_runs"] = sum(not any(isinstance(item.get(field), (int, float))
+                                                    for field in (*token_fields, "tokens"))
+                                          for item in runs)
     metrics["latency_seconds_total"] = round(sum(latencies), 4)
     metrics["latency_seconds_mean"] = (None if not latencies else round(sum(latencies) / len(latencies), 4))
-    metrics["provider_failures"] = sum(bool(item.get("provider_failure")) for item in runs)
+    metrics["provider_failures"] = sum(bool(item.get("provider_failure"))
+                                       or item.get("status") == "provider_failure" for item in runs)
+    metrics["incomplete_responses"] = sum(bool(item.get("incomplete_response"))
+                                           or item.get("status") == "incomplete_response" for item in runs)
     return metrics
+
+
+def evaluate_human_labels(labels, predictions, runs=()):
+    """Backward-compatible human-reference evaluator."""
+    return evaluate_reference_labels(labels, predictions, runs, reference_mode="human")

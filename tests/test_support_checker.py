@@ -11,6 +11,7 @@ from gtm_research.agent import run_research
 from gtm_research.model import ModelError, RetryableModelError
 from gtm_research.support import (
     accept_verified_candidate, candidate_for_verification, evaluate_human_labels,
+    evaluate_reference_labels,
     validate_verdict,
 )
 from helpers import FakeModel, brief, fetch, fixture_reader, submit
@@ -252,6 +253,41 @@ class EvaluationMetricTests(unittest.TestCase):
         self.assertFalse(metrics["provisional_gates_passed"])
         self.assertEqual(metrics["tokens_total"], 120)
         self.assertEqual(metrics["provider_failures"], 1)
+
+    def test_ai_exploratory_metrics_separate_binary_exact_ambiguity_and_questions(self):
+        labels = [
+            {"case_id": "F1", "company": "A", "kind": "fact", "ai_label": "supported", "ambiguous": False},
+            {"case_id": "F2", "company": "B", "kind": "fact", "ai_label": "partial", "ambiguous": False},
+            {"case_id": "F3", "company": "C", "kind": "fact", "ai_label": "unsupported", "ambiguous": True,
+             "ambiguity_note": "Central assertion is debatable."},
+            {"case_id": "Q1", "company": "A", "kind": "question", "ai_label": "unsupported", "ambiguous": False},
+            {"case_id": "KERI-Q002", "company": "A", "kind": "question", "ai_label": "unsupported", "ambiguous": True,
+             "ambiguity_note": "Neutral question versus presupposition."},
+        ]
+        predictions = [
+            {"case_id": "F1", "grade": "supported"},
+            {"case_id": "F2", "grade": "unsupported"},
+            {"case_id": "F3", "grade": "supported"},
+            {"case_id": "Q1", "grade": "unsupported"},
+            {"case_id": "KERI-Q002", "grade": "neutral"},
+        ]
+        metrics = evaluate_reference_labels(labels, predictions, [{
+            "input_tokens": 100, "output_tokens": 20, "total_tokens": 120,
+            "latency_seconds": 1.25, "provider_failure": True,
+            "incomplete_response": True,
+        }], "ai-exploratory")
+        self.assertFalse(metrics["acceptance_gate_applicable"])
+        self.assertFalse(metrics["provisional_gates_evaluable"])
+        self.assertEqual(metrics["facts"]["inclusive"]["supported_vs_not_supported_accuracy"], .6667)
+        self.assertEqual(metrics["facts"]["definitive"]["supported_vs_not_supported_accuracy"], 1.0)
+        self.assertEqual(metrics["facts"]["inclusive"]["exact_three_grade_agreement"], .3333)
+        self.assertEqual(metrics["questions"]["definitive_exact_agreement"], 1.0)
+        keri = next(item for item in metrics["questions"]["results"] if item["case_id"] == "KERI-Q002")
+        self.assertFalse(keri["included_in_definitive_accuracy"])
+        self.assertEqual(keri["predicted_grade"], "neutral")
+        self.assertEqual(metrics["usage"]["total_tokens"], 120)
+        self.assertEqual(metrics["provider_failures"], 1)
+        self.assertEqual(metrics["incomplete_responses"], 1)
 
 
 if __name__ == "__main__":

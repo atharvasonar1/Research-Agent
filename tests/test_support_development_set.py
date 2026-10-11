@@ -6,7 +6,7 @@ from pathlib import Path
 import unittest
 
 from scripts.render_support_development_set import (
-    render, summary, validate_dataset, verifier_cases,
+    ai_reference_labels, render, summary, validate_dataset, verifier_cases,
 )
 
 
@@ -78,6 +78,24 @@ class SupportDevelopmentSetTests(unittest.TestCase):
             self.assertEqual(case["reviewer_provenance"]["label_authority"], "ai_proposed")
             self.assertFalse(case["reviewer_provenance"]["human_approval"])
 
+    def test_ai_review_retains_proposals_and_marks_only_named_ambiguities(self):
+        active = self.data["cases"]
+        self.assertTrue(all(case["ai_review"]["grade"] == case["proposed_grade"] for case in active))
+        self.assertTrue(all(case["ai_review"]["human_approval"] is False for case in active))
+        ambiguous = {case["case_id"] for case in active if case["ai_review"]["status"] == "ambiguous"}
+        self.assertEqual(ambiguous, {"KERI-F010", "KERI-F014", "JILLS-F009", "KERI-Q002"})
+        keri_q2 = next(case for case in active if case["case_id"] == "KERI-Q002")
+        self.assertEqual(keri_q2["proposed_grade"], "unsupported")
+        self.assertEqual(keri_q2["ai_review"]["grade"], "unsupported")
+
+    def test_ai_reference_export_is_separate_from_verifier_input(self):
+        labels = ai_reference_labels(self.data)
+        self.assertEqual(len(labels), len(self.data["cases"]))
+        self.assertTrue(all(item["reviewer_kind"] == "ai" for item in labels))
+        verifier = json.dumps(verifier_cases(self.data))
+        for forbidden in ("ai_label", "ambiguity_note", "ChatGPT", "proposed_unreviewed"):
+            self.assertNotIn(forbidden, verifier)
+
     def test_label_rubric_and_keri_strategy_revision_are_explicit(self):
         rubric = self.data["label_policy"]["rubric"]
         self.assertIn("entire claim", rubric["supported"])
@@ -119,7 +137,7 @@ class SupportDevelopmentSetTests(unittest.TestCase):
 
     def test_verifier_export_contains_no_label_or_review_fields(self):
         payload = verifier_cases(self.data)
-        forbidden = {"proposed_grade", "unsupported_clause", "explanation", "label_status", "label_history", "case_history",
+        forbidden = {"proposed_grade", "unsupported_clause", "explanation", "label_status", "label_history", "case_history", "ai_review",
                      "reviewer_provenance", "case_origin", "origin_reference"}
         for case in payload["cases"]:
             self.assertTrue(forbidden.isdisjoint(case))

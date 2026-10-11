@@ -54,9 +54,11 @@ def main(argv: list[str] | None = None) -> int:
     saved.add_argument("--output-dir", default="runs/support-check")
     saved.add_argument("--timeout", type=positive_float, default=30)
     evaluate = subparsers.add_parser("evaluate-support", help="Score verifier predictions against human labels")
-    evaluate.add_argument("labels", help="Human-labeled JSON array")
+    evaluate.add_argument("labels", help="Reference-label JSON array matching --reference-mode")
     evaluate.add_argument("predictions", help="Verifier prediction JSON array")
-    evaluate.add_argument("--runs", help="Optional JSON array with tokens, latency_seconds, and provider_failure")
+    evaluate.add_argument("--runs", help="Optional JSON array with usage, latency_seconds, provider_failure, and incomplete_response")
+    evaluate.add_argument("--reference-mode", choices=("human", "ai-exploratory"), default="human",
+                          help="Reference authority; AI mode is exploratory and cannot pass acceptance gates")
     args = parser.parse_args(argv)
     if args.command is None:
         parser.print_help()
@@ -75,11 +77,13 @@ def main(argv: list[str] | None = None) -> int:
             runs = json.loads(Path(args.runs).read_text(encoding="utf-8")) if args.runs else []
             if not isinstance(labels, list) or not isinstance(predictions, list) or not isinstance(runs, list):
                 raise ValueError
-            from .support import evaluate_human_labels
-            metrics = evaluate_human_labels(labels, predictions, runs)
+            from .support import evaluate_reference_labels
+            metrics = evaluate_reference_labels(labels, predictions, runs, args.reference_mode)
         except (OSError, UnicodeError, ValueError, KeyError, TypeError):
             parser.error("labels and predictions must be valid JSON arrays with the documented fields")
         print(json.dumps(metrics, indent=2))
+        if args.reference_mode == "ai-exploratory":
+            return 0 if metrics["exploratory_shape_evaluable"] else 1
         return 0 if metrics["provisional_gates_evaluable"] else 1
 
     if args.command == "verify-saved":
