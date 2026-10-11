@@ -24,6 +24,7 @@ class CliSmokeTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("research", result.stdout)
         self.assertIn("verify-saved", result.stdout)
+        self.assertIn("verify-development-set", result.stdout)
         self.assertIn("evaluate-support", result.stdout)
 
     def test_version_matches_installed_package(self):
@@ -107,6 +108,44 @@ class CliSmokeTests(unittest.TestCase):
                                "--output-dir", directory])
             self.assertEqual(result, 0)
             outputs = list(Path(directory).glob("*/verified-brief.json"))
+            self.assertEqual(len(outputs), 1)
+
+    def test_verify_development_set_uses_label_free_input_without_reader(self):
+        from pathlib import Path
+        class Checker:
+            provider = "gemini"
+            model = "test-model"
+            def verify(self, payload, timeout):
+                self.payload = payload
+                return {"fact_verdicts": [{
+                    "fact_id": "F1", "grade": "supported",
+                    "explanation": "Supported.", "unsupported_clause": "",
+                }], "question_verdicts": [], "usage": {"total_tokens": 10}}
+            def close(self):
+                pass
+        checker = Checker()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            env = root / ".env.local"
+            env.write_text("GEMINI_API_KEY=hidden-key\n")
+            evidence = {"snapshot_id": "snap", "source_id": "S1", "evidence_id": "E1",
+                        "url": "https://example.test/", "fetched_at": "2026-01-01T00:00:00Z",
+                        "start": 0, "end": 5, "text": "Acme."}
+            source = root / "input.json"
+            source.write_text(json.dumps({
+                "schema_version": "support-verifier-development-input-v1",
+                "cases": [{"case_id": "ACME-F001", "kind": "fact",
+                           "candidate_claim": {"subject": "The site", "relation": "names", "value": "Acme"},
+                           "evidence_refs": [evidence]}],
+            }))
+            with patch("gtm_research.gemini.GeminiSupportVerifier", return_value=checker), \
+                 patch("builtins.print"):
+                result = main(["verify-development-set", str(source), "--provider", "gemini",
+                               "--model", "test-model", "--env-file", str(env),
+                               "--output-dir", str(root / "runs")])
+            self.assertEqual(result, 0)
+            self.assertEqual(checker.payload["facts"][0]["fact_id"], "F1")
+            outputs = list((root / "runs").glob("*/verifier-predictions.json"))
             self.assertEqual(len(outputs), 1)
 
     def test_ai_exploratory_scoring_never_activates_human_gate(self):

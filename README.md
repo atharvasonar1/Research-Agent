@@ -135,21 +135,34 @@ company. The shape and class-balance gates are met; all labels remain proposed a
 unreviewed, so the set is not ready for reference evaluation.
 
 The AI-label export is for exploratory scoring only and is never verifier input.
-After verifier predictions and run measurements exist, score it with:
+Run the batch verifier once, without website access, using the label-free export:
+
+```sh
+gtm-research verify-development-set \
+  /tmp/factual-support-verifier-input.json \
+  --provider gemini --model gemini-3.1-flash-lite \
+  --env-file .env.local --output-dir runs/support-development \
+  --timeout 60
+```
+
+The command creates a unique ignored output directory and prints its path. It
+makes one verifier request and permits only one retry after HTTP 503. It stores
+the exact label-free input, stable-ID mapping, prompt version, input hash,
+predictions, tokens, request latency, provider failures, and incomplete results.
+Use that printed directory to score the result:
 
 ```sh
 gtm-research evaluate-support \
   /tmp/factual-support-ai-labels.json \
-  runs/support-development/verifier-predictions.json \
-  --runs runs/support-development/verifier-runs.json \
+  runs/support-development/<run-id>/verifier-predictions.json \
+  --runs runs/support-development/<run-id>/verifier-runs.json \
   --reference-mode ai-exploratory
 ```
 
 This reports supported-versus-not-supported filtering, exact three-grade
 agreement, ambiguity sensitivity, separate question results, usage, latency,
 provider failures, and incomplete responses. AI mode cannot satisfy the human
-acceptance gate. `verify-saved` accepts a research trace, but no batch command yet
-turns the development-set export into the prediction and run files above.
+acceptance gate.
 
 Each invocation creates a unique ignored `runs/<id>/` directory containing
 `trace.json` and `result.json`. A verifier-accepted run also writes `brief.json` and

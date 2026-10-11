@@ -112,6 +112,8 @@ def verifier_cases(data):
         item["candidate_claim" if case["kind"] == "fact" else "candidate_question"] = (
             case["candidate_claim"] if case["kind"] == "fact" else case["candidate_question"]
         )
+        if case["kind"] == "question":
+            item["premise_case_ids"] = case.get("premise_case_ids", [])
         result.append(item)
     return {"schema_version": "support-verifier-development-input-v1", "cases": result}
 

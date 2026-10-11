@@ -53,6 +53,16 @@ def main(argv: list[str] | None = None) -> int:
     saved.add_argument("--model", help="Verifier model ID")
     saved.add_argument("--output-dir", default="runs/support-check")
     saved.add_argument("--timeout", type=positive_float, default=30)
+    development = subparsers.add_parser(
+        "verify-development-set",
+        help="Verify one label-free development-set export without website access",
+    )
+    development.add_argument("input", help="Label-free support-verifier development input JSON")
+    development.add_argument("--provider", choices=("openai", "gemini"), help="Verifier provider")
+    development.add_argument("--env-file", help="Explicit local configuration file")
+    development.add_argument("--model", help="Verifier model ID")
+    development.add_argument("--output-dir", default="runs/support-development")
+    development.add_argument("--timeout", type=positive_float, default=60)
     evaluate = subparsers.add_parser("evaluate-support", help="Score verifier predictions against human labels")
     evaluate.add_argument("labels", help="Reference-label JSON array matching --reference-mode")
     evaluate.add_argument("predictions", help="Verifier prediction JSON array")
@@ -85,6 +95,39 @@ def main(argv: list[str] | None = None) -> int:
         if args.reference_mode == "ai-exploratory":
             return 0 if metrics["exploratory_shape_evaluable"] else 1
         return 0 if metrics["provisional_gates_evaluable"] else 1
+
+    if args.command == "verify-development-set":
+        provider = args.provider or config.get("VERIFIER_PROVIDER") or config.get("RESEARCH_PROVIDER", "openai")
+        prefix = "GEMINI" if provider == "gemini" else "OPENAI"
+        model_name = args.model or config.get("VERIFIER_MODEL") or config.get(f"{prefix}_MODEL")
+        if not model_name:
+            parser.error(f"provide --model, VERIFIER_MODEL, or {prefix}_MODEL")
+        api_key = config.get(f"{prefix}_API_KEY", "")
+        if not api_key.strip():
+            parser.error(f"set {prefix}_API_KEY; credentials are never accepted as CLI arguments")
+        try:
+            data = json.loads(Path(args.input).read_text(encoding="utf-8"))
+            from .support import development_verifier_payload
+            development_verifier_payload(data)
+        except (OSError, UnicodeError, ValueError, KeyError, TypeError) as exc:
+            parser.error(f"development input is invalid: {exc}")
+        from .development import run_development_verifier
+        from .gemini import GeminiSupportVerifier
+        from .model import OpenAISupportVerifier
+        try:
+            verifier = (GeminiSupportVerifier(model_name, api_key) if provider == "gemini"
+                        else OpenAISupportVerifier(model_name, api_key))
+        except ValueError:
+            parser.error("invalid provider model configuration")
+        try:
+            result = run_development_verifier(verifier, data, args.output_dir, args.timeout)
+        except OSError:
+            print("Could not write local run artifacts; check the output directory.")
+            return 1
+        finally:
+            verifier.close()
+        print(json.dumps(result, indent=2))
+        return 0 if result["status"] == "completed" else 1
 
     if args.command == "verify-saved":
         provider = args.provider or config.get("VERIFIER_PROVIDER") or config.get("RESEARCH_PROVIDER", "openai")

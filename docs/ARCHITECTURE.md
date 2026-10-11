@@ -183,5 +183,8 @@ account support before migration. It is not a fallback for availability errors.
 - The bounded checker experiment is implemented without a repair or synthesis
   pass. AI-reviewed development labels support exploratory scoring only. Its
   model-quality gates remain unevaluated until the labels receive independent
-  human approval. A batch adapter from the label-free development export to saved
-  verifier predictions and run measurements is still missing.
+  human approval. `verify-development-set` maps stable case IDs to bounded verifier
+  IDs, sends one label-free batch, permits one retry only after HTTP 503, validates
+  complete unique verdict coverage, restores stable IDs, and records the model,
+  prompt version, input hash, tokens, latency, provider failures, and incomplete
+  results for exploratory scoring.

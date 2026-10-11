@@ -40,6 +40,7 @@ not claims about the current live Keri Shull site.
 | Bounded factual-support checker | 151 passed in 1.790 s |
 | Development-only capture and three-company rebalance | 162 passed in 1.708 s; 11 focused integrity tests |
 | AI-reviewed exploratory scoring mode | 166 passed in 1.697 s; 13 dataset integrity tests |
+| Development-set batch verifier adapter | 172 passed in 1.655 s; 6 focused adapter/CLI tests |
 
 Coverage includes correction after invalid evidence; unfetched and wrong-page
 citations; external, undiscovered, private, mixed, multicast, and rebound DNS
@@ -216,8 +217,8 @@ After predictions exist, exploratory AI-reference scoring is available with:
 ```sh
 gtm-research evaluate-support \
   /tmp/factual-support-ai-labels.json \
-  runs/support-development/verifier-predictions.json \
-  --runs runs/support-development/verifier-runs.json \
+  runs/support-development/<run-id>/verifier-predictions.json \
+  --runs runs/support-development/<run-id>/verifier-runs.json \
   --reference-mode ai-exploratory
 ```
 
@@ -235,10 +236,21 @@ gtm-research evaluate-support human-labels.json verifier-predictions.json \
 ```
 
 This reports whether the sample minimums are met before reporting the provisional
-gates as evaluable. It never generates or substitutes reference labels. The
-development-set batch verifier adapter that must create `verifier-predictions.json`
-and `verifier-runs.json` is not implemented; `verify-saved` only accepts one saved
-research trace and does not record latency.
+gates as evaluable. It never generates or substitutes reference labels.
+
+The label-free batch verifier command is:
+
+```sh
+gtm-research verify-development-set \
+  /tmp/factual-support-verifier-input.json \
+  --provider gemini --model gemini-3.1-flash-lite \
+  --env-file .env.local --output-dir runs/support-development \
+  --timeout 60
+```
+
+It makes no website request. One request is allowed, plus one retry only after
+HTTP 503. Its ignored run directory contains `verifier-input.json`,
+`verifier-predictions.json`, `verifier-runs.json`, and `verification.json`.
 
 Phase 1 requires a completed three-site pilot, manual grading of every fact,
 inference, and question premise, useful discovery coverage, and measured

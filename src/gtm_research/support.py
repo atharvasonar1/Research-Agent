@@ -1,6 +1,7 @@
 """Bounded semantic support checking and deterministic candidate filtering."""
 
 from copy import deepcopy
+from hashlib import sha256
 import json
 
 from jsonschema import Draft202012Validator
@@ -186,6 +187,137 @@ def parse_verifier_json(text):
     if not isinstance(value, dict):
         raise ValueError("verifier_invalid_json")
     return value
+
+
+DEVELOPMENT_INPUT_VERSION = "support-verifier-development-input-v1"
+EVIDENCE_INPUT_FIELDS = (
+    "snapshot_id", "source_id", "evidence_id", "url", "fetched_at",
+    "start", "end", "text",
+)
+
+
+def development_verifier_payload(data):
+    """Build label-free verifier input and stable-ID mappings from an export."""
+    if not isinstance(data, dict) or data.get("schema_version") != DEVELOPMENT_INPUT_VERSION:
+        raise ValueError("development_input_schema_version")
+    cases = data.get("cases")
+    if not isinstance(cases, list) or not cases:
+        raise ValueError("development_input_cases")
+    stable_ids = [case.get("case_id") for case in cases if isinstance(case, dict)]
+    if len(stable_ids) != len(cases) or any(not isinstance(item, str) or not item for item in stable_ids):
+        raise ValueError("development_input_case_id")
+    if len(set(stable_ids)) != len(stable_ids):
+        raise ValueError("development_input_duplicate_case_id")
+
+    facts = [case for case in cases if case.get("kind") == "fact"]
+    questions = [case for case in cases if case.get("kind") == "question"]
+    if len(facts) + len(questions) != len(cases) or len(facts) > 30 or len(questions) > 30:
+        raise ValueError("development_input_case_kind_or_limit")
+    fact_ids = {case["case_id"] for case in facts}
+    fact_map = {case["case_id"]: f"F{index}" for index, case in enumerate(facts, 1)}
+    question_map = {case["case_id"]: f"Q{index}" for index, case in enumerate(questions, 1)}
+
+    def evidence(case):
+        refs = case.get("evidence_refs")
+        if not isinstance(refs, list) or not refs:
+            raise ValueError(f"development_input_evidence:{case['case_id']}")
+        clean = []
+        for ref in refs:
+            if not isinstance(ref, dict) or any(field not in ref for field in EVIDENCE_INPUT_FIELDS):
+                raise ValueError(f"development_input_evidence:{case['case_id']}")
+            clean.append({field: ref[field] for field in EVIDENCE_INPUT_FIELDS})
+        return clean
+
+    model_facts = []
+    for case in facts:
+        claim = case.get("candidate_claim")
+        if not isinstance(claim, dict) or any(not isinstance(claim.get(field), str)
+                                              for field in ("subject", "relation", "value")):
+            raise ValueError(f"development_input_claim:{case['case_id']}")
+        model_facts.append({
+            "fact_id": fact_map[case["case_id"]],
+            "claim": {field: claim[field] for field in ("subject", "relation", "value")},
+            "evidence_refs": evidence(case),
+        })
+
+    model_questions = []
+    question_premises = {}
+    for case in questions:
+        question = case.get("candidate_question")
+        premises = case.get("premise_case_ids", [])
+        if not isinstance(question, str) or not question.strip():
+            raise ValueError(f"development_input_question:{case['case_id']}")
+        if (not isinstance(premises, list) or len(set(premises)) != len(premises)
+                or any(item not in fact_ids for item in premises)):
+            raise ValueError(f"development_input_question_premises:{case['case_id']}")
+        mapped = [fact_map[item] for item in premises]
+        question_premises[question_map[case["case_id"]]] = mapped
+        model_questions.append({
+            "question_id": question_map[case["case_id"]],
+            "question": question,
+            "premise_fact_ids": mapped,
+            "evidence_refs": evidence(case),
+        })
+
+    payload = {
+        "verifier_version": VERIFIER_VERSION,
+        "facts": model_facts,
+        "questions": model_questions,
+    }
+    canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True,
+                           separators=(",", ":")).encode("utf-8")
+    mapping = {
+        "facts": {model_id: stable_id for stable_id, model_id in fact_map.items()},
+        "questions": {model_id: stable_id for stable_id, model_id in question_map.items()},
+        "question_premises": question_premises,
+    }
+    return payload, mapping, sha256(canonical).hexdigest()
+
+
+def development_predictions(verdict, mapping):
+    """Validate complete verdict coverage and restore stable development IDs."""
+    errors = [
+        f"verifier_schema:{'.'.join(map(str, error.absolute_path)) or 'root'}:{error.validator}"
+        for error in list(Draft202012Validator(VERIFIER_SCHEMA).iter_errors(verdict))[:20]
+    ]
+    if errors:
+        return None, errors
+    fact_mapping = mapping["facts"]
+    question_mapping = mapping["questions"]
+    for kind, items, key, expected in (
+        ("fact", verdict.get("fact_verdicts", []), "fact_id", set(fact_mapping)),
+        ("question", verdict.get("question_verdicts", []), "question_id", set(question_mapping)),
+    ):
+        ids = [item.get(key) for item in items if isinstance(item, dict)]
+        errors.extend(f"verifier:{kind}:duplicate_id:{item}"
+                      for item in sorted({item for item in ids if ids.count(item) > 1}))
+        errors.extend(f"verifier:{kind}:unknown_id:{item}" for item in sorted(set(ids) - expected))
+        errors.extend(f"verifier:{kind}:missing_id:{item}" for item in sorted(expected - set(ids)))
+    if errors:
+        return None, errors
+
+    predictions = []
+    for kind, items, key, stable in (
+        ("fact", verdict["fact_verdicts"], "fact_id", fact_mapping),
+        ("question", verdict["question_verdicts"], "question_id", question_mapping),
+    ):
+        for item in items:
+            clause = item["unsupported_clause"].strip()
+            accepted = item["grade"] == "supported" if kind == "fact" else item["grade"] in ("neutral", "premise_supported")
+            if accepted and clause:
+                errors.append(f"verifier:{kind}:accepted_has_unsupported_clause:{item[key]}")
+            if not accepted and not clause:
+                errors.append(f"verifier:{kind}:missing_unsupported_clause:{item[key]}")
+            predictions.append({
+                "case_id": stable[item[key]], "kind": kind, "grade": item["grade"],
+                "explanation": item["explanation"], "unsupported_clause": item["unsupported_clause"],
+            })
+    if errors:
+        return None, errors
+    order = {stable_id: index for index, stable_id in enumerate(
+        list(fact_mapping.values()) + list(question_mapping.values()))}
+    predictions.sort(key=lambda item: order[item["case_id"]])
+    return predictions, []
 
 
 def _rate(numerator, denominator):
